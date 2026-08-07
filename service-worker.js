@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v22-3-5-reset-unites";
+const CACHE_VERSION = "firemap-v22-3-7-chief-only-end";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 

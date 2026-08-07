@@ -1304,3 +1304,15 @@ body[data-account-role="unit"] [data-vehicle-share]{display:inline-flex!importan
 .sms-shortcut-help li{margin:6px 0}
 .sms-shortcut-help code{padding:2px 5px;border-radius:5px;background:#111827}
 @media(max-width:620px){.sms-auto-title{align-items:flex-start}.sms-auto-actions{grid-template-columns:1fr}}
+
+
+/* FireMap V22.3.7 — fin d’événement réservée au 102 */
+body[data-account-role="unit"] #endCommandEvent,
+#view-assistant #endCommandEvent,
+#assistantView #endCommandEvent,
+#view-assistant [data-action="end-event"],
+#assistantView [data-action="end-event"],
+#view-assistant [data-action="end-intervention"],
+#assistantView [data-action="end-intervention"]{
+  display:none!important;
+}

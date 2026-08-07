@@ -205,11 +205,37 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
   function latestForVehicle(vehicleId){
     const event=activeCommandEvent();
     const matching=[...usages].filter(u=>String(u.vehicleId)===String(vehicleId));
-    const linked=event?.id
-      ? matching.filter(u=>String(u.eventId||"")===String(event.id))
-      : matching;
-    return (linked.length?linked:matching)
-      .sort((a,b)=>String(b.updatedAtText||b.createdAt||"").localeCompare(String(a.updatedAtText||a.createdAt||"")))[0]||null;
+
+    const activeLinked=event?.id
+      ? matching.filter(u=>
+          String(u.eventId||"")===String(event.id) &&
+          u.eventClosed!==true
+        )
+      : [];
+
+    const currentProfiles=matching.filter(u=>
+      u.eventClosed!==true &&
+      (
+        !u.eventId ||
+        u.resetAfterEventId ||
+        (event?.id && String(u.eventId||"")===String(event.id))
+      )
+    );
+
+    const candidates=activeLinked.length
+      ? activeLinked
+      : (currentProfiles.length ? currentProfiles : matching.filter(u=>u.eventClosed!==true));
+
+    return candidates
+      .sort((a,b)=>{
+        const aReset=a.resetAfterEventId?1:0;
+        const bReset=b.resetAfterEventId?1:0;
+        if(aReset!==bReset)return bReset-aReset;
+        const ad=Date.parse(a.updatedAt||a.createdAt||"")||0;
+        const bd=Date.parse(b.updatedAt||b.createdAt||"")||0;
+        if(bd!==ad)return bd-ad;
+        return String(b.updatedAtText||"").localeCompare(String(a.updatedAtText||""));
+      })[0]||null;
   }
   function openForVehicle(vehicleId){
     if(!$("vehicleUsageDialog")){
@@ -280,6 +306,9 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
     affected.forEach(item=>{
       item.eventClosed=true;
       item.eventClosedAt=completedAt;
+      item.updatedAt=completedAt;
+      item.updatedAtText=new Date(completedAt).toLocaleString("fr-CA");
+      queue(item);
     });
 
     const resetProfiles=[];
@@ -319,6 +348,7 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
       resetProfiles.push(clean);
     });
 
+    localStorage.removeItem(ACTIVE_EVENT_DATA);
     persist();
     render();
 

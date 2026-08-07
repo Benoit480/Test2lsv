@@ -402,6 +402,11 @@ document.addEventListener("click",event=>{
   const e=active();
   if(e)renderJournal(e);
 });$("endCommandEvent").onclick=()=>{
+  if(!window.fireMapAccount?.isChief?.()){
+    I.toast("Seul le compte 102 peut terminer un événement.");
+    return;
+  }
+
   const e=active();
   if(!e||!confirm("Terminer cet événement et réinitialiser toutes les unités?"))return;
 
@@ -413,6 +418,7 @@ document.addEventListener("click",event=>{
 
   activeId="";
   localStorage.removeItem(AC);
+  localStorage.removeItem(ACTIVE_EVENT_DATA);
   render();
 
   I.toast(
@@ -433,7 +439,19 @@ document.addEventListener("click",event=>{
       I.toast("Le Centre de commandement est réservé au compte 102.");
     }
   },true);
+  function applyEndEventPermission(){
+    const button=$("endCommandEvent");
+    const allowed=window.fireMapAccount?.isChief?.()===true;
+    if(button){
+      button.classList.toggle("hidden",!allowed);
+      button.disabled=!allowed;
+      button.setAttribute("aria-hidden",allowed?"false":"true");
+    }
+  }
+  applyEndEventPermission();
+
   window.addEventListener("firemap:account-changed",()=>{
+    applyEndEventPermission();
     if(!window.fireMapAccount?.canAccessCommand?.()&&document.querySelector("#view-command.active"))I.showView("vehicles");
   });
   $("commandGpsOpenMap")?.addEventListener("click",()=>I.showView("map"));
@@ -442,7 +460,17 @@ document.addEventListener("click",event=>{
   if(!target)return;
   window.fireMapVehicles?.showVehicle?.(target.dataset.commandGpsVehicle);
 });
-events=read(EC,[]);
+
+document.addEventListener("click",event=>{
+  const endButton=event.target.closest?.("#endCommandEvent");
+  if(endButton && !window.fireMapAccount?.isChief?.()){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    I.toast("Seul le compte 102 peut terminer un événement.");
+  }
+},true);
+
+  events=read(EC,[]);
   render();
   timer=setInterval(tick,1000);
   window.addEventListener("storage",render);

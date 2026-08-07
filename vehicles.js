@@ -136,12 +136,32 @@
     });
 
     const matching = [...merged.values()].filter(row => usageMatchesVehicle(row, vehicle));
+
     const linked = activeEvent?.id
-      ? matching.filter(row => String(row.eventId || "") === String(activeEvent.id))
-      : matching;
-    const candidates = linked.length ? linked : matching;
+      ? matching.filter(row =>
+          String(row.eventId || "") === String(activeEvent.id) &&
+          row.eventClosed !== true
+        )
+      : [];
+
+    const currentProfiles = matching.filter(row =>
+      row.eventClosed !== true &&
+      (
+        !row.eventId ||
+        row.resetAfterEventId ||
+        (activeEvent?.id && String(row.eventId || "") === String(activeEvent.id))
+      )
+    );
+
+    const candidates = linked.length
+      ? linked
+      : (currentProfiles.length ? currentProfiles : matching.filter(row => row.eventClosed !== true));
 
     return candidates.sort((a,b) => {
+      const aReset = a.resetAfterEventId ? 1 : 0;
+      const bReset = b.resetAfterEventId ? 1 : 0;
+      if (aReset !== bReset) return bReset - aReset;
+
       const ad = Date.parse(a.updatedAt || a.createdAt || "") || 0;
       const bd = Date.parse(b.updatedAt || b.createdAt || "") || 0;
       if (bd !== ad) return bd - ad;

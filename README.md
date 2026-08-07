@@ -54,3 +54,22 @@ Une nouvelle page `/import/` reçoit le SMS encodé depuis Apple Raccourcis puis
 ## V22.3.5 — Réinitialisation des unités à la fin de l’événement
 
 Lorsque le compte 102 termine l’événement, les fiches utilisées restent archivées dans l’événement terminé. De nouveaux profils propres sont créés pour les unités concernées : En caserne, 0 pompier, non alimenté, sorties fermées et pressions résiduelles vides.
+
+
+## V22.3.6 — Correction de la réinitialisation
+
+Correction du profil des unités après la fermeture d’un événement :
+
+- suppression de l’identifiant de l’ancien événement actif;
+- anciennes fiches exclues de l’affichage courant;
+- nouvelle fiche remise à zéro affichée en priorité;
+- archivage des anciennes fiches synchronisé.
+
+
+## V22.3.7 — Fin d’événement réservée au 102
+
+- Le bouton `Terminer l’événement` n’est disponible que dans le poste de commandement.
+- Seul le compte 102 peut l’utiliser.
+- L’Assistant d’intervention ne permet plus de terminer un événement.
+- Une protection JavaScript bloque aussi toute tentative d’un autre compte.
+- La réinitialisation des fiches d’unités reste déclenchée par la fermeture faite par le 102.
