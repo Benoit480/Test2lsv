@@ -1322,3 +1322,11 @@ body[data-account-role="unit"] #endCommandEvent,
   margin:8px 10px;padding:7px 9px;border:1px solid #334155;border-radius:9px;
   background:#080d15;color:#94a3b8;font-size:11px;font-weight:850;text-align:center
 }
+
+/* FireMap V24.0.0 — marqueur de build */
+.build-status-v24{
+  margin:9px 10px;padding:9px 10px;border:1px solid #22c55e;border-radius:10px;
+  background:#062015;text-align:center
+}
+.build-status-v24 strong{display:block;color:#bbf7d0}
+.build-status-v24 small{display:block;margin-top:2px;color:#86efac;font-size:10px}

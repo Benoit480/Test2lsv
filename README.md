@@ -85,3 +85,13 @@ Les fonctions existantes restent actives : tableau de bord, secteurs, journal au
 - Firebase transmet la fermeture à tous les appareils.
 - Les six unités sont remises à zéro.
 - L’historique reste conservé.
+
+
+## V24.0.0 — Base stable événements
+
+Cette version conserve les fonctions opérationnelles existantes (GPS, journal, secteurs,
+prévention, comptes véhicules, SMS et fiches véhicules), mais centralise la gestion
+de fermeture dans `event-manager.js`.
+
+Le cache PWA historique est volontairement désactivé dans cette version afin que les
+mises à jour GitHub soient réellement chargées sur iPhone.

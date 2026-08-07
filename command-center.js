@@ -477,7 +477,7 @@ document.addEventListener("click",event=>{
   document.querySelectorAll("[data-journal-filter]").forEach(button=>button.classList.toggle("active",button===filter));
   const e=active();
   if(e)renderJournal(e);
-});async function closeActiveCommandEvent(){
+});async function legacyCloseActiveCommandEvent_DISABLED(){
   if(!window.fireMapAccount?.isChief?.()){
     I.toast("Seul le compte 102 peut terminer un événement.");
     return false;
@@ -520,13 +520,21 @@ document.addEventListener("click",event=>{
   return true;
 }
 
-$("endCommandEvent").onclick=closeActiveCommandEvent;
+/* V24: fermeture gérée exclusivement par event-manager.js */
 
 window.addEventListener("firemap:call-active",e=>createEventFromActiveCall(e.detail||{}));
   window.fireMapCommandCenter={
     createFromActiveCall:createEventFromActiveCall,
     open:()=>{if(!window.fireMapAccount?.canAccessCommand?.())return I.toast("Le Centre de commandement est réservé au compte 102.");I.showView("command")},
-    getActiveEvent:active
+    getActiveEvent:active,
+    refresh:render,
+    getEvents:()=>events,
+    setActiveId:(id)=>{
+      activeId=String(id||"");
+      if(activeId)localStorage.setItem(AC,activeId);
+      else localStorage.removeItem(AC);
+      render();
+    }
   };
   document.addEventListener("click",event=>{
     const link=event.target.closest('[data-view="command"]');

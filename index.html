@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=24.0.0">
 </head>
 <body>
   <header class="topbar">
@@ -37,7 +37,10 @@
     <button data-view="inspections" class="drawer-link">✅ Inspections</button>
     <button data-view="search" class="drawer-link">🔎 Recherche d’adresse</button>
     <button id="switchVehicleAccount" class="drawer-link hidden">👤 Changer de compte</button>
-    <div class="app-version-badge">FireMap V23.0.0</div>
+    <div id="buildStatusV24" class="build-status-v24">
+      <strong>FireMap V24.0.0</strong>
+      <small>Gestion événements V24 active</small>
+    </div>
     <div class="drawer-separator"></div>
     <div class="sync-box"><span id="syncDot"></span><div><strong id="syncTitle">Connexion…</strong><small id="syncText">Vérification Firebase</small></div></div>
     <button id="installBtn" class="drawer-link hidden">📲 Installer l’application</button>
@@ -637,16 +640,17 @@
 
   <div id="toast" class="toast hidden"></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="firebase-sync.js"></script>
-  <script src="app.js"></script>
-  <script src="preplans.js"></script>
-  <script src="prevention.js"></script>
-  <script src="assistant.js"></script>
-  <script src="navigation.js"></script>
-  <script src="vehicle-accounts.js"></script>
-  <script src="vehicles.js"></script>
-  <script src="vehicle-usage.js"></script>
-  <script src="command-center.js"></script>
+  <script src="firebase-config.js?v=24.0.0"></script>
+  <script src="firebase-sync.js?v=24.0.0"></script>
+  <script src="app.js?v=24.0.0"></script>
+  <script src="preplans.js?v=24.0.0"></script>
+  <script src="prevention.js?v=24.0.0"></script>
+  <script src="assistant.js?v=24.0.0"></script>
+  <script src="navigation.js?v=24.0.0"></script>
+  <script src="vehicle-accounts.js?v=24.0.0"></script>
+  <script src="vehicles.js?v=24.0.0"></script>
+  <script src="vehicle-usage.js?v=24.0.0"></script>
+  <script src="command-center.js?v=24.0.0"></script>
+  <script src="event-manager.js?v=24.0.0"></script>
 </body>
 </html>

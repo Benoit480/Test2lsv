@@ -299,6 +299,21 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
     ];
   }
 
+  function resetFleetDefinition(){
+    const byNumber=new Map();
+    (vehicles()||[]).forEach(v=>{
+      const number=String(v.number||v.id||"");
+      if(number)byNumber.set(number,{
+        id:String(v.id||number),number,name:String(v.name||`Unité ${number}`)
+      });
+    });
+    const defaults=[
+      ["102","Chef 102"],["202","Autopompe 202"],["502","Échelle 502"],
+      ["602","Unité de soutien 602"],["802","Citerne 802"],["902","Pickup 902"]
+    ];
+    return defaults.map(([number,name])=>byNumber.get(number)||{id:number,number,name});
+  }
+
   function resetAllUnitsAfterEvent(eventId){
     const targetEventId=String(eventId||"");
     if(!targetEventId)return {archived:0,reset:0};
@@ -316,62 +331,62 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
     });
     usages=[...merged.values()];
 
-    const completedAt=new Date().toISOString();
+    const now=new Date();
+    const completedAt=now.toISOString();
     const affected=usages.filter(item=>String(item.eventId||"")===targetEventId);
 
+    // Archiver les fiches de l'événement terminé.
     affected.forEach(item=>{
       item.eventClosed=true;
       item.eventClosedAt=completedAt;
       item.updatedAt=completedAt;
-      item.updatedAtText=new Date(completedAt).toLocaleString("fr-CA");
+      item.updatedAtText=now.toLocaleString("fr-CA");
       queue(item);
     });
 
-    const resetProfiles=[];
-    resetFleetDefinition().forEach((vehicle,index)=>{
-      const vehicleId=String(vehicle.id||vehicle.number||"");
-      if(!vehicleId)return;
+    // Éviter d'empiler plusieurs resets du même événement.
+    usages=usages.filter(item=>String(item.resetAfterEventId||"")!==targetEventId);
 
-      const clean=canonical({
-        id:`reset-${vehicleId}-${Date.now()}-${index}`,
-        eventId:"",
-        sourceCallId:"",
-        vehicleId,
-        vehicleName:String(vehicle.name||`Unité ${vehicleId}`),
-        vehicleNumber:String(vehicle.number||vehicleId),
-        status:"station",
-        firefighters:0,
-        supplied:"no",
-        outlets:emptyResetOutlets(),
-        special:{
-          fourInch:{active:false,type:"4 po",pressure:"",sector:"",location:""},
-          deckGun:{active:false,type:"Canon",pressure:"",sector:"",location:""}
-        },
-        residualStart:"",
-        residualEnd:"",
-        notes:"",
-        createdAt:completedAt,
-        updatedAt:completedAt,
-        updatedAtText:new Date(completedAt).toLocaleString("fr-CA"),
-        resetAfterEventId:targetEventId,
-        eventClosed:false
-      });
+    const resetProfiles=resetFleetDefinition().map((vehicle,index)=>canonical({
+      id:`ready-${vehicle.number}-${Date.now()}-${index}`,
+      eventId:"",
+      sourceCallId:"",
+      vehicleId:String(vehicle.id||vehicle.number),
+      vehicleName:String(vehicle.name),
+      vehicleNumber:String(vehicle.number),
+      status:"station",
+      firefighters:0,
+      supplied:"no",
+      outlets:emptyResetOutlets(),
+      special:{
+        fourInch:{active:false,type:"4 po",pressure:"",sector:"",location:""},
+        deckGun:{active:false,type:"Canon",pressure:"",sector:"",location:""}
+      },
+      residualStart:"",
+      residualEnd:"",
+      notes:"",
+      createdAt:completedAt,
+      updatedAt:completedAt,
+      updatedAtText:now.toLocaleString("fr-CA"),
+      resetAfterEventId:targetEventId,
+      eventClosed:false
+    }));
 
-      usages.push(clean);
-      queue(clean);
-      resetProfiles.push(clean);
+    resetProfiles.forEach(item=>{
+      usages.push(item);
+      queue(item);
     });
 
     localStorage.removeItem(ACTIVE_EVENT_DATA);
     persist();
     render();
-
     window.dispatchEvent(new CustomEvent("firemap:vehicle-usages-ready"));
     window.dispatchEvent(new CustomEvent("firemap:vehicle-usage-updated",{
-      detail:{eventId:targetEventId,reset:true,archived:affected.length,profiles:resetProfiles}
+      detail:{eventId:targetEventId,reset:true,profiles:resetProfiles}
     }));
     window.fireMapVehicles?.refreshProfiles?.();
 
+    // Synchronisation non bloquante.
     affected.forEach(item=>syncVehicleUsageInBackground(item));
     resetProfiles.forEach(item=>syncVehicleUsageInBackground(item));
 
