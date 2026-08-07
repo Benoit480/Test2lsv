@@ -1,0 +1,7 @@
+SOURCE DES ADRESSES
+Recherche en direct : service de géocodage du ministère des Ressources naturelles et des Forêts du Québec.
+Référentiel québécois des adresses, licence Creative Commons Attribution 4.0.
+
+Le fichier BDOA_QC_v1 transmis par l'utilisateur a été vérifié. Il ne contenait aucune adresse associée à Louiseville ou au préfixe postal J5V. Aucune adresse n'a été inventée.
+
+Les résultats doivent être validés avant un usage opérationnel.

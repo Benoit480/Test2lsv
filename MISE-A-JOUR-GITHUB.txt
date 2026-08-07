@@ -1,0 +1,8 @@
+REMPLACEMENT COMPLET DU DEPOT
+
+1. Supprimer tous les fichiers actuels du dépôt GitHub.
+2. Décompresser FireMap-Louiseville-V22-3-1-Optimisee-Remplacement-Complet-GitHub.zip.
+3. Ajouter directement tous les fichiers contenus dans l’archive à la racine du dépôt.
+4. Ne pas ajouter le dossier parent : index.html doit être visible immédiatement à la racine.
+5. Attendre le déploiement GitHub Pages.
+6. Sur iPhone : fermer l’application, la rouvrir, puis actualiser.

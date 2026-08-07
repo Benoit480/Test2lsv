@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#05070b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FireMap">
+  <title>FireMap Louiseville</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <button id="menuBtn" class="header-btn" aria-label="Ouvrir le menu">☰</button>
+    <div><div class="eyebrow">SERVICE INCENDIE</div><h1>FireMap Louiseville</h1></div>
+    <button id="accountBadge" class="account-badge hidden" type="button" aria-label="Compte actif">
+      <span id="accountBadgeIcon">🚒</span>
+      <span><strong id="accountBadgeNumber">—</strong><small id="accountBadgeRole">Compte</small></span>
+    </button>
+    <button id="locateBtn" class="header-btn" aria-label="Ma position">⌖</button>
+  </header>
+
+  <aside id="drawer" class="drawer" aria-hidden="true">
+    <div class="drawer-head"><div><div class="eyebrow">SERVICE INCENDIE</div><h2>Louiseville</h2></div><button id="closeDrawer">×</button></div>
+    <button data-view="map" class="drawer-link active">🗺️ Carte opérationnelle</button>
+    <button data-view="assistant" class="drawer-link">🚨 Assistant d’intervention</button>
+    <button data-view="hydrants" class="drawer-link">🚰 Bornes-fontaines</button>
+    <button id="drawerAdd" class="drawer-link">➕ Ajouter</button>
+    <button data-view="preplans" class="drawer-link">🏢 Bâtiments</button>
+    <button data-view="prevention" class="drawer-link">🛡️ Mode prévention</button>
+    <button data-view="vehicles" class="drawer-link">🚒 Caserne et véhicules</button>
+    <button data-view="command" class="drawer-link">🚨 Centre de commandement</button>
+    <button data-view="inspections" class="drawer-link">✅ Inspections</button>
+    <button data-view="search" class="drawer-link">🔎 Recherche d’adresse</button>
+    <button id="switchVehicleAccount" class="drawer-link hidden">👤 Changer de compte</button>
+    <div class="drawer-separator"></div>
+    <div class="sync-box"><span id="syncDot"></span><div><strong id="syncTitle">Connexion…</strong><small id="syncText">Vérification Firebase</small></div></div>
+    <button id="installBtn" class="drawer-link hidden">📲 Installer l’application</button>
+  </aside>
+  <div id="backdrop" class="backdrop hidden"></div>
+
+  <main>
+    <section id="view-map" class="view active">
+      <div class="search-card compact">
+        <label for="addressSearch">Adresse d’intervention</label>
+        <div class="search-row"><input id="addressSearch" type="search" autocomplete="off" placeholder="Ex. 192 Notre-Dame ou 507 St-Laurent"><button id="voiceSearch" class="voice-btn" title="Recherche vocale" aria-label="Recherche vocale">🎤</button><button id="clearSearch">×</button></div>
+        <div id="searchStatus" class="muted"></div><div id="results" class="results"></div>
+      </div>
+      <div class="map-card">
+        <div class="map-toolbar"><div><strong>Carte opérationnelle</strong><span id="hydrantCount">Chargement…</span></div><div class="map-toolbar-actions"><button id="editModeBtn" class="edit-mode-btn" type="button" aria-pressed="false">✏️ Édition : NON</button><div class="layer-switches"><label class="switch"><input id="hydrantToggle" type="checkbox" checked><span></span> Bornes</label><label class="switch"><input id="buildingToggle" type="checkbox" checked><span></span> Bâtiments</label></div></div></div>
+        <div id="map"></div>
+      </div>
+      <details class="hydrant-legend"><summary>🎨 Légende des bornes</summary><div class="legend-grid"><span><i class="dot red"></i>Rouge — moins de 500 gal/min</span><span><i class="dot orange"></i>Orange — 500 à 999 gal/min</span><span><i class="dot green"></i>Vert — 1 000 à 1 499 gal/min</span><span><i class="dot blue"></i>Bleu — 1 500 gal/min et plus</span></div><div class="availability-legend"><span><i style="--c:#39d353"></i>Disponible</span><span><i style="--c:#ff9500"></i>À inspecter</span><span><i style="--c:#ff3b30"></i>Hors service</span><span><i style="--c:#9ca3af"></i>Inconnue</span></div></details>
+      <div id="interventionCard" class="intervention-card hidden">
+        <div class="intervention-head">
+          <div><small>INTERVENTION ACTIVE</small><strong id="selectedAddress"></strong><span id="nearestText">Calcul des ressources à proximité…</span></div>
+          <button id="clearIntervention" class="icon-close" aria-label="Fermer l’intervention">×</button>
+        </div>
+        <div class="action-row"><button id="nearestBtn" class="secondary">🚰 Afficher les bornes</button><button id="gpsBtn" class="primary">➤ Départ GPS</button></div>
+        <div class="nearest-panel">
+          <h3>3 bornes les plus proches</h3>
+          <div id="nearestList" class="nearest-list"></div>
+        </div>
+      </div>
+      <div class="recent-card favorites-card">
+        <div class="recent-head"><strong>⭐ Lieux favoris</strong><button id="addFavorite" class="text-btn">Ajouter l’adresse active</button></div>
+        <div id="favoritePlaces" class="recent-list"></div>
+      </div>
+      <div class="recent-card">
+        <div class="recent-head"><strong>Interventions récentes</strong><button id="clearHistory" class="text-btn">Effacer</button></div>
+        <div id="recentInterventions" class="recent-list"></div>
+      </div>
+    </section>
+
+
+    <section id="view-assistant" class="view">
+      <div class="section-title"><div><small>MODE OPÉRATIONNEL</small><h2>🚨 Assistant d’intervention</h2></div><button id="assistantBackMap" class="secondary small">🗺️ Carte</button></div>
+      <div class="assistant-address-card">
+        <label>Adresse de l’intervention</label>
+        <div class="assistant-address-row"><input id="assistantAddress" type="search" placeholder="Ex. 245 St-Laurent"><button id="assistantUseActive" class="secondary">Utiliser l’adresse active</button><button id="assistantLaunch" class="primary">Démarrer</button></div>
+        <div id="assistantSuggestions" class="results"></div>
+      </div>
+      <details id="smsImportCard" class="sms-import-card">
+        <summary>📩 Importer le SMS de répartition</summary>
+        <div class="sms-import-body">
+          <p>Copiez le message reçu de la répartition. FireMap détectera la nature de l’appel, l’adresse, le niveau d’alarme et les véhicules.</p>
+          <textarea id="dispatchSms" rows="5" placeholder="Collez ici le SMS de répartition…"></textarea>
+          <div class="sms-import-actions">
+            <button id="pasteDispatchSms" type="button" class="secondary">📋 Coller</button>
+            <button id="analyzeDispatchSms" type="button" class="primary">🚨 Créer l’appel actif</button>
+          </div>
+          <div id="dispatchPreview" class="dispatch-preview hidden" aria-live="polite"></div>
+        </div>
+      </details>
+      <div id="assistantEmpty" class="assistant-empty"><span>🚒</span><h3>Prêt pour un départ d’appel</h3><p>Saisissez une adresse ou utilisez l’adresse déjà sélectionnée sur la carte.</p></div>
+      <div id="assistantDashboard" class="hidden">
+        <div class="assistant-alert-head"><div><small>INTERVENTION ACTIVE</small><h2 id="assistantActiveAddress"></h2><span id="assistantPreplanStatus"></span></div><button id="assistantNavigate" class="primary">➤ Navigation intégrée</button></div>
+        <div id="assistantCritical" class="assistant-critical-grid"></div>
+        <section class="assistant-panel"><div class="assistant-panel-head"><h3>🚰 Bornes recommandées</h3><button id="assistantShowMap" class="secondary small">Voir sur la carte</button></div><div id="assistantHydrants" class="assistant-hydrant-list"></div></section>
+        <section id="assistantPreplanPanel" class="assistant-panel hidden"><div class="assistant-panel-head"><h3>🏢 Préplan du bâtiment</h3><button id="assistantOpenPreplan" class="primary small">Ouvrir le préplan complet</button></div><div id="assistantPreplanSummary"></div></section>
+
+        <section id="integratedNavigation" class="navigation-panel hidden" aria-live="polite">
+          <div class="navigation-top">
+            <div><small>NAVIGATION GPS</small><h3 id="navigationDestination">Destination</h3></div>
+            <button id="navigationClose" class="icon-close" aria-label="Arrêter la navigation">×</button>
+          </div>
+          <div class="navigation-stats">
+            <div><strong id="navigationDistance">—</strong><span>Distance restante</span></div>
+            <div><strong id="navigationDuration">—</strong><span>Temps estimé</span></div>
+            <div><strong id="navigationAccuracy">—</strong><span>Précision GPS</span></div>
+          </div>
+          <div class="navigation-next"><span id="navigationTurnIcon">➤</span><div><small>PROCHAINE MANŒUVRE</small><strong id="navigationInstruction">Calcul du trajet…</strong><span id="navigationStepDistance"></span></div></div>
+          <div class="navigation-actions"><button id="navigationRecalculate" class="secondary">↻ Recalculer</button><button id="navigationExternal" class="secondary">↗ Apple Plans / Google Maps</button><button id="navigationStop" class="danger">Arrêter</button></div>
+          <details class="navigation-itinerary"><summary>Afficher les indications</summary><ol id="navigationSteps"></ol></details>
+          <p id="navigationStatus" class="navigation-status">Demande de localisation…</p>
+        </section>
+        <div class="assistant-actions"><button id="assistantEnd" class="danger">Terminer l’intervention</button></div>
+      </div>
+    </section>
+
+    <section id="view-hydrants" class="view">
+      <div class="section-title"><div><small>RÉSEAU INCENDIE</small><h2>Bornes-fontaines</h2></div><button id="addHydrantTop" class="primary small">＋ Ajouter</button></div>
+      <div class="filter-row"><input id="hydrantSearch" type="search" placeholder="Rechercher numéro, rue, statut…"><select id="statusFilter"><option value="">Tous les statuts</option><option value="available">Disponible</option><option value="restricted">Restreinte</option><option value="out_of_service">Hors service</option><option value="unknown">Inconnue</option></select></div>
+      <div id="hydrantList" class="card-list"></div>
+    </section>
+
+
+    <section id="view-preplans" class="view">
+      <div class="section-title"><div><small>PRÉVENTION ET OPÉRATIONS</small><h2>Bâtiments</h2></div><button id="addBuildingTop" class="primary small">＋ Ajouter</button></div>
+      <div class="filter-row"><input id="buildingSearch" type="search" placeholder="Rechercher nom, adresse, risque…"><select id="riskFilter"><option value="">Tous les risques</option><option value="low">Faible</option><option value="medium">Moyen</option><option value="high">Élevé</option><option value="very_high">Très élevé</option></select></div>
+      <div id="buildingList" class="card-list"></div>
+    </section>
+
+
+    <section id="view-prevention" class="view">
+      <div class="section-title"><div><small>VISITES ET MISE À JOUR</small><h2>🛡️ Mode prévention</h2></div><button id="preventionBackMap" class="secondary small">🗺️ Carte</button></div>
+      <div id="preventionStats" class="stats-grid prevention-stats"></div>
+      <div class="filter-row prevention-filters">
+        <input id="preventionSearch" type="search" placeholder="Rechercher un bâtiment ou une adresse…">
+        <select id="preventionFilter"><option value="">Tous les bâtiments</option><option value="complete">Préplan complet</option><option value="incomplete">Informations incomplètes</option><option value="overdue">Visite à mettre à jour</option><option value="never">Jamais visité</option></select>
+      </div>
+      <div class="prevention-help card-item"><strong>Prévention liée aux bâtiments</strong><p>La visite met maintenant à jour automatiquement la fiche Bâtiment : FDC, électricité, gaz, risques, accès, observations et suivi.</p></div>
+      <div id="preventionBuildingList" class="card-list prevention-list"></div>
+    </section>
+
+    <section id="view-vehicles" class="view">
+      <div class="section-title"><div><small>RESSOURCES MOBILES</small><h2>🚒 Caserne et véhicules</h2></div><button id="vehiclesBackMap" class="secondary small">🗺️ Carte</button></div>
+      <section class="station-card">
+        <div class="station-card-head"><div class="station-icon">🚒</div><div><small>CASERNE PRINCIPALE</small><h3 id="stationNameDisplay">Caserne de Louiseville</h3><p id="stationAddressDisplay">Position configurable</p></div></div>
+        <div class="station-actions"><button id="showStationMap" class="secondary">Voir sur la carte</button><button id="navigateStation" class="primary">➤ Navigation</button><button id="editStation" class="secondary">⚙️ Modifier</button></div>
+      </section>
+      <div class="vehicle-toolbar"><div><strong>Flotte officielle</strong><span id="vehicleSyncStatus">Chargement…</span></div><button id="stopSharingAll" class="danger small hidden">Arrêter mon partage GPS</button></div>
+      <div id="vehicleList" class="vehicle-list"></div>
+    </section>
+
+    <section id="view-command" class="view command-view">
+      <div class="section-title"><div><small>CHEF DES OPÉRATIONS</small><h2>🚨 Centre de commandement</h2></div><button id="newCommandEvent" class="primary small">＋ Événement</button></div>
+      <div id="commandEmpty" class="assistant-empty"><span>🚨</span><h3>Aucun événement actif</h3><p>Créez un événement pour regrouper l’intervention et les fiches d’utilisation des véhicules.</p></div>
+      <div id="commandDashboard" class="hidden">
+        <section class="command-event-head"><div><small id="commandEventNumber">ÉVÉNEMENT</small><h2 id="commandEventAddress">—</h2><p id="commandEventType">—</p></div><div><strong id="commandElapsed">00:00</strong><span>Temps écoulé</span></div></section>
+        <div class="command-stats">
+          <article><strong id="commandVehicleCount">0</strong><span>🚒 Véhicules engagés</span></article>
+          <article class="green"><strong id="commandOnSceneCount">0</strong><span>🟢 Sur les lieux</span></article>
+          <article class="blue"><strong id="commandSuppliedCount">0</strong><span>🔵 Alimentés</span></article>
+          <article><strong id="commandFirefighterCount">0</strong><span>👨‍🚒 Pompiers</span></article>
+          <article><strong id="commandOutletCount">0</strong><span>💧 Sorties actives</span></article>
+          <article class="residual"><strong id="commandResidualMinimum">—</strong><span>📊 Résiduel minimum</span></article>
+        </div>
+        <div class="command-tabs"><button class="active" data-command-tab="vehicles">Véhicules</button><button data-command-tab="outlets">Sorties</button><button data-command-tab="sectors">Secteurs</button><button data-command-tab="gps">GPS</button><button data-command-tab="prevention">Prévention</button><button data-command-tab="journal">Journal</button><button data-command-tab="event">Événement</button></div>
+        <div id="commandPanelVehicles" class="command-panel"><div id="commandVehicleList" class="command-vehicle-grid"></div></div>
+        <div id="commandPanelOutlets" class="command-panel hidden"><div id="commandOutletList" class="command-outlet-list"></div></div><div id="commandPanelSectors" class="command-panel hidden">
+          <div class="command-sector-summary">
+            <div><strong id="commandActiveSectorCount">0</strong><span>Secteurs actifs</span></div>
+            <p>Regroupement automatique selon le secteur choisi dans chaque sortie.</p>
+          </div>
+          <div id="commandSectorList" class="command-sector-grid"></div>
+        </div>
+        <div id="commandPanelGps" class="command-panel hidden">
+          <div class="command-gps-head">
+            <div><small>LOCALISATION DES UNITÉS</small><h3>GPS en direct</h3><p>Les positions proviennent des comptes véhicules qui ont activé leur partage GPS.</p></div>
+            <button id="commandGpsOpenMap" class="primary">🗺️ Ouvrir la carte GPS</button>
+          </div>
+          <div id="commandGpsList" class="command-gps-grid"></div>
+        </div><div id="commandPanelPrevention" class="command-panel hidden">
+          <div id="commandPreventionEmpty" class="card-item">
+            <strong>Aucune fiche de prévention liée</strong>
+            <p>La recherche se fait automatiquement avec l’adresse de l’événement actif.</p>
+          </div>
+          <div id="commandPreventionContent" class="hidden">
+            <div class="command-prevention-head">
+              <div><small>FICHE DE PRÉVENTION</small><h2 id="commandPreventionTitle">Bâtiment</h2><p id="commandPreventionAddress">—</p></div>
+              <div class="command-prevention-actions">
+                <button id="commandOpenPrevention" class="primary">Ouvrir la fiche</button>
+                <button id="commandShowPreventionMap" class="secondary">Voir sur la carte</button>
+              </div>
+            </div>
+            <div class="command-prevention-grid">
+              <article class="critical"><span>⚠️</span><strong>Risques</strong><p id="commandPreventionRisks">Aucun risque inscrit</p></article>
+              <article><span>🚒</span><strong>FDC</strong><p id="commandPreventionFdc">Non inscrit</p></article>
+              <article><span>⚡</span><strong>Électricité</strong><p id="commandPreventionElectrical">Non inscrit</p></article>
+              <article><span>🔥</span><strong>Gaz</strong><p id="commandPreventionGas">Non inscrit</p></article>
+              <article><span>☣️</span><strong>Matières dangereuses</strong><p id="commandPreventionHazmat">Non inscrit</p></article>
+              <article><span>🚪</span><strong>Accès pompier</strong><p id="commandPreventionAccess">Non inscrit</p></article>
+            </div>
+            <section class="command-prevention-photos">
+              <h3>📸 Photos opérationnelles</h3>
+              <div id="commandPreventionPhotos" class="command-prevention-photo-grid"></div>
+            </section>
+          </div>
+        </div><div id="commandPanelJournal" class="command-panel hidden">
+          <section class="command-journal-toolbar">
+            <div class="command-journal-add">
+              <select id="commandJournalCategory">
+                <option value="command">Note du chef</option>
+                <option value="strategy">Changement de stratégie</option>
+                <option value="radio">Message radio</option>
+                <option value="safety">Sécurité</option>
+                <option value="victim">Victime</option>
+                <option value="utility">Service externe</option>
+                <option value="other">Autre</option>
+              </select>
+              <select id="commandJournalLevel">
+                <option value="info">Information</option>
+                <option value="attention">Attention</option>
+                <option value="important">Important</option>
+                <option value="critical">Critique</option>
+              </select>
+              <input id="commandJournalAuthor" placeholder="Auteur (optionnel)">
+              <input id="commandJournalText" placeholder="Ajouter une entrée au journal…">
+              <button id="commandJournalAdd" class="primary">Ajouter</button>
+            </div>
+            <div class="command-journal-filters">
+              <button class="active" data-journal-filter="all">Tout</button>
+              <button data-journal-filter="vehicle">Véhicules</button>
+              <button data-journal-filter="water">Alimentation</button>
+              <button data-journal-filter="outlet">Sorties</button>
+              <button data-journal-filter="pressure">Pressions</button>
+              <button data-journal-filter="command">Notes du chef</button>
+              <button data-journal-filter="critical">Critiques</button>
+            </div>
+          </section>
+          <div id="commandJournalSummary" class="command-journal-summary"></div>
+          <div id="commandJournalList" class="command-journal-timeline"></div>
+        </div>
+        <div id="commandPanelEvent" class="command-panel hidden"><div class="card-item"><p id="commandEventMeta"></p><button id="editCommandEvent" class="secondary">Modifier</button> <button id="endCommandEvent" class="danger">Terminer l’événement</button></div></div>
+      </div>
+    </section>
+
+    <section id="view-inspections" class="view">
+      <div class="section-title"><div><small>SUIVI</small><h2>Inspections</h2></div></div>
+      <div id="inspectionStats" class="stats-grid"></div><div id="inspectionList" class="card-list"></div>
+    </section>
+
+    <section id="view-search" class="view">
+      <div class="section-title"><div><small>RÉFÉRENTIEL OFFICIEL</small><h2>Recherche d’adresse</h2></div></div>
+      <div class="search-card"><label for="addressSearchFull">Adresse</label><div class="search-row"><input id="addressSearchFull" type="search" autocomplete="off" placeholder="Ex. 80 St-Paul, 507 Ste-Dorothée ou code postal"><button id="voiceSearchFull" class="voice-btn" title="Recherche vocale" aria-label="Recherche vocale">🎤</button><button id="clearSearchFull">×</button></div><div id="searchStatusFull" class="muted"></div><div id="resultsFull" class="results"></div></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button data-view="map" class="active">🗺️<span>Carte</span></button>
+    <button data-view="assistant">🚨<span>Intervention</span></button>
+    <button data-view="hydrants">🚰<span>Bornes</span></button>
+    <button id="bottomAdd" class="add-main">＋<span>Ajouter</span></button>
+    <button data-view="preplans">🏢<span>Bâtiments</span></button>
+    <button id="bottomMore">☰<span>Plus</span></button>
+  </nav>
+
+  <dialog id="hydrantDialog">
+    <form id="hydrantForm" method="dialog">
+      <div class="modal-head"><div><small id="modalKicker">BORNE-FONTAINE</small><h2 id="modalTitle">Ajouter une borne</h2></div><button type="button" id="closeModal">×</button></div>
+      <input type="hidden" id="hydrantId">
+      <div class="form-grid">
+        <label>Numéro / nom<input id="hydrantName" required placeholder="Ex. 02"></label>
+        <label>Statut<select id="hydrantStatus"><option value="available">Disponible</option><option value="restricted">Restreinte</option><option value="out_of_service">Hors service</option><option value="unknown">Inconnue</option></select></label>
+        <label class="wide">Adresse<input id="hydrantAddress" placeholder="Ex. 81 rue Sainte-Élisabeth"></label>
+        <label>Latitude<input id="hydrantLat" type="number" step="any" required></label>
+        <label>Longitude<input id="hydrantLng" type="number" step="any" required></label>
+        
+        <label>Type de sorties<select id="outletType"><option value="">Choisir le type de sorties</option><option value="1 × 4 po + 2 × 2,5 po">1 × 4 po + 2 × 2,5 po</option><option value="2 × 2,5 po">2 × 2,5 po</option></select></label>
+        <label>Couleur et débit<select id="flowRate" required><option value="">Choisir la couleur et le débit</option><option value="red">🔴 Rouge — moins de 500 gal/min</option><option value="orange">🟠 Orange — 500 à 999 gal/min</option><option value="green">🟢 Vert — 1 000 à 1 499 gal/min</option><option value="blue">🔵 Bleu — 1 500 gal/min et plus</option></select><small class="field-help">La couleur et la plage de débit sont enregistrées ensemble.</small></label>
+        <label>Date d’inspection<input id="inspectionDate" type="date"></label>
+        <label class="wide">Notes<textarea id="hydrantNotes" rows="3" placeholder="Informations opérationnelles"></textarea></label>
+      </div>
+      <p id="formHint" class="muted">Astuce : utilisez votre position ou touchez la carte avant d’ouvrir ce formulaire.</p>
+      <div class="modal-actions"><button type="button" id="deleteHydrant" class="danger hidden">Supprimer</button><span></span><button type="button" id="cancelModal" class="secondary">Annuler</button><button type="submit" id="saveBuildingButton" class="primary">Enregistrer</button></div>
+    </form>
+  </dialog>
+
+
+  <dialog id="addChoiceDialog" class="choice-dialog">
+    <div class="modal-head"><div><small>AJOUTER SUR LA CARTE</small><h2>Que voulez-vous ajouter?</h2></div><button type="button" id="closeChoice">×</button></div>
+    <div class="choice-grid"><button id="chooseHydrant" class="choice-card"><span>🚰</span><strong>Une borne-fontaine</strong><small>Conserve le formulaire actuel</small></button><button id="chooseBuilding" class="choice-card"><span>🏢</span><strong>Un bâtiment à risque</strong><small>Créer une fiche bâtiment</small></button></div>
+  </dialog>
+
+  <dialog id="commandEventDialog" class="vehicle-dialog">
+    <form id="commandEventForm" method="dialog">
+      <div class="modal-head"><div><small>GESTION D’ÉVÉNEMENT</small><h2 id="commandEventDialogTitle">Nouvel événement</h2></div><button type="button" id="closeCommandEventDialog">×</button></div>
+      <input type="hidden" id="commandEventId">
+      <div class="form-section"><div class="form-grid">
+        <label>Numéro<input id="commandEventNumberInput" required></label>
+        <label>Niveau d’alarme<select id="commandEventAlarmInput"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+        <label class="wide">Adresse<input id="commandEventAddressInput" required></label>
+        <label>Type d’intervention<input id="commandEventTypeInput"></label>
+        <label>Chef des opérations<input id="commandEventChiefInput"></label>
+        <label class="wide">Notes<textarea id="commandEventNotesInput" rows="3"></textarea></label>
+      </div></div>
+      <div class="modal-actions"><span></span><button type="button" id="cancelCommandEventDialog" class="secondary">Annuler</button><button type="submit" class="primary">Enregistrer</button></div>
+    </form>
+  </dialog>
+
+  
+  <dialog id="vehicleAccountDialog" class="vehicle-account-dialog">
+    <form id="vehicleAccountForm">
+      <div class="vehicle-account-brand">
+        <span>🚒</span><small>FIREMAP LOUISEVILLE</small>
+        <h2>Choisir le compte de l’unité</h2>
+        <p>Chaque compte est automatiquement lié à son véhicule.</p>
+      </div>
+      <div id="vehicleAccountGrid" class="vehicle-account-grid"></div>
+      <div class="vehicle-account-selected hidden" id="vehicleAccountSelected">
+        <div>
+          <span id="vehicleAccountSelectedIcon">🚒</span>
+          <div><small>COMPTE SÉLECTIONNÉ</small><strong id="vehicleAccountSelectedName">—</strong><span id="vehicleAccountSelectedRole">—</span></div>
+        </div>
+        <button type="submit" class="primary">Ouvrir ce compte</button>
+        <button type="button" id="vehicleAccountCancel" class="secondary hidden">Annuler</button>
+      </div>
+      <p class="vehicle-account-help">Le compte <strong>102</strong> est celui du chef et possède l’accès au Centre de commandement.</p>
+    </form>
+  </dialog>
+
+<dialog id="buildingDialog" class="building-dialog">
+    <form id="buildingForm" method="dialog">
+      <div class="modal-head"><div><small>BÂTIMENT À RISQUE</small><h2 id="buildingModalTitle">Ajouter un bâtiment</h2></div><button type="button" id="closeBuildingModal">×</button></div>
+      <input type="hidden" id="buildingId">
+      <div class="form-section"><h3>Informations générales</h3>
+        <p id="newBuildingHelp" class="new-building-help hidden">Inscrivez l’identité et l’emplacement du bâtiment. Après l’enregistrement, la fiche Prévention complète s’ouvrira automatiquement.</p>
+        <div class="form-grid">
+        <label>Nom du bâtiment<input id="buildingName" required placeholder="Ex. École secondaire"></label>
+        <label>Catégorie<select id="buildingCategory"><option value="other">Autre</option><option value="school">École</option><option value="care">CHSLD / résidence</option><option value="industry">Industrie</option><option value="commercial">Commerce</option><option value="gas_station">Station-service</option><option value="municipal">Municipal</option><option value="hazmat">Matières dangereuses</option></select></label>
+        <label class="wide">Adresse<input id="buildingAddress" required placeholder="Commencez à écrire une adresse"></label>
+        <label>Latitude<input id="buildingLat" type="number" step="any" required></label><label>Longitude<input id="buildingLng" type="number" step="any" required></label>
+        <label>Niveau de risque<select id="buildingRisk"><option value="low">Faible</option><option value="medium">Moyen</option><option value="high" selected>Élevé</option><option value="very_high">Très élevé</option></select></label>
+        <label>Nombre d’étages<input id="buildingFloors" type="number" min="0" value="1"></label>
+        <label>Sous-sol<select id="buildingBasement"><option value="no">Non</option><option value="yes">Oui</option><option value="partial">Partiel</option><option value="unknown">Inconnu</option></select></label>
+      </div></div>
+      <div class="form-section building-legacy-details"><h3>Préplan et opérations</h3><div class="form-grid">
+        <label class="wide">Risques particuliers<textarea id="buildingRisks" rows="3" placeholder="Construction, occupants, toiture, stockage…"></textarea></label>
+        <label class="wide">FDC / prise pompier<textarea id="buildingFdc" rows="2" placeholder="Emplacement, raccord, pression…"></textarea></label>
+        <label class="wide">Entrée et coupure électrique<textarea id="buildingElectrical" rows="2"></textarea></label>
+        <label class="wide">Gaz / propane<textarea id="buildingGas" rows="2"></textarea></label>
+        <label class="wide">Matières dangereuses<textarea id="buildingHazmat" rows="3" placeholder="Produits, quantité, emplacement, FDS…"></textarea></label>
+        <label class="wide">Accès pompier / boîte Knox / codes<textarea id="buildingAccess" rows="2"></textarea></label>
+        <label>Point de rassemblement<input id="buildingAssembly"></label><label>Côté d’attaque conseillé<input id="buildingAttackSide"></label>
+      </div></div>
+      <div class="form-section building-legacy-details"><h3>Responsable</h3><div class="form-grid"><label>Nom<input id="buildingContactName"></label><label>Téléphone<input id="buildingContactPhone" type="tel"></label></div></div>
+      <div class="form-section building-legacy-details"><h3>Plans et photos</h3><div class="form-grid">
+        <label class="wide">Lien du plan (PDF ou image)<input id="buildingPlanUrl" type="url" placeholder="https://..."><small class="field-help">Utilisez un lien accessible aux utilisateurs autorisés.</small></label>
+        <label class="wide">Liens des photos<textarea id="buildingPhotoUrls" rows="3" placeholder="Un lien par ligne"></textarea></label>
+        <label class="wide">Notes opérationnelles<textarea id="buildingNotes" rows="3"></textarea></label>
+      </div></div>
+      <div class="modal-actions"><button type="button" id="deleteBuilding" class="danger hidden">Supprimer</button><span></span><button type="button" id="cancelBuilding" class="secondary">Annuler</button><button type="submit" class="primary">Enregistrer</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="preplanDialog" class="preplan-dialog"><div id="preplanContent"></div></dialog>
+
+
+  <dialog id="preventionDialog" class="prevention-dialog">
+    <form id="preventionForm" method="dialog">
+      <input id="categoryCameraInput" type="file" accept="image/*" capture="environment" multiple hidden>
+      <input id="categoryImportInput" type="file" accept="image/*" multiple hidden>
+      <div class="modal-head"><div><small>FICHE BÂTIMENT — PRÉVENTION ET OPÉRATIONS</small><h2 id="preventionDialogTitle">Fiche du bâtiment</h2></div>
+      <div id="defaultReadOnlyBanner" class="default-readonly-banner">
+        🔒 FICHE EN LECTURE SEULE
+      </div><button type="button" id="closePreventionDialog">×</button></div>
+      <div id="interventionReadOnlyBanner" class="intervention-readonly-banner hidden">
+        🚨 MODE INTERVENTION — Consultation seulement
+      </div>
+      <input type="hidden" id="preventionBuildingId">
+      <div class="prevention-score-card"><div><small>PRÉPARATION OPÉRATIONNELLE</small><strong id="preventionScoreValue">0 %</strong></div><div class="score-track"><span id="preventionScoreBar"></span></div><p id="preventionScoreLabel">Informations à compléter</p></div>
+      <div class="form-section"><h3>Visite et responsable</h3><div class="form-grid">
+        <label>Inspecteur<input id="preventionInspector" placeholder="Nom de l’inspecteur"></label>
+        <label>Date de la visite<input id="preventionVisitDate" type="date"></label>
+        <label>Prochaine révision<input id="preventionNextReview" type="date"></label>
+        <label>Occupation maximale<input id="preventionOccupancy" type="number" min="0"></label>
+        <label class="wide">Code / consigne d’accès<input id="preventionAccessCode" placeholder="Boîte Knox, code, clé, personne à joindre…"></label>
+      </div></div>
+      <div class="form-section"><h3>Éléments vérifiés</h3><div class="prevention-check-grid">
+        <label><input id="pvElectricalPanel" type="checkbox">⚡ Panneau électrique localisé</label>
+        <label><input id="pvElectricalEntrance" type="checkbox">⚡ Entrée électrique identifiée</label>
+        <label><input id="pvGasEntrance" type="checkbox">🔥 Entrée / coupure de gaz identifiée</label>
+        <label><input id="pvWaterValve" type="checkbox">💧 Valve d’eau identifiée</label>
+        <label><input id="pvFdcAccessible" type="checkbox">🚒 FDC accessible</label>
+        <label><input id="pvSprinklers" type="checkbox">💦 Gicleurs présents</label>
+        <label><input id="pvGenerator" type="checkbox">🔋 Génératrice identifiée</label>
+        <label><input id="pvElevator" type="checkbox">🛗 Ascenseur</label>
+        <label><input id="pvDryStandpipe" type="checkbox">🧯 Colonne sèche / humide</label>
+      </div></div>
+      <div class="form-section"><h3>Risques particuliers présents</h3><div class="prevention-check-grid risk-checks">
+        <label><input id="prHazmat" type="checkbox">☣️ Matières dangereuses</label>
+        <label><input id="prChemicals" type="checkbox">🧪 Produits chimiques</label>
+        <label><input id="prPropane" type="checkbox">🔥 Propane</label>
+        <label><input id="prOxygen" type="checkbox">🫁 Oxygène</label>
+        <label><input id="prLithium" type="checkbox">🔋 Batteries au lithium</label>
+        <label><input id="prSolar" type="checkbox">☀️ Panneaux solaires</label>
+        <label><input id="prFuel" type="checkbox">⛽ Réservoirs de carburant</label>
+      </div></div>
+      <div class="form-section"><h3>Emplacements opérationnels</h3><div class="form-grid">
+        <label class="wide">Électricité<textarea id="pvElectricalNotes" rows="2" placeholder="Emplacement de l’entrée, du panneau et de la coupure"></textarea></label>
+        <label class="wide">Gaz / propane<textarea id="pvGasNotes" rows="2" placeholder="Emplacement de la valve ou du réservoir"></textarea></label>
+        <label class="wide">FDC / alimentation<textarea id="pvFdcNotes" rows="2" placeholder="Emplacement, raccord et accès"></textarea></label>
+        <label class="wide">Accès et sorties<textarea id="pvAccessNotes" rows="2" placeholder="Entrée pompier, sorties de secours, obstacles"></textarea></label>
+        <label class="wide">Matières dangereuses<textarea id="pvHazmatNotes" rows="2" placeholder="Produits, quantité et emplacement"></textarea></label>
+      </div></div>
+      <div class="form-section"><h3>Photos et documents</h3><div class="form-grid">
+        <label class="wide">Liens des photos<textarea id="pvPhotoUrls" rows="4" placeholder="Un lien par ligne : façade, FDC, électricité, gaz, toiture…"></textarea></label>
+        <label class="wide">Observations de la visite<textarea id="pvObservations" rows="4" placeholder="Anomalies, corrections demandées et notes de suivi"></textarea></label>
+      </div></div>
+      <section class="form-section"><h3>Historique des visites</h3><div id="preventionVisitHistory" class="visit-history"></div></section>
+      <div class="modal-actions building-main-actions">
+        <button type="button" id="openOperationalView" class="primary">🚨 Vue intervention</button>
+        <button type="button" id="editPreventionButton" class="secondary">✏️ Modifier</button>
+        <button type="button" id="cancelPreventionDialog" class="secondary">Fermer</button>
+        <button type="submit" id="savePreventionButton" class="primary hidden">Enregistrer la fiche</button>
+      </div>
+    </form>
+  </dialog>
+
+
+  <dialog id="operationalBuildingDialog" class="preplan-dialog operational-building-dialog">
+    <div class="operational-dialog-shell">
+      <div class="modal-head">
+        <div><small>MODE INTERVENTION</small><h2 id="operationalBuildingTitle">Fiche opérationnelle</h2></div>
+        <button type="button" id="closeOperationalBuilding">×</button>
+      </div>
+      <div id="operationalBuildingContent"></div>
+      <div class="modal-actions operational-dialog-actions">
+        <button type="button" id="operationalShowMap" class="secondary">🗺️ Carte</button>
+        <button type="button" id="operationalNavigate" class="primary">➤ Naviguer</button>
+        <button type="button" id="operationalEditBuilding" class="secondary">✏️ Modifier la fiche</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="vehicleDialog" class="vehicle-dialog">
+    <form id="vehicleForm" method="dialog">
+      <div class="modal-head"><div><small>VÉHICULE</small><h2 id="vehicleDialogTitle">Modifier le véhicule</h2></div><button type="button" id="closeVehicleDialog">×</button></div>
+      <input type="hidden" id="vehicleId">
+      <div class="form-grid">
+        <label>Appellation<input id="vehicleName" required></label>
+        <label>Numéro<input id="vehicleNumber" required></label>
+        <label>Type<select id="vehicleType"><option value="engine">Autopompe</option><option value="ladder">Échelle</option><option value="tanker">Citerne</option><option value="support">Unité de soutien</option><option value="pickup">Pickup</option><option value="chief">Chef</option></select></label>
+        <label>Statut<select id="vehicleStatus"><option value="station">À la caserne</option><option value="enroute">En route</option><option value="onscene">Sur les lieux</option><option value="water">Alimentation établie</option><option value="returning">Retour</option><option value="out">Hors service</option></select></label>
+        <label class="wide">Équipage / notes<input id="vehicleCrew" placeholder="Ex. 4 pompiers"></label>
+      </div>
+      <div class="modal-actions"><span></span><button type="button" id="cancelVehicleDialog" class="secondary">Annuler</button><button type="submit" class="primary">Enregistrer</button></div>
+    </form>
+  </dialog>
+
+
+  <dialog id="vehicleUsageDialog" class="vehicle-dialog vehicle-usage-dialog">
+    <form id="vehicleUsageForm" novalidate>
+      <div class="modal-head">
+        <div><small>UTILISATION EN INTERVENTION</small><h2 id="vehicleUsageTitle">Fiche véhicule</h2></div>
+        <button type="button" id="closeVehicleUsageDialog">×</button>
+      </div>
+
+      <input type="hidden" id="vehicleUsageId">
+      <div id="vehicleUsageEventLink" class="vehicle-usage-event-link">
+        🚨 Cette fiche sera liée automatiquement à l’événement actif du poste de commandement.
+      </div>
+
+      <div class="form-section">
+        <h3>🚒 Véhicule et état</h3>
+        <div class="form-grid">
+          <label class="wide">Véhicule
+            <select id="vehicleUsageVehicle" required></select>
+          </label>
+        </div>
+        <div class="quick-status-grid" id="vehicleUsageQuickStatus">
+          <button type="button" data-usage-status="station">🏠 En caserne</button>
+          <button type="button" data-usage-status="enroute">🚨 En route</button>
+          <button type="button" data-usage-status="onscene">📍 Arrivé sur les lieux</button>
+          <button type="button" data-usage-status="returning">↩️ Retour vers caserne</button>
+        </div>
+        <input type="hidden" id="vehicleUsageStatus" value="station">
+        <p id="vehicleUsageStatusText" class="usage-status-text">État : En caserne</p>
+      </div>
+
+      <div class="form-section">
+        <h3>👨‍🚒 Effectif</h3>
+        <div class="form-grid">
+          <label>Nombre de pompiers
+            <input id="vehicleUsageFirefighters" type="number" min="0" max="20" step="1" value="0">
+          </label>
+          <label>Alimenté
+            <select id="vehicleUsageSupplied">
+              <option value="no">Non</option>
+              <option value="hydrant">Oui — borne</option>
+              <option value="tanker">Oui — citerne</option>
+              <option value="relay">Oui — relais</option>
+              <option value="other">Oui — autre</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      
+
+      <div class="form-section">
+        <h3>💧 Panneau de pompe</h3>
+        <p class="pump-panel-help">Touchez une sortie pour la mettre en service. Elle passe alors au vert.</p>
+        <div class="pump-panel-grid">
+          <section class="pump-outlet-card" data-outlet-card="1">
+            <button type="button" class="pump-outlet-toggle" data-outlet-toggle="1"><span>Sortie 1</span><strong>Préconnect 1¾ po</strong><small>Non utilisée</small></button>
+            <input type="hidden" id="outlet1Active" value="false"><input type="hidden" id="outlet1Type" value="1¾ po">
+            <label>Pression (PSI)<input id="outlet1Pressure" type="number" min="0" step="1" inputmode="decimal"></label><label>Secteur d’opération<select id="outlet1Sector" class="outlet-sector-select"><option value="">Non précisé</option><option value="1">Secteur 1</option><option value="2">Secteur 2</option><option value="3">Secteur 3</option><option value="4">Secteur 4</option><option value="5">Secteur 5</option></select></label>
+            <label>Emplacement / Affectation<input id="outlet1Location" type="text" placeholder="Ex. Côté Alpha, attaque intérieure"></label>
+          </section>
+          <section class="pump-outlet-card" data-outlet-card="2">
+            <button type="button" class="pump-outlet-toggle" data-outlet-toggle="2"><span>Sortie 2</span><strong>Préconnect 1¾ po</strong><small>Non utilisée</small></button>
+            <input type="hidden" id="outlet2Active" value="false"><input type="hidden" id="outlet2Type" value="1¾ po">
+            <label>Pression (PSI)<input id="outlet2Pressure" type="number" min="0" step="1" inputmode="decimal"></label><label>Secteur d’opération<select id="outlet2Sector" class="outlet-sector-select"><option value="">Non précisé</option><option value="1">Secteur 1</option><option value="2">Secteur 2</option><option value="3">Secteur 3</option><option value="4">Secteur 4</option><option value="5">Secteur 5</option></select></label>
+            <label>Emplacement / Affectation<input id="outlet2Location" type="text" placeholder="Ex. Côté Alpha, attaque intérieure"></label>
+          </section>
+          <section class="pump-outlet-card" data-outlet-card="3">
+            <button type="button" class="pump-outlet-toggle" data-outlet-toggle="3"><span>Sortie 3</span><strong>Sortie de pompe</strong><small>Non utilisée</small></button>
+            <input type="hidden" id="outlet3Active" value="false"><label>Type de sortie<select id="outlet3Type"><option value="1¾ po">1¾ po</option><option value="2½ po">2½ po</option></select></label>
+            <label>Pression (PSI)<input id="outlet3Pressure" type="number" min="0" step="1" inputmode="decimal"></label><label>Secteur d’opération<select id="outlet3Sector" class="outlet-sector-select"><option value="">Non précisé</option><option value="1">Secteur 1</option><option value="2">Secteur 2</option><option value="3">Secteur 3</option><option value="4">Secteur 4</option><option value="5">Secteur 5</option></select></label>
+            <label>Emplacement / Affectation<input id="outlet3Location" type="text" placeholder="Ex. Côté Alpha, attaque intérieure"></label>
+          </section>
+          <section class="pump-outlet-card" data-outlet-card="4">
+            <button type="button" class="pump-outlet-toggle" data-outlet-toggle="4"><span>Sortie 4</span><strong>Sortie de pompe</strong><small>Non utilisée</small></button>
+            <input type="hidden" id="outlet4Active" value="false"><label>Type de sortie<select id="outlet4Type"><option value="1¾ po">1¾ po</option><option value="2½ po">2½ po</option></select></label>
+            <label>Pression (PSI)<input id="outlet4Pressure" type="number" min="0" step="1" inputmode="decimal"></label><label>Secteur d’opération<select id="outlet4Sector" class="outlet-sector-select"><option value="">Non précisé</option><option value="1">Secteur 1</option><option value="2">Secteur 2</option><option value="3">Secteur 3</option><option value="4">Secteur 4</option><option value="5">Secteur 5</option></select></label>
+            <label>Emplacement / Affectation<input id="outlet4Location" type="text" placeholder="Ex. Côté Alpha, attaque intérieure"></label>
+          </section>
+          <section class="pump-outlet-card" data-outlet-card="5">
+            <button type="button" class="pump-outlet-toggle" data-outlet-toggle="5"><span>Sortie 5</span><strong>Sortie de pompe</strong><small>Non utilisée</small></button>
+            <input type="hidden" id="outlet5Active" value="false"><label>Type de sortie<select id="outlet5Type"><option value="1¾ po">1¾ po</option><option value="2½ po">2½ po</option></select></label>
+            <label>Pression (PSI)<input id="outlet5Pressure" type="number" min="0" step="1" inputmode="decimal"></label><label>Secteur d’opération<select id="outlet5Sector" class="outlet-sector-select"><option value="">Non précisé</option><option value="1">Secteur 1</option><option value="2">Secteur 2</option><option value="3">Secteur 3</option><option value="4">Secteur 4</option><option value="5">Secteur 5</option></select></label>
+            <label>Emplacement / Affectation<input id="outlet5Location" type="text" placeholder="Ex. Côté Alpha, attaque intérieure"></label>
+          </section>
+          <section class="pump-outlet-card" data-outlet-card="6">
+            <button type="button" class="pump-outlet-toggle" data-outlet-toggle="6"><span>Sortie 6</span><strong>Sortie de pompe</strong><small>Non utilisée</small></button>
+            <input type="hidden" id="outlet6Active" value="false"><label>Type de sortie<select id="outlet6Type"><option value="1¾ po">1¾ po</option><option value="2½ po">2½ po</option></select></label>
+            <label>Pression (PSI)<input id="outlet6Pressure" type="number" min="0" step="1" inputmode="decimal"></label><label>Secteur d’opération<select id="outlet6Sector" class="outlet-sector-select"><option value="">Non précisé</option><option value="1">Secteur 1</option><option value="2">Secteur 2</option><option value="3">Secteur 3</option><option value="4">Secteur 4</option><option value="5">Secteur 5</option></select></label>
+            <label>Emplacement / Affectation<input id="outlet6Location" type="text" placeholder="Ex. Côté Alpha, attaque intérieure"></label>
+          </section>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>🚒 Équipements spéciaux</h3>
+        <div class="pump-panel-grid special">
+          <section class="pump-outlet-card special" data-outlet-card="fourInch">
+            <button type="button" class="pump-outlet-toggle" data-outlet-toggle="fourInch"><span>Sortie 4 po</span><strong>Alimentation principale</strong><small>Non utilisée</small></button>
+            <input type="hidden" id="fourInchActive" value="false">
+            <label>Pression (PSI)<input id="fourInchPressure" type="number" min="0" step="1" inputmode="decimal"></label><label>Secteur d’opération<select id="fourInchSector" class="outlet-sector-select"><option value="">Non précisé</option><option value="1">Secteur 1</option><option value="2">Secteur 2</option><option value="3">Secteur 3</option><option value="4">Secteur 4</option><option value="5">Secteur 5</option></select></label>
+            <label>Alimente / Emplacement<input id="fourInchLocation" type="text" placeholder="Ex. Borne, relais, autre autopompe"></label>
+          </section>
+          <section class="pump-outlet-card special" data-outlet-card="deckGun">
+            <button type="button" class="pump-outlet-toggle" data-outlet-toggle="deckGun"><span>Canon</span><strong>Canon de toit</strong><small>Non utilisé</small></button>
+            <input type="hidden" id="deckGunActive" value="false">
+            <label>Pression (PSI)<input id="deckGunPressure" type="number" min="0" step="1" inputmode="decimal"></label><label>Secteur d’opération<select id="deckGunSector" class="outlet-sector-select"><option value="">Non précisé</option><option value="1">Secteur 1</option><option value="2">Secteur 2</option><option value="3">Secteur 3</option><option value="4">Secteur 4</option><option value="5">Secteur 5</option></select></label>
+            <label>Direction / Cible<input id="deckGunLocation" type="text" placeholder="Ex. Toiture — Côté Alpha"></label>
+          </section>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>📊 Pressions générales</h3>
+        <div class="form-grid">
+          <label>Résiduel initial (PSI)<input id="vehicleUsageResidualStart" type="number" min="0" step="1" inputmode="decimal"></label>
+          <label>Résiduel final (PSI)<input id="vehicleUsageResidualEnd" type="number" min="0" step="1" inputmode="decimal"></label>
+          <label class="wide">Notes<textarea id="vehicleUsageNotes" rows="3" placeholder="Borne utilisée, problème, observation…"></textarea></label>
+        </div>
+      </div>
+
+      <div id="vehicleUsageSaveStatus" class="vehicle-usage-save-status hidden" role="status"></div>
+
+      <div class="modal-actions">
+        <button type="button" id="deleteVehicleUsage" class="danger hidden">Supprimer</button>
+        <span></span>
+        <button type="button" id="cancelVehicleUsageDialog" class="secondary">Annuler</button>
+        <button type="button" id="saveVehicleUsageButton" class="primary">Enregistrer la fiche</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="stationDialog" class="vehicle-dialog">
+    <form id="stationForm" method="dialog">
+      <div class="modal-head"><div><small>CASERNE</small><h2>Configurer la caserne</h2></div><button type="button" id="closeStationDialog">×</button></div>
+      <div class="form-grid">
+        <label class="wide">Nom<input id="stationName" required></label>
+        <label class="wide">Adresse<input id="stationAddress"></label>
+        <label>Latitude<input id="stationLat" type="number" step="any" required></label>
+        <label>Longitude<input id="stationLng" type="number" step="any" required></label>
+        <label class="wide">Téléphone<input id="stationPhone" type="tel"></label>
+      </div>
+      <p class="muted">La position initiale est placée au centre de Louiseville. Inscrivez les coordonnées exactes de la caserne.</p>
+      <div class="modal-actions"><span></span><button type="button" id="cancelStationDialog" class="secondary">Annuler</button><button type="submit" class="primary">Enregistrer</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="firebase-sync.js"></script>
+  <script src="app.js"></script>
+  <script src="preplans.js"></script>
+  <script src="prevention.js"></script>
+  <script src="assistant.js"></script>
+  <script src="navigation.js"></script>
+  <script src="vehicle-accounts.js"></script>
+  <script src="vehicles.js"></script>
+  <script src="vehicle-usage.js"></script>
+  <script src="command-center.js"></script>
+</body>
+</html>

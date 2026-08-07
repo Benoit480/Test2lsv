@@ -1,0 +1,1287 @@
+:root{--red:#991b1b;--red2:#b91c1c;--ink:#111827;--muted:#6b7280;--bg:#f3f4f6;--card:#fff;--line:#e5e7eb;--green:#15803d;--amber:#d97706;--blue:#2563eb;--shadow:0 12px 30px rgba(15,23,42,.12)}*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}body{padding-bottom:92px}.hidden{display:none!important}button,input,select,textarea{font:inherit}.topbar{position:sticky;top:0;z-index:800;height:96px;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;background:linear-gradient(135deg,#7f1d1d,#b91c1c);color:#fff;display:flex;align-items:center;gap:14px;box-shadow:0 8px 24px rgba(127,29,29,.25)}.topbar h1,.drawer h2{margin:1px 0 0;font-size:25px}.eyebrow{font-size:11px;font-weight:900;letter-spacing:.22em;opacity:.85}.header-btn{width:42px;height:42px;border:0;border-radius:13px;background:rgba(255,255,255,.15);color:#fff;font-size:25px}.topbar>div{flex:1}main{max-width:980px;margin:auto;padding:16px}.view{display:none}.view.active{display:block}.search-card,.map-card,.intervention-card,.card-item,.stats-grid>div{background:var(--card);border:1px solid rgba(229,231,235,.9);border-radius:22px;box-shadow:var(--shadow)}.search-card{padding:18px;margin-bottom:14px}.search-card.compact{padding:15px}.search-card label{font-weight:800;display:block;margin-bottom:8px}.search-row{display:flex;border:2px solid var(--line);border-radius:15px;overflow:hidden;background:#fff}.search-row:focus-within{border-color:#ef4444}.search-row input{flex:1;border:0;outline:0;padding:14px;background:transparent;min-width:0}.search-row button{width:46px;border:0;background:transparent;font-size:25px;color:var(--muted)}.muted{color:var(--muted);font-size:13px;margin-top:8px}.results{max-height:300px;overflow:auto}.result-item{width:100%;display:flex;gap:10px;text-align:left;padding:12px 4px;border:0;border-top:1px solid var(--line);background:#fff}.result-item strong,.result-item small{display:block}.result-item small{color:var(--muted);margin-top:3px}.pin{font-size:21px}.map-card{overflow:hidden;position:relative}.map-toolbar{height:74px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}.map-toolbar strong,.map-toolbar span{display:block}.map-toolbar span{font-size:13px;color:var(--muted);margin-top:3px}.switch{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700}.switch input{display:none}.switch span{width:38px;height:22px;border-radius:20px;background:#d1d5db;position:relative}.switch span:after{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}.switch input:checked+span{background:var(--red2)}.switch input:checked+span:after{transform:translateX(16px)}#map{height:52vh;min-height:390px}.intervention-card{margin-top:14px;padding:16px}.intervention-card small,.intervention-card strong,.intervention-card span{display:block}.intervention-card small{color:var(--red2);font-weight:900;letter-spacing:.14em}.intervention-card strong{font-size:19px;margin:5px 0}.intervention-card span{color:var(--muted)}.action-row{display:flex;gap:10px;margin-top:14px}.action-row button{flex:1}.primary,.secondary,.danger{border:0;border-radius:13px;padding:12px 15px;font-weight:800}.primary{background:var(--red2);color:#fff}.secondary{background:#eef2f7;color:var(--ink)}.danger{background:#fee2e2;color:#991b1b}.small{padding:10px 12px}.section-title{display:flex;align-items:center;justify-content:space-between;margin:6px 2px 16px}.section-title h2{margin:3px 0 0}.section-title small{font-weight:900;color:var(--red2);letter-spacing:.13em}.filter-row{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:14px}.filter-row input,.filter-row select,.form-grid input,.form-grid select,.form-grid textarea{width:100%;border:1px solid #d1d5db;border-radius:12px;padding:12px;background:#fff}.card-list{display:grid;gap:12px}.card-item{padding:15px;display:flex;gap:13px;align-items:flex-start}.hydrant-badge{width:45px;height:45px;border-radius:50% 50% 45% 45%;display:grid;place-items:center;color:#fff;font-weight:900;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.2);background:#2563eb}.hydrant-badge.red{background:#dc2626}.hydrant-badge.yellow{background:#eab308;color:#111}.hydrant-badge.green{background:#16a34a}.hydrant-badge.orange{background:#f97316}.card-content{flex:1;min-width:0}.card-content h3{margin:0 0 4px}.card-content p{margin:3px 0;color:var(--muted);font-size:14px}.status{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900}.status.active{background:#dcfce7;color:#166534}.status.maintenance{background:#fef3c7;color:#92400e}.status.inactive{background:#fee2e2;color:#991b1b}.card-actions{display:flex;gap:7px;margin-top:10px}.card-actions button{border:0;border-radius:10px;padding:8px 10px;font-weight:700}.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px}.stats-grid>div{padding:14px;text-align:center}.stats-grid strong{display:block;font-size:24px}.stats-grid span{font-size:12px;color:var(--muted)}.bottom-nav{position:fixed;z-index:900;left:0;right:0;bottom:0;height:76px;padding-bottom:env(safe-area-inset-bottom);background:rgba(255,255,255,.96);border-top:1px solid var(--line);display:flex;justify-content:space-around;backdrop-filter:blur(12px)}.bottom-nav button{flex:1;border:0;background:transparent;color:#6b7280;font-size:21px}.bottom-nav button span{display:block;font-size:10px;margin-top:3px}.bottom-nav button.active{color:var(--red2);font-weight:800}.bottom-nav .add-main{color:#fff;background:var(--red2);max-width:66px;height:66px;margin-top:-14px;border-radius:22px;box-shadow:0 8px 22px rgba(185,28,28,.35)}.drawer{position:fixed;z-index:1100;left:0;top:0;bottom:0;width:min(86vw,360px);padding:calc(18px + env(safe-area-inset-top)) 16px 20px;background:#111827;color:#fff;transform:translateX(-105%);transition:.25s;box-shadow:20px 0 50px rgba(0,0,0,.3)}.drawer.open{transform:none}.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:8px 4px 22px}.drawer-head button{border:0;background:transparent;color:#fff;font-size:32px}.drawer-link{width:100%;border:0;background:transparent;color:#e5e7eb;text-align:left;padding:14px;border-radius:13px;font-weight:750;font-size:16px}.drawer-link.active,.drawer-link:active{background:#991b1b;color:#fff}.drawer-separator{height:1px;background:#374151;margin:16px 0}.sync-box{display:flex;gap:10px;padding:12px}.sync-box span:first-child{width:11px;height:11px;border-radius:50%;background:#f59e0b;margin-top:4px}.sync-box span:first-child.ok{background:#22c55e}.sync-box strong,.sync-box small{display:block}.sync-box small{color:#9ca3af;margin-top:2px}.backdrop{position:fixed;inset:0;z-index:1050;background:rgba(0,0,0,.45)}dialog{border:0;border-radius:22px;padding:0;width:min(94vw,650px);box-shadow:0 24px 80px rgba(0,0,0,.35)}dialog::backdrop{background:rgba(0,0,0,.55)}dialog form{padding:20px}.modal-head{display:flex;justify-content:space-between}.modal-head h2{margin:3px 0 18px}.modal-head small{color:var(--red2);font-weight:900;letter-spacing:.13em}.modal-head button{border:0;background:transparent;font-size:30px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form-grid label{font-size:13px;font-weight:750}.form-grid label input,.form-grid label select,.form-grid label textarea{margin-top:6px}.form-grid .wide{grid-column:1/-1}.modal-actions{display:flex;gap:10px;align-items:center;margin-top:18px}.modal-actions span{flex:1}.toast{position:fixed;z-index:1400;left:50%;bottom:100px;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 17px;border-radius:12px;box-shadow:var(--shadow);max-width:88vw;text-align:center}.leaflet-popup-content-wrapper{border-radius:15px}.custom-hydrant{background:transparent;border:0}.hydrant-icon{width:30px;height:30px;border-radius:50% 50% 44% 44%;background:#2563eb;border:3px solid #fff;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,.4)}.hydrant-icon.red{background:#dc2626}.hydrant-icon.yellow{background:#eab308;color:#111}.hydrant-icon.green{background:#16a34a}.hydrant-icon.orange{background:#f97316}@media(min-width:760px){body{padding-bottom:20px}.bottom-nav{left:50%;right:auto;width:520px;transform:translateX(-50%);bottom:12px;border:1px solid var(--line);border-radius:22px}.view.active{animation:fade .15s}.card-list{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){main{padding:12px}.topbar{height:88px}.topbar h1{font-size:21px}#map{height:48vh;min-height:360px}.form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.filter-row{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr 1fr}}@keyframes fade{from{opacity:.5}to{opacity:1}}
+
+.intervention-head{display:flex;gap:12px;align-items:flex-start}.intervention-head>div{flex:1}.icon-close{border:0;background:#fee2e2;color:#991b1b;width:36px;height:36px;border-radius:11px;font-size:25px;line-height:1}.nearest-panel{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}.nearest-panel h3{font-size:14px;margin:0 0 9px}.nearest-list{display:grid;gap:8px}.nearest-item{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;padding:10px;background:#f8fafc;border:1px solid var(--line);border-radius:14px}.nearest-rank{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#dbeafe;color:#1d4ed8;font-weight:900}.nearest-info strong,.nearest-info span{display:block}.nearest-info span{font-size:12px;color:var(--muted);margin-top:2px}.nearest-actions{display:flex;gap:5px}.nearest-actions button{border:0;border-radius:9px;padding:8px 9px;font-weight:800}.mini-map{background:#eef2f7}.mini-gps{background:var(--red2);color:#fff}.recent-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:15px;margin-top:14px;box-shadow:var(--shadow)}.recent-head{display:flex;align-items:center;justify-content:space-between}.text-btn{border:0;background:transparent;color:var(--red2);font-weight:800}.recent-list{display:grid;gap:7px;margin-top:10px}.recent-item{width:100%;border:0;background:#f8fafc;border-radius:12px;padding:10px;text-align:left}.recent-item strong,.recent-item span{display:block}.recent-item span{font-size:12px;color:var(--muted);margin-top:3px}.intervention-pin{width:38px;height:38px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:#dc2626;border:3px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,.4);display:grid;place-items:center}.intervention-pin span{transform:rotate(45deg);color:#fff;font-size:17px}.leaflet-intervention-line{stroke-dasharray:7 7}.pulse-ring{animation:pulse 1.7s infinite}@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,38,38,.55)}70%{box-shadow:0 0 0 16px rgba(220,38,38,0)}100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}}
+
+/* Bornes intelligentes — fond noir, couleur du débit, contour disponibilité */
+.custom-hydrant{background:transparent!important;border:0!important;overflow:visible!important}
+.hydrant-marker{position:relative;width:56px;height:70px;display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 5px 5px rgba(0,0,0,.48))}
+.hydrant-emoji{width:48px;height:48px;border-radius:16px;background:#080b10;border:3px solid var(--status);box-shadow:0 0 0 2px rgba(0,0,0,.72),0 0 12px color-mix(in srgb,var(--status) 45%,transparent);display:grid;place-items:center;padding:4px}
+.hydrant-emoji svg{width:38px;height:42px;display:block;filter:drop-shadow(0 0 4px var(--flow))}
+.hydrant-gpm{margin-top:-2px;min-width:54px;padding:3px 5px;border-radius:7px;background:#05070a;border:2px solid var(--status);color:#fff;font-size:12px;font-weight:900;line-height:1;text-align:center;white-space:nowrap}
+.hydrant-gpm small{display:block;font-size:8px;font-weight:700;margin-top:2px;color:#d1d5db}
+.hydrant-mini{--flow:#1e90ff;--status:#39d353;flex:0 0 54px;width:54px;height:54px;border-radius:16px;background:#080b10;border:3px solid var(--status);display:grid;place-items:center;box-shadow:0 0 0 2px #111827}
+.hydrant-mini svg{width:38px;height:42px;filter:drop-shadow(0 0 4px var(--flow))}
+.status.available{background:#dcfce7;color:#166534}.status.restricted{background:#fef9c3;color:#854d0e}.status.out_of_service{background:#fee2e2;color:#991b1b}.status.unknown{background:#e5e7eb;color:#374151}
+.hydrant-legend{margin:12px 0;background:#0b1017;color:#fff;border:1px solid #273244;border-radius:16px;padding:11px 13px;box-shadow:var(--shadow)}
+.hydrant-legend summary{font-weight:900;cursor:pointer}.legend-grid,.availability-legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px;font-size:12px}.legend-grid span,.availability-legend span{display:flex;align-items:center;gap:7px}.dot{width:14px;height:14px;border-radius:50%;display:inline-block;border:2px solid #05070a;box-shadow:0 0 0 1px #667085}.dot.blue{background:#1e90ff}.dot.green{background:#69d31f}.dot.yellow{background:#ffe100}.dot.orange{background:#ff8a00}.dot.red{background:#ff2a22}.availability-legend{border-top:1px solid #273244;padding-top:10px}.availability-legend i{width:17px;height:17px;border-radius:50%;background:#080b10;border:3px solid var(--c);display:inline-block}.field-help{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+@media(max-width:420px){.hydrant-marker{transform:scale(.9);transform-origin:center bottom}.legend-grid,.availability-legend{grid-template-columns:1fr 1fr}}
+
+/* FireMap — marqueurs compacts et choix débit/couleur */
+.hydrant-marker{width:40px!important;height:52px!important;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))!important}
+.hydrant-emoji{width:38px!important;height:38px!important;border-width:3px!important}
+.hydrant-emoji svg{width:27px!important;height:30px!important;filter:drop-shadow(0 0 3px var(--flow))!important}
+.hydrant-gpm{margin-top:-1px!important;min-width:38px!important;padding:2px 4px!important;border-radius:7px!important;font-size:8px!important;line-height:1.1!important;white-space:nowrap!important}
+.hydrant-gpm small{display:none!important}
+#flowRate option{font-weight:700}
+@media(max-width:420px){.hydrant-marker{transform:scale(.86)!important;transform-origin:center bottom!important}}
+
+
+/* FireMap V5 — thème sombre complet et marqueurs 50 % plus petits */
+:root{--ink:#f8fafc;--muted:#94a3b8;--bg:#05070b;--card:#0b1017;--line:#263244;--shadow:0 12px 30px rgba(0,0,0,.42)}
+html,body{background:#05070b!important;color:#f8fafc!important}
+.topbar{background:linear-gradient(180deg,#070a10,#05070b)!important;border-bottom:1px solid #202a38!important;box-shadow:0 8px 24px rgba(0,0,0,.45)!important}
+.search-card,.map-card,.intervention-card,.card-item,.stats-grid>div{background:#0b1017!important;border-color:#263244!important;color:#f8fafc!important}
+.search-row,.result-item,.filter-row input,.filter-row select,.form-grid input,.form-grid select,.form-grid textarea{background:#080d14!important;color:#f8fafc!important;border-color:#334155!important}
+.search-row input{color:#f8fafc!important}
+.search-row input::placeholder,.form-grid input::placeholder,.form-grid textarea::placeholder{color:#64748b!important}
+.result-item{border-top-color:#263244!important}
+.secondary{background:#18212d!important;color:#f8fafc!important;border:1px solid #334155!important}
+.danger{background:#3a1015!important;color:#fecaca!important}
+.bottom-nav{background:rgba(5,7,11,.96)!important;border-top-color:#263244!important}
+.bottom-nav button{color:#94a3b8!important}.bottom-nav button.active{color:#ff3b30!important}
+.drawer{background:#080d14!important}.drawer-link.active,.drawer-link:active{background:#7f1d1d!important}
+dialog{background:#0b1017!important;color:#f8fafc!important;border:1px solid #334155!important}
+dialog form{background:#0b1017!important}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0b1017!important;color:#f8fafc!important}
+.leaflet-control-zoom a{background:#0b1017!important;color:#fff!important;border-color:#334155!important}
+.leaflet-control-attribution{background:rgba(5,7,11,.82)!important;color:#cbd5e1!important}
+.leaflet-control-attribution a{color:#60a5fa!important}
+
+/* Marqueurs de carte réduits à environ la moitié */
+.hydrant-marker{width:22px!important;height:30px!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.65))!important}
+.hydrant-emoji{width:21px!important;height:21px!important;border-width:2px!important;border-radius:7px!important;padding:1px!important}
+.hydrant-emoji svg{width:15px!important;height:17px!important;filter:drop-shadow(0 0 2px var(--flow))!important}
+.hydrant-gpm{margin-top:-1px!important;min-width:22px!important;padding:1px 2px!important;border-width:1px!important;border-radius:4px!important;font-size:5px!important;line-height:1!important}
+.hydrant-gpm small{display:none!important}
+@media(max-width:420px){.hydrant-marker{transform:none!important}}
+
+/* FireMap V7 — recherche vocale et favoris */
+.voice-btn{flex:0 0 42px;border:0;border-left:1px solid #334155;background:#111827;color:#fff;font-size:18px}.voice-btn:active{background:#7f1d1d}.favorite-item{display:grid;grid-template-columns:1fr 40px;gap:7px;align-items:stretch}.favorite-item>button:first-child{border:1px solid #263244;background:#080d14;color:#f8fafc;border-radius:12px;padding:10px;text-align:left}.favorite-item strong,.favorite-item span{display:block}.favorite-item span{font-size:12px;color:#94a3b8;margin-top:3px}.favorite-remove{border:1px solid #3f1d24;background:#2a0f14;color:#fecaca;border-radius:12px;font-size:22px}.favorites-card{border-color:#3b2f16!important}
+
+/* Module Préplans V8 */
+.layer-switches{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.building-div-icon{background:transparent;border:0}.building-marker{width:30px;height:34px;border-radius:9px;background:#0b0f16;border:3px solid var(--risk);display:grid;place-items:center;font-size:18px;box-shadow:0 4px 12px #000a}.building-marker:after{content:"";position:absolute;bottom:-4px;width:8px;height:8px;background:var(--risk);transform:rotate(45deg);z-index:-1}.building-list-icon{min-width:48px;width:48px;height:48px;border-radius:14px;background:#0c1119;border:3px solid var(--risk);display:grid;place-items:center;font-size:25px}.building-list-icon.large{width:62px;height:62px;font-size:32px}.risk-badge{display:inline-flex;padding:4px 9px;border-radius:999px;font-size:.78rem;font-weight:800;background:#1b2230}.risk-badge.low{color:#39d353}.risk-badge.medium{color:#ffd400}.risk-badge.high{color:#ff9500}.risk-badge.very_high{color:#ff3b30}.choice-dialog{max-width:560px}.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px}.choice-card{min-height:150px;border:1px solid #273141;background:#0c1119;border-radius:18px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}.choice-card span{font-size:42px}.choice-card strong{font-size:1rem}.choice-card small{color:#9ca3af}.building-dialog{width:min(940px,96vw);max-height:92vh}.building-dialog form{max-height:88vh;overflow:auto}.form-section{padding:0 18px 8px}.form-section h3{margin:16px 0 10px;color:#f3f4f6;font-size:1rem;border-bottom:1px solid #202938;padding-bottom:8px}.preplan-dialog{width:min(900px,96vw);max-height:92vh}.preplan-dialog #preplanContent{max-height:88vh;overflow:auto}.preplan-hero{display:flex;align-items:center;gap:14px;padding:16px 18px;background:#0b1018;border-bottom:1px solid #202938}.preplan-hero div:last-child{display:flex;flex-direction:column;gap:5px}.preplan-hero span{color:#aab2c0}.preplan-actions{display:flex;gap:10px;flex-wrap:wrap;padding:14px 18px}.button-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:10px;padding:10px 14px;font-weight:800}.preplan-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 18px}.preplan-section{background:#0c1119;border:1px solid #222c3a;border-radius:14px;padding:14px}.preplan-section h3{margin:0 0 8px;font-size:.96rem}.preplan-section p{margin:0;color:#d0d5de;line-height:1.5}.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}.photo-grid img{width:100%;height:120px;object-fit:cover;border-radius:10px;border:1px solid #293446}.building-card{align-items:flex-start}@media(max-width:640px){.choice-grid,.preplan-grid{grid-template-columns:1fr}.layer-switches{gap:4px}.map-toolbar{align-items:flex-start}.map-toolbar .switch{font-size:.72rem}.building-dialog .form-grid{grid-template-columns:1fr}.building-dialog .form-grid .wide{grid-column:auto}}
+
+/* V10 — Mode édition par appui long (1 seconde) */
+.map-toolbar-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.edit-mode-btn{border:1px solid #374151;border-radius:11px;padding:8px 10px;background:#111827;color:#e5e7eb;font-size:12px;font-weight:900;white-space:nowrap}
+.edit-mode-btn.active{background:#9a3412;border-color:#fb923c;color:#fff;box-shadow:0 0 0 3px rgba(251,146,60,.18)}
+#map.map-edit-mode{cursor:crosshair;-webkit-touch-callout:none;user-select:none}
+#map.map-edit-mode:after{content:"Maintenir 1 seconde pour ajouter";position:absolute;z-index:450;left:50%;top:10px;transform:translateX(-50%);padding:7px 11px;border-radius:999px;background:rgba(17,24,39,.9);color:#fff;font-size:11px;font-weight:800;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#map.holding-to-add:after{content:"Maintenez…";background:#9a3412}
+@media(max-width:640px){.map-toolbar{height:auto;min-height:92px;gap:8px;align-items:flex-start}.map-toolbar-actions{gap:7px}.edit-mode-btn{font-size:11px;padding:7px 8px}.layer-switches{width:100%}}
+
+/* V12 — Assistant d’intervention */
+.assistant-address-card,.assistant-panel,.assistant-alert-head,.assistant-empty{background:#0b1017;border:1px solid #263244;border-radius:18px;padding:16px;margin-bottom:14px}.assistant-address-card label{display:block;font-weight:900;margin-bottom:8px}.assistant-address-row{display:grid;grid-template-columns:1fr auto auto;gap:8px}.assistant-address-row input{background:#080d14;color:#fff;border:1px solid #334155;border-radius:12px;padding:12px;font-size:16px}.assistant-empty{text-align:center;padding:42px 18px}.assistant-empty>span{font-size:52px}.assistant-empty h3{margin:8px 0}.assistant-empty p{color:#94a3b8}.assistant-alert-head{display:flex;align-items:center;justify-content:space-between;gap:14px;border-color:#7f1d1d;background:linear-gradient(135deg,#250b0e,#0b1017)}.assistant-alert-head small{color:#ff6b63;font-weight:900}.assistant-alert-head h2{margin:3px 0;font-size:1.15rem}.assistant-alert-head span{color:#cbd5e1;font-size:.85rem}.assistant-critical-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}.assistant-critical{display:flex;gap:10px;align-items:flex-start;background:#0b1017;border:1px solid #263244;border-radius:15px;padding:13px}.assistant-critical.urgent{border-color:#b91c1c;background:#210b0e}.assistant-critical>span{font-size:24px}.assistant-critical small,.assistant-critical strong{display:block}.assistant-critical small{color:#94a3b8;font-size:.68rem;font-weight:900}.assistant-critical strong{margin-top:4px;font-size:.88rem;white-space:pre-wrap}.assistant-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.assistant-panel h3{margin:0}.assistant-hydrant-list{display:grid;gap:8px}.assistant-hydrant{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:10px;padding:10px;border:1px solid #263244;border-radius:13px;background:#080d14}.assistant-hydrant.recommended{border-color:#39d353;box-shadow:0 0 0 2px rgba(57,211,83,.12)}.assistant-rank{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#18212d;font-weight:900}.assistant-hydrant strong,.assistant-hydrant span,.assistant-hydrant small{display:block}.assistant-hydrant span,.assistant-hydrant small{color:#94a3b8;font-size:.78rem;margin-top:2px}.assistant-summary strong,.assistant-summary span{display:block}.assistant-summary span{color:#94a3b8;margin-top:4px}.assistant-summary p{margin-bottom:0}.assistant-actions{display:flex;justify-content:flex-end;margin:14px 0 30px}.bottom-nav{grid-template-columns:repeat(6,1fr)}
+@media(max-width:700px){.assistant-address-row{grid-template-columns:1fr 1fr}.assistant-address-row input{grid-column:1/-1}.assistant-critical-grid{grid-template-columns:1fr}.assistant-alert-head{align-items:flex-start;flex-direction:column}.bottom-nav button{font-size:18px}.bottom-nav button span{font-size:9px}}
+
+/* V13 — Navigation GPS intégrée simple */
+.navigation-panel{background:#070b11;border:1px solid #7f1d1d;border-radius:18px;padding:15px;margin:0 0 16px;box-shadow:0 16px 35px rgba(0,0,0,.35)}
+.navigation-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.navigation-top small{color:#ff6b63;font-weight:900;letter-spacing:.08em}.navigation-top h3{margin:4px 0 0;font-size:1.02rem}
+.navigation-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:13px 0}.navigation-stats>div{background:#0d141e;border:1px solid #263244;border-radius:13px;padding:10px;text-align:center}.navigation-stats strong,.navigation-stats span{display:block}.navigation-stats strong{font-size:1.15rem}.navigation-stats span{font-size:.68rem;color:#94a3b8;margin-top:3px}
+.navigation-next{display:grid;grid-template-columns:58px 1fr;gap:12px;align-items:center;background:linear-gradient(135deg,#291013,#111827);border:1px solid #991b1b;border-radius:15px;padding:13px}.navigation-next>span{font-size:42px;text-align:center}.navigation-next small,.navigation-next strong,.navigation-next div>span{display:block}.navigation-next small{font-size:.66rem;color:#fca5a5;font-weight:900}.navigation-next strong{font-size:1rem;margin:3px 0}.navigation-next div>span{font-size:.8rem;color:#cbd5e1}
+.navigation-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.navigation-itinerary{background:#0b1017;border:1px solid #263244;border-radius:13px;padding:10px}.navigation-itinerary summary{cursor:pointer;font-weight:900}.navigation-itinerary ol{list-style:none;padding:8px 0 0;margin:0;display:grid;gap:6px}.navigation-itinerary li{display:grid;grid-template-columns:32px 1fr;gap:9px;align-items:center;border-top:1px solid #202a38;padding:8px 2px}.navigation-itinerary li>span{font-size:22px;text-align:center}.navigation-itinerary li strong,.navigation-itinerary li small{display:block}.navigation-itinerary li strong{font-size:.84rem}.navigation-itinerary li small{color:#94a3b8;margin-top:2px}.navigation-status{margin:10px 2px 0;color:#94a3b8;font-size:.78rem}.navigation-status.error{color:#fca5a5}
+@media(max-width:600px){.navigation-stats{grid-template-columns:1fr 1fr}.navigation-stats>div:last-child{grid-column:1/-1}.navigation-actions button{flex:1 1 45%;font-size:.76rem}.navigation-next{grid-template-columns:48px 1fr}.navigation-next>span{font-size:36px}}
+
+/* V15 — Import SMS de répartition */
+.sms-import-card{margin:14px 0;border:1px solid #263244;border-radius:18px;background:#0b1018;overflow:hidden}
+.sms-import-card summary{cursor:pointer;padding:16px 18px;font-weight:800;color:#f3f4f6;list-style:none}
+.sms-import-card summary::-webkit-details-marker{display:none}
+.sms-import-card summary::after{content:"⌄";float:right;color:#94a3b8}
+.sms-import-card[open] summary::after{content:"⌃"}
+.sms-import-body{border-top:1px solid #202a39;padding:16px}
+.sms-import-body p{margin:0 0 12px;color:#9ca3af;line-height:1.45}
+.sms-import-body textarea{width:100%;resize:vertical;min-height:118px;background:#070b12;color:#f8fafc;border:1px solid #344155;border-radius:14px;padding:13px;font:inherit;line-height:1.4}
+.sms-import-body textarea:focus{outline:none;border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.15)}
+.sms-import-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.sms-import-actions button{flex:1;min-width:140px}
+.dispatch-preview{display:grid;gap:7px;margin-top:12px;padding:13px;border:1px solid #29405b;border-radius:13px;background:#0d1622;color:#dbeafe}
+.dispatch-preview strong{color:#4ade80}
+.dispatch-preview span{display:block;color:#cbd5e1}
+@media(max-width:640px){.sms-import-actions{display:grid;grid-template-columns:1fr 1fr}.sms-import-actions button{min-width:0}.assistant-address-row{grid-template-columns:1fr}.assistant-address-row button{width:100%}}
+\n\n/* V20 — Caserne et véhicules */\n.station-card,.vehicle-toolbar{background:#0b1017;border:1px solid #263244;border-radius:18px;padding:16px;margin-bottom:14px}.station-card-head{display:flex;align-items:center;gap:14px}.station-icon{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-size:34px;background:#4a0d10;border:1px solid #ef4444}.station-card h3{margin:3px 0}.station-card p,.station-card small,.vehicle-toolbar span{color:#94a3b8}.station-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.vehicle-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px}.vehicle-toolbar strong,.vehicle-toolbar span{display:block}.vehicle-list{display:grid;gap:10px}.vehicle-card{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:12px;background:#0b1017;border:1px solid #263244;border-radius:16px;padding:13px}.vehicle-card.sharing{border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.15)}.vehicle-symbol{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:28px;background:#111827;border:2px solid var(--vehicle-status,#64748b)}.vehicle-main h3{margin:0 0 4px}.vehicle-main p{margin:2px 0;color:#94a3b8;font-size:.8rem}.vehicle-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.vehicle-status{display:inline-flex;padding:4px 8px;border-radius:999px;background:color-mix(in srgb,var(--vehicle-status) 18%,transparent);color:var(--vehicle-status);font-size:.72rem;font-weight:900}.vehicle-marker,.station-marker{position:relative;display:grid;place-items:center}.vehicle-marker .vehicle-marker-body{width:39px;height:39px;border-radius:12px;background:#0b1017;border:3px solid var(--status);display:grid;place-items:center;font-size:23px;box-shadow:0 4px 14px rgba(0,0,0,.45)}.vehicle-marker .vehicle-marker-label{position:absolute;top:35px;background:#05070b;color:#fff;border:1px solid #334155;border-radius:7px;padding:2px 5px;font-size:9px;font-weight:900;white-space:nowrap}.vehicle-marker.live .vehicle-marker-body:after{content:"";position:absolute;width:48px;height:48px;border:2px solid #3b82f6;border-radius:16px;animation:vehiclePulse 1.6s infinite}.station-marker-body{width:46px;height:46px;border-radius:14px;background:#4a0d10;border:3px solid #ef4444;display:grid;place-items:center;font-size:28px;box-shadow:0 5px 17px rgba(0,0,0,.5)}.station-marker-label{position:absolute;top:43px;background:#05070b;color:white;border:1px solid #ef4444;border-radius:7px;padding:2px 6px;font-size:9px;font-weight:900;white-space:nowrap}@keyframes vehiclePulse{0%{transform:scale(.8);opacity:.9}100%{transform:scale(1.25);opacity:0}}.vehicle-dialog{width:min(650px,96vw)}\n@media(max-width:650px){.vehicle-card{grid-template-columns:48px 1fr}.vehicle-actions{grid-column:1/-1;justify-content:stretch}.vehicle-actions button{flex:1}.vehicle-toolbar{align-items:flex-start;flex-direction:column}.station-actions button{flex:1}}\n
+/* V20.0.2 — Cartes du bas entièrement sombres */
+.recent-card,
+.favorites-card {
+  background:#0b1017 !important;
+  border-color:#263244 !important;
+  color:#f8fafc !important;
+  box-shadow:0 12px 30px rgba(0,0,0,.38) !important;
+}
+
+.recent-card .recent-head strong,
+.favorites-card .recent-head strong {
+  color:#f8fafc !important;
+}
+
+.recent-card .recent-item,
+.favorites-card .recent-item,
+.recent-card .favorite-item > button:first-child,
+.favorites-card .favorite-item > button:first-child {
+  background:#080d14 !important;
+  border:1px solid #263244 !important;
+  color:#f8fafc !important;
+}
+
+.recent-card .recent-item strong,
+.favorites-card .recent-item strong,
+.recent-card .favorite-item strong,
+.favorites-card .favorite-item strong {
+  color:#3b82f6 !important;
+}
+
+.recent-card .recent-item span,
+.favorites-card .recent-item span,
+.recent-card .favorite-item span,
+.favorites-card .favorite-item span,
+.recent-card .muted,
+.favorites-card .muted {
+  color:#94a3b8 !important;
+}
+
+/* V20.0.3 — Thème sombre uniforme, sans panneaux blancs */
+:root{
+  --ink:#f8fafc;
+  --muted:#94a3b8;
+  --bg:#02060b;
+  --card:#0b1017;
+  --line:#263244;
+  --shadow:0 14px 34px rgba(0,0,0,.42);
+}
+html,body{background:#02060b!important;color:#f8fafc!important}
+main,.view{background:transparent!important}
+
+.search-card,.map-card,.intervention-card,.card-item,.stats-grid>div,
+.recent-card,.favorites-card,.assistant-address-card,.assistant-panel,
+.assistant-alert-head,.assistant-empty,.sms-import-card,.navigation-panel,
+.station-card,.vehicle-toolbar,.vehicle-card,.preplan-section,
+.choice-card,.filter-row,.nearest-panel{
+  background:#0b1017!important;
+  border-color:#263244!important;
+  color:#f8fafc!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.36)!important;
+}
+
+/* Historique et favoris */
+.recent-card,.favorites-card,
+section .recent-card,
+#view-map .recent-card{
+  background:#0b1017!important;
+  background-color:#0b1017!important;
+}
+.recent-list{background:transparent!important}
+.recent-item,.favorite-item>button:first-child,
+#recentInterventions .recent-item,
+#favoritePlaces .favorite-item>button:first-child{
+  background:#060b12!important;
+  background-color:#060b12!important;
+  color:#f8fafc!important;
+  border:1px solid #263244!important;
+}
+.recent-head,.recent-head *{background:transparent!important}
+
+/* Recherche, formulaires et sélecteurs */
+.search-row,.search-row input,.search-row button,
+.filter-row input,.filter-row select,
+.form-grid input,.form-grid select,.form-grid textarea,
+.assistant-address-row input,.sms-import-body textarea,
+input,select,textarea{
+  background:#070c13!important;
+  color:#f8fafc!important;
+  border-color:#334155!important;
+}
+input::placeholder,textarea::placeholder{color:#6f7c91!important}
+option{background:#0b1017!important;color:#f8fafc!important}
+
+/* Résultats, ressources proches et listes */
+.result-item,.nearest-item,.assistant-hydrant,
+.navigation-stats>div,.navigation-itinerary,
+.dispatch-preview{
+  background:#070c13!important;
+  color:#f8fafc!important;
+  border-color:#263244!important;
+}
+.secondary,.mini-map{
+  background:#172131!important;
+  color:#f8fafc!important;
+  border:1px solid #334155!important;
+}
+.danger,.icon-close{
+  background:#2a0f14!important;
+  color:#fecaca!important;
+  border:1px solid #7f1d1d!important;
+}
+
+/* Fenêtres modales et préplans */
+dialog,dialog form,.building-dialog,.preplan-dialog,.vehicle-dialog{
+  background:#080d14!important;
+  color:#f8fafc!important;
+}
+dialog::backdrop{background:rgba(0,0,0,.78)!important}
+.modal-head,.modal-actions,.form-section,.preplan-actions,.preplan-grid{
+  background:transparent!important;
+}
+
+/* Navigation inférieure et tiroir */
+.bottom-nav{
+  background:rgba(3,7,12,.97)!important;
+  border-top-color:#263244!important;
+}
+.bottom-nav button{color:#94a3b8!important}
+.bottom-nav button.active{color:#ef4444!important}
+.bottom-nav .add-main{color:#fff!important;background:#c81e1e!important}
+.drawer{background:#080d14!important}
+
+/* Cartes Leaflet */
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{
+  background:#080d14!important;
+  color:#f8fafc!important;
+}
+.leaflet-control-zoom a,
+.leaflet-control-layers{
+  background:#080d14!important;
+  color:#f8fafc!important;
+  border-color:#334155!important;
+}
+.leaflet-control-zoom a:hover{background:#111827!important}
+
+/* Texte */
+h1,h2,h3,h4,strong,label,.section-title h2{color:#f8fafc}
+.muted,.card-content p,.stats-grid span,.result-item small,
+.nearest-info span,.navigation-status,.assistant-empty p{
+  color:#94a3b8!important;
+}
+.text-btn{background:transparent!important;color:#ef4444!important}
+
+
+/* V20.1.0 — Mode prévention */
+.prevention-help{margin-bottom:14px}.prevention-help p{margin:.45rem 0 0;color:#94a3b8}.prevention-list{display:grid;gap:12px}.prevention-building-card{display:block}.prevention-building-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.prevention-building-head h3{margin:0 0 4px}.prevention-building-head p{margin:0;color:#94a3b8}.score-badge{min-width:58px;padding:8px 10px;border-radius:12px;text-align:center;font-weight:950;background:#2b1115;color:#fca5a5;border:1px solid #7f1d1d}.score-badge.partial{background:#2a210b;color:#fde68a;border-color:#854d0e}.score-badge.complete{background:#0b2819;color:#86efac;border-color:#166534}.score-track{height:9px;border-radius:999px;background:#182230;overflow:hidden;margin:12px 0}.score-track span{display:block;height:100%;background:#ef4444;border-radius:999px;transition:width .25s}.score-track span.partial{background:#f59e0b}.score-track span.complete{background:#22c55e}.prevention-meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#94a3b8;font-size:.82rem}.prevention-meta .overdue{color:#fb923c;font-weight:800}.prevention-dialog{width:min(840px,96vw);max-height:92vh}.prevention-score-card{background:#070c13;border:1px solid #263244;border-radius:16px;padding:14px;margin-bottom:14px}.prevention-score-card>div:first-child{display:flex;justify-content:space-between;align-items:end}.prevention-score-card strong{font-size:1.6rem}.prevention-score-card p{margin:4px 0 0;color:#94a3b8}.prevention-check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.prevention-check-grid label{display:flex;align-items:center;gap:9px;background:#070c13;border:1px solid #263244;border-radius:12px;padding:11px;color:#e2e8f0;font-weight:700}.prevention-check-grid input{width:20px;height:20px;accent-color:#dc2626}.risk-checks label:has(input:checked){border-color:#f97316;background:#24140b}.visit-history{display:grid;gap:8px}.visit-item{background:#070c13;border:1px solid #263244;border-radius:12px;padding:11px}.visit-item strong,.visit-item span{display:block}.visit-item span{color:#94a3b8;font-size:.82rem}.visit-item p{margin:6px 0 0}.prevention-summary{border-color:#166534!important}.prevention-summary .score-track{margin:8px 0 12px}@media(max-width:640px){.prevention-check-grid{grid-template-columns:1fr}.prevention-meta{flex-direction:column;gap:4px}.prevention-dialog{width:98vw}}
+
+
+/* V20.1.1 — Photos par catégorie en prévention */
+.prevention-photo-item{background:#070c13;border:1px solid #263244;border-radius:14px;padding:0;overflow:hidden}
+.prevention-photo-item>label{border:0!important;border-radius:0!important;background:transparent!important}
+.category-photo-controls{padding:0 11px 11px;display:flex;gap:8px;flex-wrap:wrap}
+.photo-action{flex:1;min-width:145px;padding:9px 10px;border-radius:10px;border:1px solid #334155;background:#111b29;color:#f8fafc;font-weight:800;font-size:.82rem}
+.photo-action.camera{border-color:#b91c1c;background:#2a0f14}.photo-action.import{border-color:#1d4ed8;background:#0c1b36}
+.category-photo-input{display:none!important}
+.category-photo-gallery{width:100%;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px}
+.category-photo-gallery>small{color:#94a3b8}
+.category-photo-thumb{position:relative;margin:0;width:74px;height:74px;border:1px solid #334155;border-radius:10px;overflow:hidden;background:#02050a}
+.category-photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.category-photo-thumb button{position:absolute;right:3px;top:3px;width:25px;height:25px;border-radius:50%;border:1px solid #fecaca;background:#b91c1c;color:#fff;font-size:18px;line-height:20px;padding:0}
+.prevention-photo-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-top:12px}
+.prevention-photo-summary img{width:100%;height:82px;object-fit:cover;border-radius:10px;border:1px solid #334155}
+.prevention-check-grid .prevention-photo-item:has(input:checked){border-color:#dc2626}.risk-checks .prevention-photo-item:has(input:checked){border-color:#f97316;background:#24140b}
+@media(max-width:640px){.photo-action{min-width:calc(50% - 4px);font-size:.76rem;padding:9px 5px}}
+
+/* V20.1.2 — Prévention = préplan opérationnel */
+.preplan-prevention-title{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.preplan-from-prevention{border-color:#d62828!important;box-shadow:0 0 0 1px rgba(214,40,40,.2) inset}
+.preplan-check-list{margin:10px 0 0;padding-left:1.3rem;display:grid;gap:8px}
+.preplan-check-list li{color:#f3f6fb}
+.preplan-unconfirmed{color:#8f9bad!important}
+.preplan-alert{border-color:#ff9500!important;background:rgba(255,149,0,.08)!important}
+.preplan-photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.preplan-photo-card{display:block;position:relative;border:1px solid #26344d;border-radius:14px;overflow:hidden;background:#05080f;color:#fff;text-decoration:none}
+.preplan-photo-card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.preplan-photo-card span{display:block;padding:8px 10px;font-size:.82rem;font-weight:700}
+@media(min-width:700px){.preplan-photo-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+
+/* FireMap V20.1.4 — liaison Prévention/Bâtiments */
+.building-prevention-meta{
+  display:block;
+  margin-top:5px;
+  color:#9fb0c7;
+  font-size:12px;
+}
+.prevention-open-btn{
+  border-color:#3b82f6!important;
+  color:#dbeafe!important;
+}
+
+
+/* FireMap V20.1.5 — fiche Prévention principale */
+#preventionDialog .modal-head small{
+  color:#ff4d55;
+}
+#preventionDialog .modal-head h2{
+  color:#fff;
+}
+.building-main-actions{
+  position:sticky;
+  bottom:0;
+  z-index:10;
+  background:rgba(7,10,16,.98);
+  border-top:1px solid #26344d;
+  padding:12px;
+}
+#openLegacyPreplan{
+  border-color:#6b7280!important;
+  color:#d1d5db!important;
+  white-space:nowrap;
+}
+@media(max-width:650px){
+  .building-main-actions{
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .building-main-actions span{
+    display:none;
+  }
+  #openLegacyPreplan{
+    grid-column:1/-1;
+  }
+}
+
+
+/* FireMap V20.2.0 — fiche Bâtiment opérationnelle */
+.operational-building-dialog{
+  width:min(900px,97vw);
+  max-height:94vh;
+}
+.operational-dialog-shell{
+  background:#05080e;
+  color:#fff;
+}
+.operational-dialog-actions{
+  position:sticky;
+  bottom:0;
+  z-index:10;
+  background:rgba(5,8,14,.98);
+  border-top:1px solid #26344d;
+  padding:12px;
+}
+.operational-building-header{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+  padding:16px;
+  margin:12px;
+  border:1px solid #334155;
+  border-radius:18px;
+  background:#080d15;
+}
+.operational-building-header h2{
+  margin:4px 0;
+  color:#fff;
+}
+.operational-building-header p{
+  margin:0;
+  color:#94a3b8;
+}
+.operational-danger{
+  border:2px solid #ef4444!important;
+  background:#260b0f!important;
+}
+.operational-danger h3,
+.operational-danger p{
+  color:#fecaca!important;
+}
+.operational-priority{
+  border-color:#2563eb!important;
+}
+.operational-priority-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.operational-priority-grid>div{
+  background:#05080e;
+  border:1px solid #334155;
+  border-radius:13px;
+  padding:12px;
+}
+.operational-priority-grid span{
+  display:block;
+  color:#93c5fd;
+  font-weight:800;
+  margin-bottom:5px;
+}
+.operational-priority-grid strong{
+  color:#fff;
+  white-space:pre-wrap;
+}
+.operational-photo-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.operational-photo{
+  display:block;
+  position:relative;
+  border:1px solid #334155;
+  border-radius:14px;
+  overflow:hidden;
+  background:#05080e;
+}
+.operational-photo img{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  display:block;
+}
+.operational-photo span{
+  display:block;
+  padding:8px;
+  color:#fff;
+  font-weight:800;
+}
+.operational-big-value{
+  font-size:2rem;
+  font-weight:950;
+  color:#fff;
+}
+.form-section-collapsed{
+  padding:0!important;
+  overflow:hidden;
+}
+.form-section-collapsed>h3{
+  margin:0!important;
+  padding:14px;
+  cursor:pointer;
+}
+.form-section-collapsed>:not(h3){
+  display:none!important;
+}
+.building-main-actions{
+  grid-template-columns:repeat(5,minmax(0,1fr));
+}
+.operational-card-btn{
+  border-color:#ef4444!important;
+  color:#fecaca!important;
+}
+@media(max-width:700px){
+  .operational-priority-grid,
+  .operational-photo-grid{
+    grid-template-columns:1fr;
+  }
+  .operational-photo img{
+    height:220px;
+  }
+  .building-main-actions{
+    grid-template-columns:1fr 1fr;
+  }
+  #openOperationalView{
+    grid-column:1/-1;
+  }
+}
+
+
+/* FireMap V20.2.1 — création d'un bâtiment vers la fiche Prévention */
+#buildingDialog.new-building-mode .building-legacy-details{
+  display:none!important;
+}
+.new-building-help{
+  margin:0 0 14px;
+  padding:11px 13px;
+  border:1px solid #2563eb;
+  border-radius:12px;
+  background:#071426;
+  color:#bfdbfe;
+  line-height:1.4;
+}
+#buildingDialog.new-building-mode #buildingForm{
+  max-width:720px;
+}
+#buildingDialog.new-building-mode #saveBuildingButton{
+  background:#dc2626;
+  border-color:#ef4444;
+  font-weight:900;
+}
+
+
+/* FireMap V20.2.2 — photos par colonne */
+.category-photo-toolbar{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  width:100%;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid #26344d;
+}
+.category-photo-btn{
+  min-height:42px;
+  border-radius:11px;
+  border:1px solid #334155;
+  background:#0a101b;
+  color:#fff;
+  font-weight:800;
+  font-size:14px;
+}
+.category-photo-btn.camera{
+  border-color:#dc2626;
+  color:#fecaca;
+}
+.category-photo-btn.import{
+  border-color:#2563eb;
+  color:#bfdbfe;
+}
+.category-photo-gallery{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.category-photo-thumb{
+  position:relative;
+  margin:0;
+  border:1px solid #334155;
+  border-radius:11px;
+  overflow:hidden;
+  background:#05080e;
+}
+.category-photo-thumb img{
+  width:100%;
+  height:100px;
+  object-fit:cover;
+  display:block;
+}
+.category-photo-thumb button{
+  position:absolute;
+  top:4px;
+  right:4px;
+  width:30px;
+  height:30px;
+  border:0;
+  border-radius:50%;
+  background:rgba(185,28,28,.95);
+  color:#fff;
+  font-size:20px;
+}
+#preventionForm label:has(.category-photo-toolbar){
+  flex-wrap:wrap;
+}
+@media(max-width:600px){
+  .category-photo-toolbar{
+    grid-template-columns:1fr;
+  }
+  .category-photo-gallery{
+    grid-column:1;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .category-photo-thumb img{
+    height:120px;
+  }
+}
+
+
+/* FireMap V20.2.3 — lecture seule pendant une intervention */
+.intervention-readonly-banner{
+  margin:10px 12px 0;
+  padding:12px 14px;
+  border:2px solid #ef4444;
+  border-radius:14px;
+  background:#2a0b0f;
+  color:#fecaca;
+  font-weight:950;
+  text-align:center;
+  letter-spacing:.02em;
+}
+#preventionForm.intervention-readonly{
+  position:relative;
+}
+#preventionForm.intervention-readonly input:disabled,
+#preventionForm.intervention-readonly select:disabled,
+#preventionForm.intervention-readonly textarea:disabled{
+  opacity:1;
+  color:#e5e7eb!important;
+  -webkit-text-fill-color:#e5e7eb!important;
+  background:#070b12!important;
+  border-color:#334155!important;
+}
+#preventionForm.intervention-readonly input[type="checkbox"]:disabled{
+  opacity:1;
+  filter:none;
+}
+#preventionForm.intervention-readonly label{
+  cursor:default!important;
+}
+#preventionForm.intervention-readonly .category-photo-gallery{
+  display:grid!important;
+}
+#preventionForm.intervention-readonly .category-photo-thumb button{
+  display:none!important;
+}
+
+
+/* FireMap V20.2.4 — verrouillage forcé depuis Vue intervention */
+#preventionForm.intervention-readonly .category-photo-toolbar .category-photo-btn{
+  display:none!important;
+}
+#preventionForm.intervention-readonly .modal-actions button[type="submit"]{
+  display:none!important;
+}
+
+
+/* FireMap V20.2.5 — barre de fiche simplifiée */
+.building-main-actions{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:8px!important;
+}
+#openOperationalView{
+  grid-column:auto!important;
+}
+@media(max-width:700px){
+  .building-main-actions{
+    grid-template-columns:1fr 1fr!important;
+  }
+  #openOperationalView{
+    grid-column:1/-1!important;
+  }
+  .building-main-actions .primary,
+  .building-main-actions .secondary{
+    min-width:0!important;
+    white-space:normal!important;
+  }
+}
+
+
+/* FireMap V20.2.6 — lecture seule par défaut */
+.default-readonly-banner{
+  margin:10px 12px 0;
+  padding:11px 14px;
+  border:1px solid #2563eb;
+  border-radius:13px;
+  background:#071426;
+  color:#bfdbfe;
+  font-weight:900;
+  text-align:center;
+}
+#preventionForm.default-readonly input:disabled,
+#preventionForm.default-readonly select:disabled,
+#preventionForm.default-readonly textarea:disabled{
+  opacity:1;
+  color:#e5e7eb!important;
+  -webkit-text-fill-color:#e5e7eb!important;
+  background:#070b12!important;
+  border-color:#334155!important;
+}
+#preventionForm.default-readonly input[type="checkbox"]:disabled{
+  opacity:1;
+  filter:none;
+}
+#preventionForm.default-readonly .category-photo-btn,
+#preventionForm.default-readonly [data-photo-delete]{
+  display:none!important;
+}
+#editPreventionButton{
+  border-color:#f59e0b!important;
+  color:#fde68a!important;
+  font-weight:900;
+}
+.building-main-actions{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+@media(max-width:700px){
+  .building-main-actions{
+    grid-template-columns:1fr 1fr!important;
+  }
+  #openOperationalView{
+    grid-column:1/-1!important;
+  }
+}
+
+
+/* FireMap V20.2.10 — affichage fiable des photos */
+.category-photo-gallery.has-photos{
+  margin-top:8px;
+  padding:8px;
+  border:1px solid #334155;
+  border-radius:12px;
+  background:#05080e;
+}
+.category-photo-count{
+  grid-column:1/-1;
+  color:#94a3b8;
+  font-weight:700;
+}
+.category-photo-thumb img{
+  display:block!important;
+  width:100%!important;
+  min-height:110px;
+  object-fit:cover!important;
+  background:#111827;
+}
+
+
+/* FireMap V20.2.11 — photos gratuites dans Firestore */
+.category-photo-gallery::before{
+  content:"Photos enregistrées dans la fiche";
+  grid-column:1/-1;
+  color:#94a3b8;
+  font-size:12px;
+  font-weight:700;
+}
+
+
+/* FireMap V20.3.0 — fiches d'utilisation des véhicules */
+.vehicle-usage-section{
+  margin-top:18px;
+  padding-top:16px;
+  border-top:1px solid #26344d;
+}
+.vehicle-usage-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.vehicle-usage-head h3{margin:3px 0 0}
+.vehicle-usage-list{display:grid;gap:10px}
+.vehicle-usage-card{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:13px;
+  border:1px solid #26344d;
+  border-radius:15px;
+  background:#080d15;
+}
+.vehicle-usage-icon{font-size:30px}
+.vehicle-usage-main h4{margin:0 0 3px}
+.vehicle-usage-main strong{color:#93c5fd}
+.vehicle-usage-main p{margin:3px 0;color:#cbd5e1}
+.vehicle-usage-main small{color:#94a3b8}
+.vehicle-usage-dialog{width:min(760px,96vw)}
+.quick-status-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+.quick-status-grid button{
+  min-height:54px;
+  border:1px solid #334155;
+  border-radius:13px;
+  background:#070b12;
+  color:#fff;
+  font-weight:900;
+}
+.quick-status-grid button.active{
+  border-color:#ef4444;
+  background:#2a0b0f;
+  color:#fecaca;
+  box-shadow:0 0 0 2px rgba(239,68,68,.2);
+}
+.usage-status-text{
+  margin:10px 0 0;
+  font-weight:900;
+  color:#bfdbfe;
+}
+@media(max-width:620px){
+  .vehicle-usage-head{align-items:flex-start}
+  .vehicle-usage-card{grid-template-columns:auto 1fr}
+  .vehicle-usage-card>button{grid-column:1/-1}
+  .quick-status-grid{grid-template-columns:1fr}
+}
+
+/* FireMap V20.3.1 — panneau de pompe 6 sorties */
+.sector-choice-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.sector-choice-grid button{min-height:46px;border:1px solid #334155;border-radius:11px;background:#070b12;color:#fff;font-weight:900}.sector-choice-grid button.active{border-color:#2563eb;background:#071a33;color:#bfdbfe}.pump-panel-help{color:#94a3b8}.pump-panel-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.pump-outlet-card{border:1px solid #334155;border-radius:15px;padding:11px;background:#070b12}.pump-outlet-card.active{border-color:#22c55e;background:#062015;box-shadow:0 0 0 2px rgba(34,197,94,.15)}.pump-outlet-toggle{width:100%;display:grid;gap:3px;text-align:left;padding:12px;border:1px solid #475569;border-radius:12px;background:#111827;color:#fff;margin-bottom:10px}.pump-outlet-toggle span{font-size:12px;text-transform:uppercase;color:#94a3b8;font-weight:900}.pump-outlet-toggle strong{font-size:17px}.pump-outlet-toggle.active{border-color:#22c55e;background:#0b3b23}.pump-outlet-toggle.active span,.pump-outlet-toggle.active small{color:#bbf7d0}.pump-outlet-card label{display:block;margin-top:8px}@media(max-width:720px){.sector-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sector-choice-grid button:last-child{grid-column:1/-1}.pump-panel-grid{grid-template-columns:1fr}}
+
+
+/* FireMap V20.3.2 — secteur choisi par sortie */
+.outlet-sector-select{
+  width:100%;
+  min-height:44px;
+  padding:9px 11px;
+  border:1px solid #334155;
+  border-radius:10px;
+  background:#0b1220;
+  color:#fff;
+  font-weight:800;
+}
+
+.command-view{padding-bottom:90px}.command-event-head{display:flex;justify-content:space-between;gap:12px;padding:16px;border:1px solid #334155;border-radius:16px;background:#080d15;margin-bottom:12px}.command-event-head h2{margin:3px 0}.command-event-head>div:last-child{text-align:center}.command-event-head strong{font-size:28px;display:block}.command-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:12px}.command-stats article{padding:12px;border:1px solid #334155;border-radius:13px;background:#080d15;text-align:center}.command-stats article.green{border-color:#22c55e}.command-stats article.blue{border-color:#3b82f6}.command-stats strong{font-size:26px;display:block}.command-tabs{display:flex;gap:8px;overflow:auto;margin-bottom:10px}.command-tabs button{padding:10px 14px;border:1px solid #334155;border-radius:10px;background:#0a101b;color:#fff;font-weight:800}.command-tabs button.active{background:#7f1d1d;border-color:#ef4444}.command-vehicle-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.command-vehicle-card{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:13px;border:1px solid #334155;border-radius:14px;background:#080d15}.command-vehicle-card.green{border-color:#22c55e}.command-vehicle-card.blue{border-color:#3b82f6;background:#071426}.command-vehicle-card.yellow{border-color:#eab308}.command-vehicle-card>span{font-size:26px}.command-vehicle-card h3{margin:0}.command-vehicle-card p{margin:4px 0}.command-outlet-list{display:grid;gap:8px}.command-outlet-card{padding:12px;border:1px solid #22c55e;border-radius:13px;background:#062015}.command-outlet-card strong,.command-outlet-card span{display:block}.command-outlet-card p{margin:5px 0 0}.command-journal-add{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:10px}.command-journal-item{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:10px;border-left:3px solid #ef4444;background:#080d15;margin-bottom:7px}.command-journal-item p{margin:0}@media(max-width:700px){.command-stats{grid-template-columns:repeat(2,1fr)}.command-vehicle-grid{grid-template-columns:1fr}.command-event-head{display:block}}
+
+
+/* FireMap V21.0.2 — liaison appel / événement / véhicules */
+.vehicle-usage-event-link{
+  margin:10px 12px 0;
+  padding:10px 12px;
+  border:1px solid #ef4444;
+  border-radius:12px;
+  background:#260b0f;
+  color:#fecaca;
+  font-weight:850;
+}
+.vehicle-event-link{
+  display:block;
+  margin-top:4px;
+  color:#fca5a5!important;
+  font-weight:800;
+}
+
+
+/* FireMap V21.0.3 — Prévention dans le poste de commandement */
+.command-prevention-head{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;padding:15px;margin-bottom:12px;border:1px solid #334155;border-radius:16px;background:#080d15}
+.command-prevention-head h2{margin:3px 0}.command-prevention-head p{margin:0;color:#cbd5e1}
+.command-prevention-actions{display:flex;gap:8px;flex-wrap:wrap}
+.command-prevention-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.command-prevention-grid article{padding:14px;border:1px solid #334155;border-radius:14px;background:#080d15}
+.command-prevention-grid article.critical{border-color:#ef4444;background:#260b0f}
+.command-prevention-grid span{font-size:24px}.command-prevention-grid strong{display:block;margin:6px 0}
+.command-prevention-grid p{margin:0;color:#cbd5e1;white-space:pre-wrap}
+.command-prevention-photos{margin-top:14px}.command-prevention-photo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.command-prevention-photo-grid a{display:block;overflow:hidden;border:1px solid #334155;border-radius:12px;background:#05080e}
+.command-prevention-photo-grid img{display:block;width:100%;height:140px;object-fit:cover}
+@media(max-width:760px){.command-prevention-head{grid-template-columns:1fr}.command-prevention-actions button{flex:1}.command-prevention-grid{grid-template-columns:1fr}.command-prevention-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* FireMap V21.0.4 — fiche camion intégrée au profil de l’unité */
+.vehicle-profile-card{
+  display:block!important;
+  padding:16px!important;
+  border-left:4px solid var(--vehicle-status)!important;
+}
+.vehicle-profile-card.usage-onscene{
+  border-color:#22c55e!important;
+}
+.vehicle-profile-card.usage-supplied{
+  border-color:#3b82f6!important;
+  box-shadow:0 0 0 1px rgba(59,130,246,.25);
+}
+.vehicle-profile-top{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:14px;
+  align-items:center;
+}
+.vehicle-profile-linked{
+  display:block;
+  margin-top:7px;
+  color:#fca5a5;
+  font-weight:850;
+}
+.vehicle-profile-usage{
+  margin-top:14px;
+  padding:13px;
+  border:1px solid #26344d;
+  border-radius:14px;
+  background:#050a12;
+}
+.vehicle-profile-stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.vehicle-profile-stats span{
+  padding:9px;
+  border:1px solid #26344d;
+  border-radius:10px;
+  background:#0b1220;
+  color:#cbd5e1;
+}
+.vehicle-profile-stats strong{
+  color:#fff;
+}
+.vehicle-profile-outlets{
+  display:grid;
+  gap:7px;
+  margin:12px 0 0;
+  padding:0;
+  list-style:none;
+}
+.vehicle-profile-outlets li{
+  display:grid;
+  gap:3px;
+  padding:9px 11px;
+  border-left:3px solid #22c55e;
+  border-radius:0 10px 10px 0;
+  background:#062015;
+}
+.vehicle-profile-outlets li span{
+  color:#bbf7d0;
+  font-size:13px;
+}
+.vehicle-profile-empty{
+  margin:12px 0 0;
+  color:#94a3b8;
+}
+.vehicle-profile-pressure,
+.vehicle-profile-notes{
+  margin:10px 0 0;
+  color:#cbd5e1;
+}
+.vehicle-profile-notes{
+  padding:9px;
+  border-radius:10px;
+  background:#111827;
+  white-space:pre-wrap;
+}
+.vehicle-profile-usage>small{
+  display:block;
+  margin-top:10px;
+  color:#94a3b8;
+}
+.vehicle-profile-actions{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:12px;
+}
+.vehicle-profile-actions button:first-child{
+  grid-column:1/-1;
+  min-height:50px;
+}
+@media(max-width:620px){
+  .vehicle-profile-stats{
+    grid-template-columns:1fr;
+  }
+  .vehicle-profile-actions{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+
+/* FireMap V21.0.8 — confirmation fiable de sauvegarde */
+.vehicle-usage-save-status{
+  margin:12px 14px 0;
+  padding:11px 13px;
+  border-radius:11px;
+  border:1px solid #334155;
+  background:#0b1220;
+  color:#e5e7eb;
+  font-weight:850;
+  text-align:center;
+}
+.vehicle-usage-save-status.success{
+  border-color:#22c55e;
+  background:#062015;
+  color:#bbf7d0;
+}
+.vehicle-usage-save-status.warning{
+  border-color:#eab308;
+  background:#251a02;
+  color:#fef08a;
+}
+.vehicle-usage-save-status.error{
+  border-color:#ef4444;
+  background:#260b0f;
+  color:#fecaca;
+}
+.vehicle-usage-save-status.info{
+  border-color:#3b82f6;
+  background:#071426;
+  color:#bfdbfe;
+}
+
+
+/* FireMap V21.0.11 — pression résiduelle dans le profil */
+.vehicle-profile-residual{
+  margin-top:10px;
+  padding:11px 13px;
+  border:1px solid #334155;
+  border-radius:12px;
+  background:#0b1220;
+}
+.vehicle-profile-residual>span{
+  display:block;
+  margin-bottom:8px;
+  color:#e5e7eb;
+}
+.vehicle-profile-residual>div{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.vehicle-profile-residual>div span{
+  padding:8px 10px;
+  border-radius:9px;
+  background:#111827;
+  color:#cbd5e1;
+}
+.vehicle-profile-residual strong{
+  color:#fff;
+}
+@media(max-width:620px){
+  .vehicle-profile-residual>div{
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* FireMap V22.0.0 — tableau de commandement complet */
+.command-stats article.residual{
+  border-color:#f59e0b;
+  background:#211504;
+}
+.command-sector-summary{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:14px;
+  align-items:center;
+  margin-bottom:12px;
+  padding:13px;
+  border:1px solid #334155;
+  border-radius:14px;
+  background:#080d15;
+}
+.command-sector-summary>div{
+  min-width:110px;
+  text-align:center;
+}
+.command-sector-summary strong{
+  display:block;
+  font-size:30px;
+}
+.command-sector-summary span,
+.command-sector-summary p{
+  color:#94a3b8;
+}
+.command-sector-summary p{
+  margin:0;
+}
+.command-sector-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
+}
+.command-sector-card{
+  padding:14px;
+  border:1px solid #f59e0b;
+  border-radius:15px;
+  background:#171005;
+}
+.command-sector-title{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.command-sector-title>span{
+  font-size:28px;
+}
+.command-sector-title h3{
+  margin:2px 0 0;
+}
+.command-sector-stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  margin:12px 0;
+}
+.command-sector-stats span{
+  padding:8px;
+  border-radius:9px;
+  background:#0b1220;
+  color:#cbd5e1;
+  text-align:center;
+}
+.command-sector-stats strong{
+  display:block;
+  color:#fff;
+}
+.command-sector-card ul{
+  display:grid;
+  gap:7px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+.command-sector-card li{
+  display:grid;
+  gap:3px;
+  padding:9px 10px;
+  border-left:3px solid #22c55e;
+  border-radius:0 9px 9px 0;
+  background:#062015;
+}
+.command-sector-card li span{
+  color:#bbf7d0;
+  font-size:13px;
+}
+@media(max-width:760px){
+  .command-sector-grid{
+    grid-template-columns:1fr;
+  }
+  .command-sector-stats{
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* FireMap V22.1.0 — journal d’intervention automatique */
+.command-journal-toolbar{
+  display:grid;
+  gap:10px;
+  margin-bottom:11px;
+}
+.command-journal-add{
+  display:grid;
+  grid-template-columns:160px 130px 160px 1fr auto;
+  gap:8px;
+}
+.command-journal-filters{
+  display:flex;
+  gap:7px;
+  overflow-x:auto;
+  padding-bottom:3px;
+}
+.command-journal-filters button{
+  min-height:38px;
+  padding:7px 11px;
+  border:1px solid #334155;
+  border-radius:10px;
+  background:#0b1220;
+  color:#e5e7eb;
+  font-weight:800;
+  white-space:nowrap;
+}
+.command-journal-filters button.active{
+  border-color:#ef4444;
+  background:#3b0b12;
+}
+.command-journal-summary{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:11px;
+}
+.command-journal-summary span{
+  padding:8px 11px;
+  border:1px solid #334155;
+  border-radius:10px;
+  background:#080d15;
+  color:#cbd5e1;
+}
+.command-journal-summary strong{
+  color:#fff;
+}
+.command-journal-timeline{
+  position:relative;
+  display:grid;
+  gap:8px;
+}
+.command-journal-timeline:before{
+  content:"";
+  position:absolute;
+  top:8px;
+  bottom:8px;
+  left:67px;
+  width:2px;
+  background:#334155;
+}
+.command-journal-item{
+  position:relative;
+  display:grid;
+  grid-template-columns:54px 30px 1fr;
+  gap:9px;
+  align-items:start;
+  padding:10px 12px;
+  border:1px solid #334155;
+  border-radius:13px;
+  background:#080d15;
+}
+.command-journal-item time{
+  padding-top:4px;
+  color:#cbd5e1;
+  font-weight:900;
+}
+.command-journal-icon{
+  position:relative;
+  z-index:1;
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  border:2px solid #64748b;
+  border-radius:50%;
+  background:#080d15;
+}
+.command-journal-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:9px;
+  margin-bottom:3px;
+}
+.command-journal-meta span{
+  color:#94a3b8;
+  font-size:12px;
+}
+.command-journal-content p{
+  margin:0;
+  white-space:pre-wrap;
+}
+.command-journal-content small{
+  display:block;
+  margin-top:5px;
+  color:#cbd5e1;
+}
+.command-journal-item.level-attention{
+  border-color:#eab308;
+}
+.command-journal-item.level-attention .command-journal-icon{
+  border-color:#eab308;
+}
+.command-journal-item.level-important{
+  border-color:#f97316;
+  background:#241005;
+}
+.command-journal-item.level-important .command-journal-icon{
+  border-color:#f97316;
+}
+.command-journal-item.level-critical{
+  border-color:#ef4444;
+  background:#260b0f;
+}
+.command-journal-item.level-critical .command-journal-icon{
+  border-color:#ef4444;
+}
+@media(max-width:900px){
+  .command-journal-add{
+    grid-template-columns:1fr 1fr;
+  }
+  .command-journal-add input:nth-of-type(2){
+    grid-column:1/-1;
+  }
+  .command-journal-add button{
+    grid-column:1/-1;
+  }
+}
+@media(max-width:560px){
+  .command-journal-add{
+    grid-template-columns:1fr;
+  }
+  .command-journal-add input:nth-of-type(2),
+  .command-journal-add button{
+    grid-column:auto;
+  }
+  .command-journal-timeline:before{
+    left:56px;
+  }
+  .command-journal-item{
+    grid-template-columns:43px 28px 1fr;
+    padding:9px;
+  }
+}
+
+/* FireMap V22.2.0 — comptes par véhicule */
+.account-badge{display:flex;align-items:center;gap:7px;min-height:42px;padding:5px 9px;border:1px solid #334155;border-radius:11px;background:#0b1220;color:#fff}
+.account-badge>span:first-child{font-size:21px}.account-badge>span:last-child{display:grid;text-align:left;line-height:1.05}.account-badge strong{font-size:14px}.account-badge small{color:#94a3b8;font-size:10px}
+.vehicle-account-dialog{width:min(760px,96vw);max-height:92vh;padding:0;border:1px solid #334155;border-radius:19px;background:#05080e;color:#fff}
+.vehicle-account-dialog::backdrop{background:rgba(0,0,0,.88);backdrop-filter:blur(5px)}
+.vehicle-account-dialog form{padding:18px}.vehicle-account-brand{display:grid;justify-items:center;text-align:center;margin-bottom:15px}.vehicle-account-brand>span{font-size:48px}.vehicle-account-brand h2{margin:4px 0}.vehicle-account-brand p{margin:0;color:#94a3b8}
+.vehicle-account-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.vehicle-account-card{display:grid;justify-items:center;gap:5px;min-height:145px;padding:12px 8px;border:1px solid #334155;border-radius:14px;background:#0b1220;color:#fff;text-align:center}
+.vehicle-account-card.selected{border-color:#22c55e;background:#062015;box-shadow:0 0 0 2px rgba(34,197,94,.16)}
+.vehicle-account-card.chief{border-color:#ef4444}.vehicle-account-card.chief.selected{background:#260b0f}
+.vehicle-account-icon{font-size:34px}.vehicle-account-card small{color:#cbd5e1}.vehicle-account-card em{color:#94a3b8;font-size:11px;font-style:normal}
+.vehicle-account-selected{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:13px;padding:12px;border:1px solid #334155;border-radius:14px;background:#080d15}
+.vehicle-account-selected>div{display:flex;gap:10px;align-items:center}.vehicle-account-selected>div>span{font-size:31px}.vehicle-account-selected>div>div{display:grid}.vehicle-account-selected>div>div span,.vehicle-account-selected small{color:#94a3b8}
+.vehicle-account-help{margin:13px 0 0;color:#cbd5e1;text-align:center}
+body[data-account-role="unit"] #editStation,body[data-account-role="unit"] [data-vehicle-share]{display:none!important}
+@media(max-width:680px){.vehicle-account-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.vehicle-account-selected{grid-template-columns:1fr}.vehicle-account-selected button{width:100%}.account-badge small{display:none}}
+
+/* FireMap V22.3.0 — GPS en direct par véhicule */
+.vehicle-profile-gps{margin-top:10px;padding:11px;border:1px solid #334155;border-radius:12px;background:#0b1220}
+.vehicle-profile-gps>div:first-child{display:flex;gap:9px;align-items:center}.vehicle-profile-gps>div:first-child>span{font-size:23px}.vehicle-profile-gps>div:first-child>div{display:grid}.vehicle-profile-gps small{color:#94a3b8}
+.vehicle-profile-gps.live{border-color:#22c55e;background:#062015}.vehicle-profile-gps.delayed{border-color:#eab308}.vehicle-profile-gps.stale{border-color:#ef4444;background:#260b0f}
+.vehicle-profile-gps-data{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.vehicle-profile-gps-data span{padding:7px 9px;border-radius:8px;background:#111827;color:#cbd5e1}.vehicle-profile-gps-data strong{display:block;color:#fff}
+.command-gps-head{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-bottom:12px;padding:13px;border:1px solid #334155;border-radius:14px;background:#080d15}.command-gps-head h3{margin:2px 0}.command-gps-head p{margin:0;color:#94a3b8}
+.command-gps-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.command-gps-card{padding:13px;border:1px solid #334155;border-radius:14px;background:#080d15}.command-gps-card.live{border-color:#22c55e;background:#062015}.command-gps-card.delayed{border-color:#eab308}.command-gps-card.stale{border-color:#ef4444;background:#260b0f}
+.command-gps-unit{display:flex;gap:10px;align-items:center}.command-gps-unit>span{font-size:29px}.command-gps-unit h3{margin:0}.command-gps-unit strong{color:#cbd5e1}.command-gps-data{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:11px 0}.command-gps-data span{padding:7px;border-radius:8px;background:#111827;color:#94a3b8;font-size:12px}.command-gps-data strong{display:block;color:#fff;font-size:13px}
+body[data-account-role="unit"] [data-vehicle-share]{display:inline-flex!important}
+@media(max-width:760px){.command-gps-head{grid-template-columns:1fr}.command-gps-grid{grid-template-columns:1fr}.command-gps-data{grid-template-columns:1fr}.vehicle-profile-gps-data{grid-template-columns:1fr}}
