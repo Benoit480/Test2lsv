@@ -282,6 +282,23 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
     return outlets;
   }
 
+  function resetFleetDefinition(){
+    const current=vehicles();
+    if(current?.length)return current.map(v=>({
+      id:String(v.id||v.number||""),
+      number:String(v.number||v.id||""),
+      name:String(v.name||`Unité ${v.number||v.id||""}`)
+    }));
+    return [
+      {id:"102",number:"102",name:"Chef 102"},
+      {id:"202",number:"202",name:"Autopompe 202"},
+      {id:"502",number:"502",name:"Échelle 502"},
+      {id:"602",number:"602",name:"Unité de soutien 602"},
+      {id:"802",number:"802",name:"Citerne 802"},
+      {id:"902",number:"902",name:"Pickup 902"}
+    ];
+  }
+
   function resetAllUnitsAfterEvent(eventId){
     const targetEventId=String(eventId||"");
     if(!targetEventId)return {archived:0,reset:0};
@@ -302,7 +319,6 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
     const completedAt=new Date().toISOString();
     const affected=usages.filter(item=>String(item.eventId||"")===targetEventId);
 
-    // Conserver les fiches originales dans l’historique de l’événement terminé.
     affected.forEach(item=>{
       item.eventClosed=true;
       item.eventClosedAt=completedAt;
@@ -312,20 +328,17 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
     });
 
     const resetProfiles=[];
-    const seenVehicles=new Set();
-
-    affected.forEach(old=>{
-      const vehicleId=String(old.vehicleId||old.vehicleNumber||"");
-      if(!vehicleId||seenVehicles.has(vehicleId))return;
-      seenVehicles.add(vehicleId);
+    resetFleetDefinition().forEach((vehicle,index)=>{
+      const vehicleId=String(vehicle.id||vehicle.number||"");
+      if(!vehicleId)return;
 
       const clean=canonical({
-        id:`reset-${vehicleId}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,
+        id:`reset-${vehicleId}-${Date.now()}-${index}`,
         eventId:"",
         sourceCallId:"",
         vehicleId,
-        vehicleName:String(old.vehicleName||`Unité ${vehicleId}`),
-        vehicleNumber:String(old.vehicleNumber||vehicleId),
+        vehicleName:String(vehicle.name||`Unité ${vehicleId}`),
+        vehicleNumber:String(vehicle.number||vehicleId),
         status:"station",
         firefighters:0,
         supplied:"no",
@@ -340,7 +353,8 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
         createdAt:completedAt,
         updatedAt:completedAt,
         updatedAtText:new Date(completedAt).toLocaleString("fr-CA"),
-        resetAfterEventId:targetEventId
+        resetAfterEventId:targetEventId,
+        eventClosed:false
       });
 
       usages.push(clean);
@@ -354,12 +368,7 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
 
     window.dispatchEvent(new CustomEvent("firemap:vehicle-usages-ready"));
     window.dispatchEvent(new CustomEvent("firemap:vehicle-usage-updated",{
-      detail:{
-        eventId:targetEventId,
-        reset:true,
-        archived:affected.length,
-        profiles:resetProfiles
-      }
+      detail:{eventId:targetEventId,reset:true,archived:affected.length,profiles:resetProfiles}
     }));
     window.fireMapVehicles?.refreshProfiles?.();
 

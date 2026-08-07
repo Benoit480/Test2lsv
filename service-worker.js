@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v22-3-7-chief-only-end";
+const CACHE_VERSION = "firemap-v23-0-0-stable-events";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
@@ -101,7 +101,18 @@ self.addEventListener("fetch", event => {
   }
 
   if (url.origin === self.location.origin) {
-    event.respondWith(cacheFirst(request));
+    event.respondWith((async()=>{
+      try{
+        const response=await fetch(request,{cache:"no-store"});
+        if(response.ok){
+          const cache=await caches.open(STATIC_CACHE);
+          cache.put(request,response.clone());
+        }
+        return response;
+      }catch(_){
+        return (await caches.match(request)) || Response.error();
+      }
+    })());
     return;
   }
 

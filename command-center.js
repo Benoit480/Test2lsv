@@ -1,4 +1,4 @@
-(()=>{"use strict";const $=id=>document.getElementById(id),I=window.fireMapInternal;if(!I)return;const EC="firemap-command-events-v1",AC="firemap-command-active-v1",UC="firemap-vehicle-usages-v2",ACTIVE_EVENT_DATA="firemap-command-active-event-data";let events=[],activeId=localStorage.getItem(AC)||"",timer;const read=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))||f}catch(_){return f}},write=(k,v)=>localStorage.setItem(k,JSON.stringify(v)),uid=()=>crypto.randomUUID?crypto.randomUUID():`e-${Date.now()}`,esc=v=>I.esc?I.esc(v):String(v??"");function normAddress(v=""){return String(v).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\b(rue|avenue|av|boulevard|boul|chemin|ch|route|rang)\b/g,"").replace(/[^a-z0-9]/g,"")}
+(()=>{"use strict";const $=id=>document.getElementById(id),I=window.fireMapInternal;if(!I)return;const EC="firemap-command-events-v1",AC="firemap-command-active-v1",UC="firemap-vehicle-usages-v2",ACTIVE_EVENT_DATA="firemap-command-active-event-data";let events=[],activeId=localStorage.getItem(AC)||"",timer,commandCloudUnsub=null;const read=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))||f}catch(_){return f}},write=(k,v)=>localStorage.setItem(k,JSON.stringify(v)),uid=()=>crypto.randomUUID?crypto.randomUUID():`e-${Date.now()}`,esc=v=>I.esc?I.esc(v):String(v??"");function normAddress(v=""){return String(v).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\b(rue|avenue|av|boulevard|boul|chemin|ch|route|rang)\b/g,"").replace(/[^a-z0-9]/g,"")}
 function buildings(){return window.fireMapPreplans?.getBuildings?.()||window.fireMapInternal?.state?.buildings||[]}
 function findBuilding(e){const target=normAddress(e?.address||"");if(!target)return null;const list=buildings();return list.find(b=>normAddress(b.address||b.adresse||"")===target)||list.find(b=>{const a=normAddress(b.address||b.adresse||"");return a&&(a.includes(target)||target.includes(a))})||null}
 function preventionRecord(id){return window.fireMapPrevention?.getRecordForBuilding?.(id)||null}
@@ -102,7 +102,83 @@ function addJournal(e,msg,options={}){
     }
   }
 
-  
+
+function eventStartedAtValue(event){
+  const value=event?.startedAt;
+  if(typeof value==="string")return Date.parse(value)||0;
+  if(value?.toMillis)return value.toMillis();
+  if(value?.seconds)return Number(value.seconds)*1000;
+  return 0;
+}
+
+function applyCloudCommandEvents(items=[]){
+  const localEvents=read(EC,[]);
+  const merged=new Map(localEvents.map(event=>[String(event.id),event]));
+  (Array.isArray(items)?items:[]).forEach(event=>{
+    if(event?.id)merged.set(String(event.id),event);
+  });
+  events=[...merged.values()];
+
+  const previousActiveId=String(activeId||localStorage.getItem(AC)||"");
+  const previousEvent=previousActiveId
+    ? events.find(event=>String(event.id)===previousActiveId)
+    : null;
+
+  if(previousEvent?.status==="closed"){
+    activeId="";
+    localStorage.removeItem(AC);
+    localStorage.removeItem(ACTIVE_EVENT_DATA);
+    write(EC,events);
+    window.dispatchEvent(new CustomEvent("firemap:event-closed",{detail:previousEvent}));
+    render();
+    return;
+  }
+
+  let current=events.find(event=>
+    String(event.id)===String(activeId) && event.status!=="closed"
+  )||null;
+
+  if(!current){
+    current=events
+      .filter(event=>event.status!=="closed")
+      .sort((a,b)=>eventStartedAtValue(b)-eventStartedAtValue(a))[0]||null;
+  }
+
+  if(current){
+    activeId=String(current.id);
+    localStorage.setItem(AC,activeId);
+    write(ACTIVE_EVENT_DATA,{
+      id:current.id,
+      sourceCallId:current.sourceCallId||"",
+      number:current.number||"",
+      address:current.address||""
+    });
+    window.dispatchEvent(new CustomEvent("firemap:command-event-linked",{detail:{
+      eventId:current.id,
+      sourceCallId:current.sourceCallId||"",
+      number:current.number||"",
+      address:current.address||""
+    }}));
+  }else{
+    activeId="";
+    localStorage.removeItem(AC);
+    localStorage.removeItem(ACTIVE_EVENT_DATA);
+  }
+
+  write(EC,events);
+  render();
+}
+
+function connectCommandCloud(){
+  const cloud=window.fireMapCloud;
+  if(!cloud?.subscribeCommandEvents)return;
+  commandCloudUnsub?.();
+  commandCloudUnsub=cloud.subscribeCommandEvents(
+    items=>applyCloudCommandEvents(items),
+    error=>console.warn("Synchronisation des événements indisponible.",error)
+  );
+}
+
 function residualValues(rows){
   const values=[];
   rows.forEach(({u})=>{
@@ -401,32 +477,52 @@ document.addEventListener("click",event=>{
   document.querySelectorAll("[data-journal-filter]").forEach(button=>button.classList.toggle("active",button===filter));
   const e=active();
   if(e)renderJournal(e);
-});$("endCommandEvent").onclick=()=>{
+});async function closeActiveCommandEvent(){
   if(!window.fireMapAccount?.isChief?.()){
     I.toast("Seul le compte 102 peut terminer un événement.");
-    return;
+    return false;
   }
 
-  const e=active();
-  if(!e||!confirm("Terminer cet événement et réinitialiser toutes les unités?"))return;
+  const event=active();
+  if(!event)return false;
+  if(!confirm("Terminer cet événement et réinitialiser toutes les unités?"))return false;
 
-  e.status="closed";
-  addJournal(e,"Intervention terminée",{category:"system",level:"important"});
-  saveEventInBackground(e);
+  event.status="closed";
+  event.closedAt=new Date().toISOString();
+  event.closedBy="102";
+  addJournal(event,"Intervention terminée par le compte 102",{
+    category:"system",
+    level:"important",
+    author:"102 — Chef des opérations"
+  });
 
-  const result=window.fireMapVehicleUsage?.resetAllUnitsAfterEvent?.(e.id)||{archived:0,reset:0};
+  saveLocal();
+  const result=window.fireMapVehicleUsage?.resetAllUnitsAfterEvent?.(event.id)||{archived:0,reset:0};
 
   activeId="";
   localStorage.removeItem(AC);
   localStorage.removeItem(ACTIVE_EVENT_DATA);
+  write(EC,events);
+
+  window.dispatchEvent(new CustomEvent("firemap:event-closed",{detail:event}));
   render();
 
   I.toast(
-    result.reset
-      ? `Événement terminé — ${result.reset} unité${result.reset>1?"s":""} réinitialisée${result.reset>1?"s":""}.`
-      : "Événement terminé — aucune fiche d’unité active à réinitialiser."
+    `Événement terminé — ${result.reset||0} unité${result.reset===1?"":"s"} réinitialisée${result.reset===1?"":"s"}.`
   );
-};window.addEventListener("firemap:call-active",e=>createEventFromActiveCall(e.detail||{}));
+
+  try{
+    await window.fireMapCloud?.saveCommandEvent?.(event);
+  }catch(error){
+    console.warn("Fermeture enregistrée localement, synchronisation en attente.",error);
+    I.toast("Événement fermé localement — synchronisation Firebase en attente.");
+  }
+  return true;
+}
+
+$("endCommandEvent").onclick=closeActiveCommandEvent;
+
+window.addEventListener("firemap:call-active",e=>createEventFromActiveCall(e.detail||{}));
   window.fireMapCommandCenter={
     createFromActiveCall:createEventFromActiveCall,
     open:()=>{if(!window.fireMapAccount?.canAccessCommand?.())return I.toast("Le Centre de commandement est réservé au compte 102.");I.showView("command")},
@@ -472,6 +568,8 @@ document.addEventListener("click",event=>{
 
   events=read(EC,[]);
   render();
+  connectCommandCloud();
+  window.addEventListener("firemap-cloud-ready",connectCommandCloud);
   timer=setInterval(tick,1000);
   window.addEventListener("storage",render);
   window.addEventListener("firemap:vehicle-usage-updated",render);

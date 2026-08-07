@@ -285,7 +285,26 @@
   $("assistantBackMap").onclick=()=>I.showView("map");
   $("assistantShowMap").onclick=()=>{if(!active)return;I.showView("map");const pts=[[active.lat,active.lng],...nearest.slice(0,3).map(p=>[p.lat,p.lng])];I.map.fitBounds(pts,{padding:[45,45]})};
   $("assistantOpenPreplan").onclick=()=>matchedBuilding&&window.fireMapPreplans?.openPreplanById(matchedBuilding.id);
-  $("assistantEnd").onclick=()=>{active=null;matchedBuilding=null;nearest=[];I.clearIntervention();$("assistantDashboard").classList.add("hidden");$("assistantEmpty").classList.remove("hidden");$("assistantAddress").value="";I.showView("map")};
+  
+
+
+  function clearAssistantAfterCommandClose(detail={}){
+    active=null;
+    matchedBuilding=null;
+    nearest=[];
+    localStorage.removeItem("firemap-active-call");
+    I.clearIntervention();
+    $("assistantDashboard")?.classList.add("hidden");
+    $("assistantEmpty")?.classList.remove("hidden");
+    if($("assistantAddress"))$("assistantAddress").value="";
+    window.fireMapNavigation?.stop?.();
+    I.showView("map");
+    I.toast("Événement terminé par le poste de commandement.");
+  }
+
+  window.addEventListener("firemap:event-closed",event=>{
+    clearAssistantAfterCommandClose(event.detail||{});
+  });
 
   window.fireMapDispatch={parse:parseDispatchSms,importText:importDispatchSms,receiveAutomaticSms,settings:readSmsSettings};
   window.addEventListener("load",()=>{
@@ -328,7 +347,6 @@
   };
 
   window.fireMapInterventionLock={
-    start(detail={}){dispatch("firemap:intervention-started",detail)},
-    end(detail={}){dispatch("firemap:intervention-ended",detail)}
+    start(detail={}){dispatch("firemap:intervention-started",detail)}
   };
 })();

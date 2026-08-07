@@ -73,3 +73,15 @@ Correction du profil des unités après la fermeture d’un événement :
 - L’Assistant d’intervention ne permet plus de terminer un événement.
 - Une protection JavaScript bloque aussi toute tentative d’un autre compte.
 - La réinitialisation des fiches d’unités reste déclenchée par la fermeture faite par le 102.
+
+
+## V23.0.0 — Gestion stable des événements
+
+Les fonctions existantes restent actives : tableau de bord, secteurs, journal automatique, GPS, prévention, comptes véhicules, import SMS et fiches véhicules.
+
+- Seul le compte 102 peut fermer un événement.
+- Le seul bouton de fermeture est dans le Poste de commandement.
+- Le vrai bouton `assistantEnd` a été retiré.
+- Firebase transmet la fermeture à tous les appareils.
+- Les six unités sont remises à zéro.
+- L’historique reste conservé.
