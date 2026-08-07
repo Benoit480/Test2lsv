@@ -37,3 +37,10 @@ Cette archive est prête à remplacer complètement le contenu du dépôt GitHub
 ## Firebase
 
 La configuration actuelle a été conservée. Les fichiers `firestore.rules` et `storage.rules` restent inclus pour publication dans Firebase si nécessaire.
+
+
+## V22.3.2 — SMS automatique sur iPhone
+
+FireMap accepte maintenant les SMS transmis par une automatisation Apple Raccourcis. Le numéro autorisé est vérifié, les doublons sont bloqués et l’appel actif ainsi que l’événement de commandement sont créés automatiquement.
+
+Voir `CONFIGURATION-RACCOURCI-SMS-IPHONE.md`.

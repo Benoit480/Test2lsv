@@ -88,6 +88,31 @@
         <summary>📩 Importer le SMS de répartition</summary>
         <div class="sms-import-body">
           <p>Copiez le message reçu de la répartition. FireMap détectera la nature de l’appel, l’adresse, le niveau d’alarme et les véhicules.</p>
+
+          <section class="sms-auto-settings">
+            <div class="sms-auto-title">
+              <div><strong>⚡ Réception automatique par Raccourcis</strong><small>Autoriser seulement le numéro de la répartition</small></div>
+              <label class="switch-line"><input id="smsAutoEnabled" type="checkbox"><span>Activée</span></label>
+            </div>
+            <label>Numéro autorisé
+              <input id="smsAuthorizedSender" type="tel" inputmode="tel" placeholder="Ex. +18195551234">
+            </label>
+            <div class="sms-auto-actions">
+              <button id="saveSmsSettings" type="button" class="secondary">Enregistrer le numéro</button>
+              <button id="copyShortcutUrl" type="button" class="secondary">Copier le lien FireMap</button>
+            </div>
+            <div id="smsAutoStatus" class="sms-auto-status" aria-live="polite"></div>
+            <details class="sms-shortcut-help">
+              <summary>Comment configurer le Raccourci iPhone</summary>
+              <ol>
+                <li>Créer une automatisation personnelle déclenchée à la réception d’un message du numéro autorisé.</li>
+                <li>Ajouter l’action <strong>Encoder l’URL</strong> avec le contenu du message reçu.</li>
+                <li>Ajouter l’action <strong>Ouvrir les URL</strong> avec le lien FireMap copié.</li>
+                <li>Remplacer <code>TEXTE_ENCODE</code> par la variable du message encodé.</li>
+              </ol>
+            </details>
+          </section>
+
           <textarea id="dispatchSms" rows="5" placeholder="Collez ici le SMS de répartition…"></textarea>
           <div class="sms-import-actions">
             <button id="pasteDispatchSms" type="button" class="secondary">📋 Coller</button>

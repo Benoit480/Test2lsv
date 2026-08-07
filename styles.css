@@ -1285,3 +1285,22 @@ body[data-account-role="unit"] #editStation,body[data-account-role="unit"] [data
 .command-gps-unit{display:flex;gap:10px;align-items:center}.command-gps-unit>span{font-size:29px}.command-gps-unit h3{margin:0}.command-gps-unit strong{color:#cbd5e1}.command-gps-data{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:11px 0}.command-gps-data span{padding:7px;border-radius:8px;background:#111827;color:#94a3b8;font-size:12px}.command-gps-data strong{display:block;color:#fff;font-size:13px}
 body[data-account-role="unit"] [data-vehicle-share]{display:inline-flex!important}
 @media(max-width:760px){.command-gps-head{grid-template-columns:1fr}.command-gps-grid{grid-template-columns:1fr}.command-gps-data{grid-template-columns:1fr}.vehicle-profile-gps-data{grid-template-columns:1fr}}
+
+
+/* FireMap V22.3.2 — réception automatique des SMS par Raccourcis */
+.sms-auto-settings{display:grid;gap:10px;margin-bottom:13px;padding:12px;border:1px solid #334155;border-radius:14px;background:#080d15}
+.sms-auto-title{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.sms-auto-title>div{display:grid;gap:2px}.sms-auto-title small{color:#94a3b8}
+.switch-line{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.sms-auto-settings label:not(.switch-line){display:grid;gap:5px;font-weight:800}
+.sms-auto-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sms-auto-status{min-height:20px;padding:8px 10px;border-radius:9px;background:#111827;color:#cbd5e1;font-size:13px}
+.sms-auto-status.success{border:1px solid #22c55e;background:#062015;color:#bbf7d0}
+.sms-auto-status.warning{border:1px solid #eab308;background:#251a02;color:#fef08a}
+.sms-auto-status.error{border:1px solid #ef4444;background:#260b0f;color:#fecaca}
+.sms-shortcut-help{border-top:1px solid #26344d;padding-top:9px}
+.sms-shortcut-help summary{cursor:pointer;font-weight:850}
+.sms-shortcut-help ol{margin:9px 0 0;padding-left:22px;color:#cbd5e1}
+.sms-shortcut-help li{margin:6px 0}
+.sms-shortcut-help code{padding:2px 5px;border-radius:5px;background:#111827}
+@media(max-width:620px){.sms-auto-title{align-items:flex-start}.sms-auto-actions{grid-template-columns:1fr}}
