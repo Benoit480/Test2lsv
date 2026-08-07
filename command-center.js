@@ -401,7 +401,26 @@ document.addEventListener("click",event=>{
   document.querySelectorAll("[data-journal-filter]").forEach(button=>button.classList.toggle("active",button===filter));
   const e=active();
   if(e)renderJournal(e);
-});$("endCommandEvent").onclick=()=>{const e=active();if(!e||!confirm("Terminer cet événement?"))return;e.status="closed";addJournal(e,"Intervention terminée",{category:"system",level:"important"});saveEventInBackground(e);activeId="";localStorage.removeItem(AC);render()};window.addEventListener("firemap:call-active",e=>createEventFromActiveCall(e.detail||{}));
+});$("endCommandEvent").onclick=()=>{
+  const e=active();
+  if(!e||!confirm("Terminer cet événement et réinitialiser toutes les unités?"))return;
+
+  e.status="closed";
+  addJournal(e,"Intervention terminée",{category:"system",level:"important"});
+  saveEventInBackground(e);
+
+  const result=window.fireMapVehicleUsage?.resetAllUnitsAfterEvent?.(e.id)||{archived:0,reset:0};
+
+  activeId="";
+  localStorage.removeItem(AC);
+  render();
+
+  I.toast(
+    result.reset
+      ? `Événement terminé — ${result.reset} unité${result.reset>1?"s":""} réinitialisée${result.reset>1?"s":""}.`
+      : "Événement terminé — aucune fiche d’unité active à réinitialiser."
+  );
+};window.addEventListener("firemap:call-active",e=>createEventFromActiveCall(e.detail||{}));
   window.fireMapCommandCenter={
     createFromActiveCall:createEventFromActiveCall,
     open:()=>{if(!window.fireMapAccount?.canAccessCommand?.())return I.toast("Le Centre de commandement est réservé au compte 102.");I.showView("command")},

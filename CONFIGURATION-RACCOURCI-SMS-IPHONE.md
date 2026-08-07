@@ -1,33 +1,38 @@
-# Configuration iPhone — SMS automatique vers FireMap
+# Configuration iPhone — import SMS simplifié
 
-Une application web ne peut pas lire directement les SMS d’un iPhone. La méthode gratuite utilise une automatisation personnelle dans l’application Raccourcis.
+## Adresse dédiée
 
-## Dans FireMap
+Utilisez cette adresse dans Raccourcis :
 
-1. Ouvrir `Intervention`.
-2. Ouvrir `Importer le SMS de répartition`.
-3. Inscrire le numéro exact de la répartition.
-4. Activer `Réception automatique`.
-5. Appuyer sur `Copier le lien FireMap`.
+`https://benoit480.github.io/Test2lsv/import/?from=332211&sms=`
 
-## Dans Raccourcis
+La variable **URL encodée** doit être ajoutée immédiatement après `sms=`.
 
-1. Ouvrir **Raccourcis**.
-2. Aller dans **Automatisation**.
-3. Créer une nouvelle automatisation de type **Message**.
-4. Choisir l’expéditeur correspondant au numéro de la répartition.
-5. Choisir **Exécuter immédiatement**, lorsque cette option est disponible.
-6. Ajouter l’action **Encoder l’URL** avec le contenu du message reçu.
-7. Ajouter une action **Texte** et coller le lien FireMap copié.
-8. Remplacer `TEXTE_ENCODE` par la variable du message encodé.
-9. Ajouter l’action **Ouvrir les URL**.
+## Raccourci complet
 
-Le lien ressemble à :
+1. Déclencheur : **Lorsque je reçois un message de 332211**.
+2. Action : **Encoder URL**.
+   - Entrée : `Message reçu`.
+3. Action : **Texte**.
+   - Contenu fixe :
 
-`https://VOTRE-NOM.github.io/VOTRE-DEPOT/?source=shortcut&from=NUMERO&sms=TEXTE_ENCODE`
+   `https://benoit480.github.io/Test2lsv/import/?from=332211&sms=`
+
+   - Ajouter la variable bleue produite par **Encoder URL** juste après le signe `=`.
+4. Action : **Ouvrir les URL**.
+   - Entrée : la variable **Texte**.
+5. Choisir **Exécuter immédiatement** lorsque l’option est disponible.
 
 ## Résultat
 
-FireMap vérifie le numéro, bloque les doublons, extrait l’adresse et crée automatiquement l’appel actif ainsi que l’événement du poste de commandement.
+Le SMS ouvre l’adresse `/import/`, qui transmet ensuite le message à FireMap. FireMap :
 
-Selon la version d’iOS et les réglages de sécurité, une confirmation peut être demandée.
+- vérifie que le numéro est autorisé;
+- bloque les doublons;
+- extrait l’adresse et la nature de l’appel;
+- crée l’appel actif;
+- crée l’événement du poste de commandement.
+
+## Important
+
+Une page Web ne peut pas lire directement les SMS d’un iPhone. La variable du message doit donc toujours être transmise par Raccourcis.

@@ -44,3 +44,13 @@ La configuration actuelle a été conservée. Les fichiers `firestore.rules` et 
 FireMap accepte maintenant les SMS transmis par une automatisation Apple Raccourcis. Le numéro autorisé est vérifié, les doublons sont bloqués et l’appel actif ainsi que l’événement de commandement sont créés automatiquement.
 
 Voir `CONFIGURATION-RACCOURCI-SMS-IPHONE.md`.
+
+
+## V22.3.3 — Route d’importation SMS simplifiée
+
+Une nouvelle page `/import/` reçoit le SMS encodé depuis Apple Raccourcis puis redirige automatiquement vers FireMap pour créer l’appel.
+
+
+## V22.3.5 — Réinitialisation des unités à la fin de l’événement
+
+Lorsque le compte 102 termine l’événement, les fiches utilisées restent archivées dans l’événement terminé. De nouveaux profils propres sont créés pour les unités concernées : En caserne, 0 pompier, non alimenté, sorties fermées et pressions résiduelles vides.

@@ -242,6 +242,104 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
     });
     return [...merged.values()];
   }
+  function emptyResetOutlets(){
+    const outlets={};
+    for(let number=1;number<=6;number++){
+      outlets[number]={
+        active:false,
+        type:number<=2?"1¾ po":"",
+        pressure:"",
+        sector:"",
+        location:""
+      };
+    }
+    return outlets;
+  }
+
+  function resetAllUnitsAfterEvent(eventId){
+    const targetEventId=String(eventId||"");
+    if(!targetEventId)return {archived:0,reset:0};
+
+    let local=[];
+    try{
+      const parsed=JSON.parse(localStorage.getItem(CACHE)||"[]");
+      local=Array.isArray(parsed)?parsed:[];
+    }catch(_){}
+
+    const merged=new Map();
+    [...local,...usages].forEach(row=>{
+      const item=canonical(row);
+      merged.set(String(item.id),item);
+    });
+    usages=[...merged.values()];
+
+    const completedAt=new Date().toISOString();
+    const affected=usages.filter(item=>String(item.eventId||"")===targetEventId);
+
+    // Conserver les fiches originales dans l’historique de l’événement terminé.
+    affected.forEach(item=>{
+      item.eventClosed=true;
+      item.eventClosedAt=completedAt;
+    });
+
+    const resetProfiles=[];
+    const seenVehicles=new Set();
+
+    affected.forEach(old=>{
+      const vehicleId=String(old.vehicleId||old.vehicleNumber||"");
+      if(!vehicleId||seenVehicles.has(vehicleId))return;
+      seenVehicles.add(vehicleId);
+
+      const clean=canonical({
+        id:`reset-${vehicleId}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,
+        eventId:"",
+        sourceCallId:"",
+        vehicleId,
+        vehicleName:String(old.vehicleName||`Unité ${vehicleId}`),
+        vehicleNumber:String(old.vehicleNumber||vehicleId),
+        status:"station",
+        firefighters:0,
+        supplied:"no",
+        outlets:emptyResetOutlets(),
+        special:{
+          fourInch:{active:false,type:"4 po",pressure:"",sector:"",location:""},
+          deckGun:{active:false,type:"Canon",pressure:"",sector:"",location:""}
+        },
+        residualStart:"",
+        residualEnd:"",
+        notes:"",
+        createdAt:completedAt,
+        updatedAt:completedAt,
+        updatedAtText:new Date(completedAt).toLocaleString("fr-CA"),
+        resetAfterEventId:targetEventId
+      });
+
+      usages.push(clean);
+      queue(clean);
+      resetProfiles.push(clean);
+    });
+
+    persist();
+    render();
+
+    window.dispatchEvent(new CustomEvent("firemap:vehicle-usages-ready"));
+    window.dispatchEvent(new CustomEvent("firemap:vehicle-usage-updated",{
+      detail:{
+        eventId:targetEventId,
+        reset:true,
+        archived:affected.length,
+        profiles:resetProfiles
+      }
+    }));
+    window.fireMapVehicles?.refreshProfiles?.();
+
+    affected.forEach(item=>syncVehicleUsageInBackground(item));
+    resetProfiles.forEach(item=>syncVehicleUsageInBackground(item));
+
+    return {archived:affected.length,reset:resetProfiles.length};
+  }
+
+
   function refreshVehicleProfiles(){
     window.dispatchEvent(new CustomEvent("firemap:vehicle-usages-ready"));
   }
@@ -252,7 +350,8 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
     latestForVehicle,
     openForVehicle,
     activeCount,
-    suppliedLabel
+    suppliedLabel,
+    resetAllUnitsAfterEvent
   };
   window.addEventListener("firemap:command-event-linked",()=>{render();refreshVehicleProfiles()});
   render();

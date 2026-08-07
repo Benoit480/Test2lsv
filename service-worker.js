@@ -1,8 +1,9 @@
-const CACHE_VERSION = "firemap-v22-3-2-sms-auto";
+const CACHE_VERSION = "firemap-v22-3-5-reset-unites";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
 const APP_SHELL = [
+  "import/index.html",
   "./",
   "index.html",
   "styles.css",
