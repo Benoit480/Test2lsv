@@ -407,6 +407,20 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
     suppliedLabel,
     resetAllUnitsAfterEvent
   };
+
+  // Bouton central de la barre du bas : ouvre directement la fiche
+  // du véhicule lié au compte actuellement connecté.
+  const bottomVehicleUsage=$("bottomVehicleUsage");
+  if(bottomVehicleUsage){
+    bottomVehicleUsage.addEventListener("click",()=>{
+      const account=window.fireMapAccount?.current?.();
+      if(!account?.id){
+        window.fireMapAccount?.openChooser?.(false);
+        return core.toast("Choisissez d’abord le compte de l’unité.");
+      }
+      openForVehicle(String(account.id));
+    });
+  }
   window.addEventListener("firemap:command-event-linked",()=>{render();refreshVehicleProfiles()});
   render();
   refreshVehicleProfiles();

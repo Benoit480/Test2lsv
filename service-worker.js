@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v25-google-routes-25-0-2";
+const CACHE_VERSION = "firemap-v25-0-3-vehicle-sheet-button";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 

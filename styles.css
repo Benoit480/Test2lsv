@@ -1334,3 +1334,29 @@ body[data-account-role="unit"] #endCommandEvent,
 
 /* FireMap V25 — Google Maps */
 .google-map-config-error{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;text-align:center;background:#0b1017;color:#fff}.google-map-config-error span{color:#cbd5e1}.firemap-google-marker{background:transparent;border:0;transform:translateY(-10px)}.gm-style .gm-style-iw-c{border-radius:15px!important}.gm-style .gm-style-iw-d{overflow:auto!important}.gm-style-iw-chr{height:32px}.gm-style .gm-style-iw-c,.gm-style .gm-style-iw-tc::after{background:#0b1017!important;color:#f8fafc!important}.gm-style .gm-style-iw-c button{color:inherit}.gm-control-active,.gm-svpc{border-radius:10px!important}.google-default-pin{font-size:24px;color:#dc2626;text-shadow:0 2px 5px rgba(0,0,0,.4)}
+
+
+/* V25.0.3 — bouton central Fiche véhicule */
+.bottom-nav .vehicle-sheet-main{
+  color:#fff!important;
+  background:#0b1017!important;
+  border:2px solid #2563eb!important;
+  max-width:82px;
+  height:66px;
+  margin-top:-14px;
+  border-radius:22px;
+  box-shadow:0 8px 22px rgba(37,99,235,.25);
+  font-size:24px!important;
+  line-height:1;
+}
+.bottom-nav .vehicle-sheet-main span{
+  color:#fff!important;
+  font-size:9px!important;
+  line-height:1.05;
+  margin-top:5px!important;
+  font-weight:800;
+}
+.bottom-nav .vehicle-sheet-main:active{
+  transform:translateY(1px);
+  background:#111827!important;
+}

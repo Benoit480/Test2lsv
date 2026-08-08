@@ -10,7 +10,7 @@
     "navigation.js?v=25.0.2",
     "vehicle-accounts.js?v=25.0.2",
     "vehicles.js?v=25.0.2",
-    "vehicle-usage.js?v=25.0.2",
+    "vehicle-usage.js?v=25.0.3",
     "command-center.js?v=25.0.2",
     "event-manager.js?v=25.0.2"
   ];
