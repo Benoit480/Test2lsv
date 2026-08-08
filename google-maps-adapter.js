@@ -152,8 +152,17 @@
       await googleReady;
       const {Route}=await google.maps.importLibrary("routes");
       const fields=["distanceMeters","durationMillis","path"];
-      if(steps)fields.push("legs.steps.distanceMeters","legs.steps.instructions","legs.steps.maneuver","legs.steps.endLocation","legs.steps.path");
-      const {routes}=await Route.computeRoutes({origin:toLiteral(origin),destination:toLiteral(destination),travelMode:"DRIVING",routingPreference:"TRAFFIC_UNAWARE",language:"fr-CA",units:"METRIC",fields});
+      // Pour obtenir les étapes, demander l'objet legs complet. Les masques imbriqués
+      // utilisés auparavant provoquaient une erreur avec la bibliothèque Routes JS.
+      if(steps)fields.push("legs");
+      const {routes}=await Route.computeRoutes({
+        origin:toLiteral(origin),
+        destination:toLiteral(destination),
+        travelMode:"DRIVING",
+        language:"fr-CA",
+        units:"METRIC",
+        fields
+      });
       const route=routes?.[0]; if(!route)throw new Error("Aucun trajet Google Routes");
       const normalizedSteps=(route.legs||[]).flatMap(leg=>(leg.steps||[]).map(step=>({
         distance:Number(step.distanceMeters)||0,
@@ -166,7 +175,12 @@
     async matrix(origin,destinations){
       await googleReady;
       const {RouteMatrix}=await google.maps.importLibrary("routes");
-      const {matrix}=await RouteMatrix.computeRouteMatrix({origins:[toLiteral(origin)],destinations:destinations.map(toLiteral),travelMode:"DRIVING",routingPreference:"TRAFFIC_UNAWARE",fields:["distanceMeters","durationMillis","condition"]});
+      const {matrix}=await RouteMatrix.computeRouteMatrix({
+        origins:[toLiteral(origin)],
+        destinations:destinations.map(toLiteral),
+        travelMode:"DRIVING",
+        fields:["distanceMeters","durationMillis","condition"]
+      });
       const row=matrix?.rows?.[0];
       return (row?.items||[]).map(item=>({distance:Number(item.distanceMeters),duration:Number(item.durationMillis)/1000,condition:item.condition}));
     }
