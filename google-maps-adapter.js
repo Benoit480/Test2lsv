@@ -147,42 +147,82 @@
     }
   };
 
+  function routeErrorMessage(error){
+    const parts=[];
+    if(error?.message)parts.push(error.message);
+    if(error?.code)parts.push(String(error.code));
+    if(error?.status)parts.push(String(error.status));
+    if(error?.details)parts.push(typeof error.details==="string"?error.details:JSON.stringify(error.details));
+    return parts.filter(Boolean).join(" — ") || "Erreur Google Routes inconnue";
+  }
+
+  function routePoint(value){
+    if(!value)return null;
+    const p=toLiteral(value);
+    return Number.isFinite(p.lat)&&Number.isFinite(p.lng)?p:null;
+  }
+
   window.fireMapGoogleRoutes={
+    lastError:"",
     async computeRoute(origin,destination,{steps=true}={}){
       await googleReady;
       const {Route}=await google.maps.importLibrary("routes");
-      const fields=["distanceMeters","durationMillis","path"];
-      // Pour obtenir les étapes, demander l'objet legs complet. Les masques imbriqués
-      // utilisés auparavant provoquaient une erreur avec la bibliothèque Routes JS.
-      if(steps)fields.push("legs");
-      const {routes}=await Route.computeRoutes({
+      const request={
         origin:toLiteral(origin),
         destination:toLiteral(destination),
         travelMode:"DRIVING",
-        language:"fr-CA",
-        units:"METRIC",
-        fields
-      });
-      const route=routes?.[0]; if(!route)throw new Error("Aucun trajet Google Routes");
-      const normalizedSteps=(route.legs||[]).flatMap(leg=>(leg.steps||[]).map(step=>({
-        distance:Number(step.distanceMeters)||0,
-        instruction:step.instructions||"Continuez",
-        maneuverType:String(step.maneuver||"straight").toLowerCase(),
-        location:step.endLocation?{lat:Number(step.endLocation.lat),lng:Number(step.endLocation.lng)}:null
-      })));
-      return {distance:Number(route.distanceMeters)||0,duration:(Number(route.durationMillis)||0)/1000,path:(route.path||[]).map(p=>[Number(p.lat),Number(p.lng)]),steps:normalizedSteps,raw:route};
+        fields:steps
+          ? ["path","distanceMeters","durationMillis","legs"]
+          : ["path","distanceMeters","durationMillis"]
+      };
+      try{
+        const {routes}=await Route.computeRoutes(request);
+        const route=routes?.[0];
+        if(!route)throw new Error("Aucun trajet retourné par Google Routes");
+        const normalizedSteps=steps?(route.legs||[]).flatMap(leg=>(leg.steps||[]).map(step=>({
+          distance:Number(step.distanceMeters)||0,
+          instruction:step.instructions||"Continuez",
+          maneuverType:String(step.maneuver||"straight").toLowerCase(),
+          location:routePoint(step.endLocation)
+        }))):[];
+        const path=(route.path||[]).map(routePoint).filter(Boolean).map(p=>[p.lat,p.lng]);
+        if(!path.length)throw new Error("Google Routes a retourné un trajet sans tracé");
+        this.lastError="";
+        return {
+          distance:Number(route.distanceMeters)||0,
+          duration:(Number(route.durationMillis)||0)/1000,
+          path,
+          steps:normalizedSteps,
+          raw:route
+        };
+      }catch(error){
+        this.lastError=routeErrorMessage(error);
+        console.error("FireMap Google Routes computeRoute:",error);
+        throw error;
+      }
     },
     async matrix(origin,destinations){
       await googleReady;
       const {RouteMatrix}=await google.maps.importLibrary("routes");
-      const {matrix}=await RouteMatrix.computeRouteMatrix({
-        origins:[toLiteral(origin)],
-        destinations:destinations.map(toLiteral),
-        travelMode:"DRIVING",
-        fields:["distanceMeters","durationMillis","condition"]
-      });
-      const row=matrix?.rows?.[0];
-      return (row?.items||[]).map(item=>({distance:Number(item.distanceMeters),duration:Number(item.durationMillis)/1000,condition:item.condition}));
+      try{
+        const {matrix}=await RouteMatrix.computeRouteMatrix({
+          origins:[toLiteral(origin)],
+          destinations:destinations.map(toLiteral),
+          travelMode:"DRIVING",
+          fields:["distanceMeters","durationMillis","condition"]
+        });
+        const row=matrix?.rows?.[0];
+        this.lastError="";
+        return (row?.items||[]).map(item=>({
+          distance:Number(item.distanceMeters),
+          duration:Number(item.durationMillis)/1000,
+          condition:item.condition
+        }));
+      }catch(error){
+        this.lastError=routeErrorMessage(error);
+        console.error("FireMap Google Routes matrix:",error);
+        throw error;
+      }
     }
   };
 

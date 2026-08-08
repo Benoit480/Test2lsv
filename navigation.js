@@ -81,7 +81,10 @@
       lastRouteOrigin={lat:origin.lat,lng:origin.lng};lastRouteAt=Date.now();
       setStatus("Navigation Google active. Le GPS suit votre déplacement.");
     }catch(e){
-      console.error(e);setStatus("Impossible de calculer le trajet Google. Utilisez le bouton Apple Plans / Google Maps.",true);I.toast("Trajet intégré indisponible.");
+      console.error(e);
+      const detail=window.fireMapGoogleRoutes?.lastError||e?.message||"Erreur inconnue";
+      setStatus(`Trajet Google indisponible : ${detail}`,true);
+      I.toast("Trajet intégré indisponible — détails affichés dans Navigation.");
     }
   }
   function beginWatch(){
