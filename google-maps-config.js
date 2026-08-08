@@ -1,10 +1,4 @@
-// FireMap — Google Maps Platform configuration
-// Collez votre clé entre les guillemets. Ne changez pas les autres valeurs.
-window.FIREMAP_GOOGLE_CONFIG = {
-  apiKey: "AIzaSyD20E6icu8pdOsTDZApecCLT7T7O9bFAgU",
-  language: "fr",
-  region: "CA",
-  // Google est privilégié autour de Louiseville lorsque l'appareil est en ligne.
-  louisevilleCenter: { lat: 46.2563, lng: -72.9417 },
-  locationBiasRadiusMeters: 50000
-};
+// FireMap — configuration Google Maps
+// Collez votre clé API Google Maps entre les guillemets ci-dessous.
+// La clé doit être restreinte à https://benoit480.github.io/Test2lsv/*
+window.FIREMAP_GOOGLE_MAPS_API_KEY = "AIzaSyD20E6icu8pdOsTDZApecCLT7T7O9bFAgU";
