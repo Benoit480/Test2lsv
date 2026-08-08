@@ -54,20 +54,16 @@
     const candidates=computeNearestAir(origin,12);if(!candidates.length)return[];
     const key=[Number(origin.lat).toFixed(5),Number(origin.lng).toFixed(5),...candidates.map(p=>p.id)].join("|");
     if(roadRankCache?.key===key&&Date.now()-roadRankCache.at<60000)return roadRankCache.items.slice(0,limit);
-    const coords=[[origin.lng,origin.lat],...candidates.map(p=>[p.lng,p.lat])].map(c=>c.join(",")).join(";");
-    const destinations=candidates.map((_,i)=>i+1).join(";");
     try{
-      const url=`https://router.project-osrm.org/table/v1/driving/${coords}?sources=0&destinations=${destinations}&annotations=distance,duration`;
-      const r=await fetch(url,{headers:{Accept:"application/json"}});if(!r.ok)throw new Error(`HTTP ${r.status}`);const data=await r.json();
-      const distances=data.distances?.[0]||[],durations=data.durations?.[0]||[];
-      const items=candidates.map((p,i)=>({...p,distance:Number(distances[i]),duration:Number(durations[i]),roadDistance:true})).filter(p=>isFinite(p.distance)).sort((a,b)=>a.distance-b.distance||((normalizeStatus(a.status)==="restricted")-(normalizeStatus(b.status)==="restricted"))||(Number(b.flowGpm||0)-Number(a.flowGpm||0)));
+      const results=await window.fireMapGoogleRoutes.matrix(origin,candidates);
+      const items=candidates.map((p,i)=>({...p,distance:Number(results[i]?.distance),duration:Number(results[i]?.duration),roadDistance:true})).filter(p=>isFinite(p.distance)).sort((a,b)=>a.distance-b.distance||((normalizeStatus(a.status)==="restricted")-(normalizeStatus(b.status)==="restricted"))||(Number(b.flowGpm||0)-Number(a.flowGpm||0)));
       if(items.length){roadRankCache={key,at:Date.now(),items};return items.slice(0,limit)}
-    }catch(e){console.warn("Classement routier indisponible, repli à vol d’oiseau",e)}
+    }catch(e){console.warn("Classement Google Routes indisponible, repli à vol d’oiseau",e)}
     const fallback=candidates.map(p=>({...p,distance:p.airDistance,duration:null,roadDistance:false})).sort((a,b)=>a.distance-b.distance);roadRankCache={key,at:Date.now(),items:fallback};return fallback.slice(0,limit)
   }
   async function drawRoadRoutes(origin,items){
     resourceLayer.clearLayers();const colors=["#f59e0b","#94a3b8","#b87333"];
-    await Promise.all(items.slice(0,3).map(async(p,i)=>{try{const url=`https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${p.lng},${p.lat}?overview=full&geometries=geojson`;const r=await fetch(url,{headers:{Accept:"application/json"}});if(!r.ok)throw new Error();const route=(await r.json()).routes?.[0];if(!route)return;L.polyline(route.geometry.coordinates.map(c=>[c[1],c[0]]),{color:colors[i],weight:i===0?5:3,opacity:.88,dashArray:i===0?null:"8 7",className:"leaflet-intervention-line"}).addTo(resourceLayer)}catch(_){L.polyline([[origin.lat,origin.lng],[p.lat,p.lng]],{color:colors[i],weight:i===0?4:2,opacity:.55,dashArray:"6 7"}).addTo(resourceLayer)}}))
+    await Promise.all(items.slice(0,3).map(async(p,i)=>{try{const route=await window.fireMapGoogleRoutes.computeRoute(origin,p,{steps:false});if(!route?.path?.length)return;L.polyline(route.path,{color:colors[i],weight:i===0?5:3,opacity:.88,dashArray:i===0?null:"8 7"}).addTo(resourceLayer)}catch(_){L.polyline([[origin.lat,origin.lng],[p.lat,p.lng]],{color:colors[i],weight:i===0?4:2,opacity:.55,dashArray:"6 7"}).addTo(resourceLayer)}}))
   }
   async function renderNearest(){
     const token=++nearestRenderToken,box=$("nearestList");resourceLayer.clearLayers();if(!state.selected){state.nearest=[];return[]}
@@ -108,7 +104,7 @@
             .map(name=>caches.delete(name))
         );
       }
-      localStorage.setItem("firemap-runtime-build","24.0.0");
+      localStorage.setItem("firemap-runtime-build","25.0.0");
     }catch(error){
       console.warn("Nettoyage de l’ancien cache FireMap impossible.",error);
     }

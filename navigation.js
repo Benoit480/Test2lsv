@@ -23,25 +23,15 @@
   const distance=(a,b)=>{const R=6371000,p1=radians(a.lat),p2=radians(b.lat),dp=radians(b.lat-a.lat),dl=radians(b.lng-a.lng),x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))};
 
   function turnIcon(step){
-    const m=step?.maneuver||{};
-    if(m.type==="arrive")return "🏁";
-    if(m.type==="roundabout"||m.type==="rotary")return "⟳";
-    const mod=m.modifier||"straight";
-    return ({left:"↰",right:"↱","slight left":"↖","slight right":"↗","sharp left":"⬅","sharp right":"➡",uturn:"↩",straight:"↑"})[mod]||"➤";
+    const m=String(step?.maneuverType||"").toLowerCase();
+    if(m.includes("arrive"))return "🏁";
+    if(m.includes("roundabout"))return "⟳";
+    if(m.includes("u_turn")||m.includes("uturn"))return "↩";
+    if(m.includes("left"))return m.includes("slight")?"↖":"↰";
+    if(m.includes("right"))return m.includes("slight")?"↗":"↱";
+    return "↑";
   }
-  function instruction(step){
-    const m=step?.maneuver||{}, road=step?.name?` sur ${step.name}`:"";
-    if(m.type==="depart")return `Prenez la route${road}`;
-    if(m.type==="arrive")return "Vous êtes arrivé à destination";
-    if(m.type==="roundabout"||m.type==="rotary")return `Entrez dans le carrefour giratoire${m.exit?` et prenez la sortie ${m.exit}`:""}${road}`;
-    if(m.type==="merge")return `Insérez-vous${road}`;
-    if(m.type==="on ramp")return `Prenez la bretelle${road}`;
-    if(m.type==="off ramp")return `Prenez la sortie${road}`;
-    if(m.type==="fork")return `Restez ${String(m.modifier||"").includes("left")?"à gauche":"à droite"}${road}`;
-    if(m.type==="end of road")return `Au bout de la route, tournez ${String(m.modifier||"").includes("left")?"à gauche":"à droite"}${road}`;
-    const dir=({left:"à gauche",right:"à droite","slight left":"légèrement à gauche","slight right":"légèrement à droite","sharp left":"fortement à gauche","sharp right":"fortement à droite",uturn:"faites demi-tour",straight:"continuez tout droit"})[m.modifier||"straight"]||"continuez";
-    return dir==="faites demi-tour"?`${dir}${road}`:`Tournez ${dir}${road}`;
-  }
+  function instruction(step){return step?.instruction||"Continuez";}
   function setStatus(text,error=false){const el=$("navigationStatus");el.textContent=text;el.classList.toggle("error",error)}
   function showPanel(){
     I.showView("assistant");
@@ -61,32 +51,26 @@
   function updateNextStep(pos){
     if(!routeSteps.length)return;
     let best=0,bestD=Infinity;
-    routeSteps.forEach((s,i)=>{const c=s.maneuver?.location;if(!c)return;const d=distance(pos,{lat:c[1],lng:c[0]});if(d<bestD){bestD=d;best=i}});
+    routeSteps.forEach((s,i)=>{const c=s.location;if(!c)return;const d=distance(pos,c);if(d<bestD){bestD=d;best=i}});
     const step=routeSteps[Math.min(best+1,routeSteps.length-1)]||routeSteps[best];
-    const c=step?.maneuver?.location;
-    const d=c?distance(pos,{lat:c[1],lng:c[0]}):step?.distance||0;
+    const c=step?.location;
+    const d=c?distance(pos,c):step?.distance||0;
     $("navigationTurnIcon").textContent=turnIcon(step);
     $("navigationInstruction").textContent=instruction(step);
-    $("navigationStepDistance").textContent=step?.maneuver?.type==="arrive"?"":`Dans environ ${fmtDistance(d)}`;
+    $("navigationStepDistance").textContent=String(step?.maneuverType||"").includes("arrive")?"":`Dans environ ${fmtDistance(d)}`;
   }
   function renderSteps(){
     $("navigationSteps").innerHTML=routeSteps.map(s=>`<li><span>${turnIcon(s)}</span><div><strong>${I.esc(instruction(s))}</strong><small>${fmtDistance(s.distance||0)}</small></div></li>`).join("");
   }
   async function calculate(origin){
     if(!destination)return;
-    if(requestController)requestController.abort();
-    requestController=new AbortController();
-    setStatus("Calcul du trajet en cours…");
+    const requestId=Date.now();requestController={id:requestId,abort(){this.aborted=true},aborted:false};
+    setStatus("Calcul du trajet Google en cours…");
     $("navigationInstruction").textContent="Calcul du trajet…";
-    const url=`https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson&steps=true`;
     try{
-      const r=await fetch(url,{signal:requestController.signal,headers:{"Accept":"application/json"}});
-      if(!r.ok)throw new Error(`HTTP ${r.status}`);
-      const data=await r.json();
-      const route=data.routes?.[0];
-      if(!route)throw new Error("Aucun trajet");
-      routeCoordinates=route.geometry.coordinates.map(c=>[c[1],c[0]]);
-      routeSteps=(route.legs||[]).flatMap(l=>l.steps||[]);
+      const route=await window.fireMapGoogleRoutes.computeRoute(origin,destination,{steps:true});
+      if(requestController?.id!==requestId||requestController?.aborted)return;
+      routeCoordinates=route.path||[];routeSteps=route.steps||[];
       if(routeLine)routeLayer.removeLayer(routeLine);
       routeLine=L.polyline(routeCoordinates,{color:"#1689ff",weight:6,opacity:.95,lineJoin:"round"}).addTo(routeLayer);
       L.circleMarker([destination.lat,destination.lng],{radius:10,color:"#fff",weight:3,fillColor:"#ff3b30",fillOpacity:1}).bindTooltip("Intervention").addTo(routeLayer);
@@ -95,10 +79,9 @@
       $("navigationDuration").textContent=fmtDuration(route.duration);
       renderSteps();updateNextStep(origin);
       lastRouteOrigin={lat:origin.lat,lng:origin.lng};lastRouteAt=Date.now();
-      setStatus("Navigation active. Le GPS suit votre déplacement.");
+      setStatus("Navigation Google active. Le GPS suit votre déplacement.");
     }catch(e){
-      if(e.name==="AbortError")return;
-      console.error(e);setStatus("Impossible de calculer le trajet. Utilisez le bouton Apple Plans / Google Maps.",true);I.toast("Trajet intégré indisponible.");
+      console.error(e);setStatus("Impossible de calculer le trajet Google. Utilisez le bouton Apple Plans / Google Maps.",true);I.toast("Trajet intégré indisponible.");
     }
   }
   function beginWatch(){

@@ -1,11 +1,13 @@
-const CACHE_VERSION = "firemap-v23-0-0-stable-events";
+const CACHE_VERSION = "firemap-v25-google-maps";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
 const APP_SHELL = [
-  "import/index.html",
   "./",
   "index.html",
+  "firemap-boot.js",
+  "google-maps-adapter.js",
+  "google-maps-config.js",
   "styles.css",
   "app.js",
   "preplans.js",
@@ -116,6 +118,6 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  // CDN resources such as Leaflet are cached after the first successful load.
+  // Ressources externes Google Maps : utilisation réseau avec repli cache si disponible.
   event.respondWith(cacheFirst(request).catch(() => Response.error()));
 });
