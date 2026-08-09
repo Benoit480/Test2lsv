@@ -1360,3 +1360,67 @@ body[data-account-role="unit"] #endCommandEvent,
   transform:translateY(1px);
   background:#111827!important;
 }
+
+/* FireMap V25.0.5 — correction popup bâtiment Google Maps */
+.gm-style .gm-style-iw-c,
+.gm-style .gm-style-iw-tc::after,
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #0b1017 !important;
+  color: #f8fafc !important;
+}
+
+/* Bouton "Ouvrir la fiche" : fond noir + texte rouge */
+.gm-style .gm-style-iw-d button[data-open-preplan],
+.leaflet-popup-content button[data-open-preplan] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  background: #0b1017 !important;
+  color: #ef4444 !important;
+  border: 1px solid #7f1d1d !important;
+  border-radius: 999px !important;
+  padding: 10px 16px !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  opacity: 1 !important;
+}
+
+.gm-style .gm-style-iw-d button[data-open-preplan]:hover,
+.gm-style .gm-style-iw-d button[data-open-preplan]:active,
+.gm-style .gm-style-iw-d button[data-open-preplan]:focus,
+.leaflet-popup-content button[data-open-preplan]:hover,
+.leaflet-popup-content button[data-open-preplan]:active,
+.leaflet-popup-content button[data-open-preplan]:focus {
+  background: #111827 !important;
+  color: #ff4d55 !important;
+  border-color: #dc2626 !important;
+}
+
+/* Force le même rendu si le navigateur présente le bouton comme désactivé */
+.gm-style .gm-style-iw-d button[data-open-preplan]:disabled,
+.leaflet-popup-content button[data-open-preplan]:disabled {
+  opacity: 1 !important;
+  background: #0b1017 !important;
+  color: #ef4444 !important;
+  border-color: #7f1d1d !important;
+}
+
+/* X de fermeture du popup Google Maps en rouge */
+.gm-style .gm-ui-hover-effect,
+.gm-style .gm-style-iw-chr button,
+.gm-style button[aria-label="Fermer"],
+.gm-style button[aria-label="Close"] {
+  opacity: 1 !important;
+}
+
+.gm-style .gm-ui-hover-effect img,
+.gm-style button[aria-label="Fermer"] img,
+.gm-style button[aria-label="Close"] img {
+  filter: invert(19%) sepia(97%) saturate(3349%) hue-rotate(346deg) brightness(95%) contrast(95%) !important;
+}
+
+.gm-style .gm-ui-hover-effect span,
+.gm-style .gm-style-iw-chr button span {
+  background-color: #ef4444 !important;
+}
