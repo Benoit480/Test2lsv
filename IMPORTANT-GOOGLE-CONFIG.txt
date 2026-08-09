@@ -1,0 +1,18 @@
+FIREMAP V24.1.2 — CONFIG GOOGLE PROTÉGÉE
+
+Cette mise à jour NE CONTIENT PAS google-maps-config.js volontairement.
+
+Pourquoi:
+Les versions précédentes pouvaient remplacer votre clé Google par une configuration vide.
+
+À faire cette fois:
+1. Téléversez tous les fichiers de cette ZIP dans GitHub.
+2. NE SUPPRIMEZ PAS le fichier google-maps-config.js déjà présent dans votre dépôt.
+3. Ouvrez google-maps-config.js sur GitHub.
+4. Vérifiez que apiKey contient bien votre clé Google.
+5. Si apiKey est vide, remettez votre clé UNE SEULE FOIS.
+6. Enregistrez/Commit.
+
+Les prochaines ZIP peuvent maintenant laisser ce fichier intact.
+
+Le fichier google-maps-config.example.js est seulement un exemple et ne contient aucune vraie clé.
