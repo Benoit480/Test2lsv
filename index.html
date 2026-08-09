@@ -10,7 +10,26 @@
   <title>FireMap Louiseville</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="stylesheet" href="styles.css?v=25.0.3">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css?v=24.1.1">
+
+<style id="firemap-popup-building-v24-1-1">
+/* FireMap V24.1.1 — Popup bâtiment Google Maps */
+.gm-style .gm-ui-hover-effect { opacity:1 !important; background:transparent !important; }
+.gm-style .gm-ui-hover-effect > span { background-color:#ff3b30 !important; }
+.gm-style .gm-style-iw button:not(.gm-ui-hover-effect) {
+  background:#05070b !important; color:#ff3b30 !important;
+  -webkit-text-fill-color:#ff3b30 !important; border:1px solid #ff3b30 !important;
+  opacity:1 !important; box-shadow:none !important;
+}
+.gm-style .gm-style-iw button:not(.gm-ui-hover-effect):disabled,
+.gm-style .gm-style-iw button:not(.gm-ui-hover-effect):active,
+.gm-style .gm-style-iw button:not(.gm-ui-hover-effect):focus {
+  background:#05070b !important; color:#ff3b30 !important;
+  -webkit-text-fill-color:#ff3b30 !important; border-color:#ff3b30 !important; opacity:1 !important;
+}
+</style>
+
 </head>
 <body>
   <header class="topbar">
@@ -37,8 +56,8 @@
     <button data-view="search" class="drawer-link">🔎 Recherche d’adresse</button>
     <button id="switchVehicleAccount" class="drawer-link hidden">👤 Changer de compte</button>
     <div id="buildStatusV24" class="build-status-v24">
-      <strong>FireMap V25.0.0</strong>
-      <small>Google Maps + Routes — événements V24 conservés</small>
+      <strong>FireMap V24.1.1</strong>
+      <small>Recherche Google + Louiseville hors ligne</small>
     </div>
     <div class="drawer-separator"></div>
     <div class="sync-box"><span id="syncDot"></span><div><strong id="syncTitle">Connexion…</strong><small id="syncText">Vérification Firebase</small></div></div>
@@ -293,7 +312,7 @@
     <button data-view="map" class="active">🗺️<span>Carte</span></button>
     <button data-view="assistant">🚨<span>Intervention</span></button>
     <button data-view="hydrants">🚰<span>Bornes</span></button>
-    <button id="bottomVehicleUsage" class="vehicle-sheet-main" type="button" aria-label="Ouvrir la fiche véhicule">🚒<span>Fiche véhicule</span></button>
+    <button id="bottomAdd" class="add-main">＋<span>Ajouter</span></button>
     <button data-view="preplans">🏢<span>Bâtiments</span></button>
     <button id="bottomMore">☰<span>Plus</span></button>
   </nav>
@@ -638,8 +657,20 @@
   </dialog>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="google-maps-config.js?v=25.0.0"></script>
-  <script src="google-maps-adapter.js?v=25.0.2"></script>
-  <script src="firemap-boot.js?v=25.0.3"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="firebase-config.js?v=24.1.1"></script>
+  <script src="firebase-sync.js?v=24.1.1"></script>
+  <script src="app.js?v=24.1.1"></script>
+  <script src="preplans.js?v=24.1.1"></script>
+  <script src="prevention.js?v=24.1.1"></script>
+  <script src="assistant.js?v=24.1.1"></script>
+  <script src="navigation.js?v=24.1.1"></script>
+  <script src="vehicle-accounts.js?v=24.1.1"></script>
+  <script src="vehicles.js?v=24.1.1"></script>
+  <script src="vehicle-usage.js?v=24.1.1"></script>
+  <script src="command-center.js?v=24.1.1"></script>
+  <script src="event-manager.js?v=24.1.1"></script>
+  <script src="google-maps-config.js?v=24.1.1"></script>
+  <script src="google-address-search.js?v=24.1.1"></script>
 </body>
 </html>
