@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v25-0-3-vehicle-sheet-button";
+const CACHE_VERSION = "firemap-v25-0-4-google-address-search";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
@@ -8,6 +8,7 @@ const APP_SHELL = [
   "firemap-boot.js",
   "google-maps-adapter.js",
   "google-maps-config.js",
+  "google-address-search.js",
   "styles.css",
   "app.js",
   "preplans.js",
