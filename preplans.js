@@ -123,7 +123,7 @@
     holdStart=null;holdPointerId=null;holdTriggered=false;
     mapContainer.classList.remove("holding-to-add");
   }
-  function ignoredTarget(target){return Boolean(target.closest(".leaflet-control,.leaflet-marker-icon,.leaflet-popup,.map-fab,button,a,input,label"))}
+  function ignoredTarget(target){return Boolean(target.closest(".gm-control-active,.gm-style-iw,.firemap-google-marker,.map-fab,button,a,input,label"))}
   function pointFromClient(x,y){const r=mapContainer.getBoundingClientRect();return I.map.containerPointToLatLng(L.point(x-r.left,y-r.top))}
   editBtn.addEventListener("click",()=>setEditMode(!editMode));
   mapContainer.addEventListener("pointerdown",e=>{

@@ -95,15 +95,3 @@ de fermeture dans `event-manager.js`.
 
 Le cache PWA historique est volontairement désactivé dans cette version afin que les
 mises à jour GitHub soient réellement chargées sur iPhone.
-
-
-## V24.1.0 — Recherche hybride d'adresses
-Google Places en ligne; banque locale Louiseville hors ligne. Configuration dans `google-maps-config.js`.
-
-
-## V24.1.2 — Protection de la configuration Google
-
-`google-maps-config.js` est volontairement exclu des mises à jour afin d'éviter
-d'écraser la clé Google configurée dans GitHub.
-
-Utiliser `google-maps-config.example.js` uniquement comme référence.
