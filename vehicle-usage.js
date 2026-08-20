@@ -9,10 +9,52 @@
   const esc=v=>core.esc?core.esc(v):String(v??""),uid=()=>crypto.randomUUID?crypto.randomUUID():`usage-${Date.now()}`;
   const vehicles=()=>window.fireMapVehicles?.getVehicles?.()||[];
   function emptyOutlet(n){return{active:false,type:"1¾ po",pressure:"",sector:"",location:""}}
+  function timestampIso(value,fallback=""){
+    if(!value)return fallback;
+    if(typeof value==="string")return value;
+    try{
+      if(typeof value.toDate==="function")return value.toDate().toISOString();
+      if(Number.isFinite(Number(value.seconds)))return new Date(Number(value.seconds)*1000).toISOString();
+      if(value instanceof Date)return value.toISOString();
+    }catch(_){}
+    return fallback;
+  }
   function canonical(x={}){
     const outlets={};for(let n=1;n<=6;n++){const o={...emptyOutlet(n),...(x.outlets?.[n]||x.outlets?.[String(n)]||{})};o.active=!!o.active;o.pressure=o.pressure===""||o.pressure==null?"":Number(o.pressure);o.sector=["1","2","3","4","5"].includes(String(o.sector))?String(o.sector):"";o.location=String(o.location||"");o.type=n<=2?"1¾ po":(["1¾ po","2½ po"].includes(o.type)?o.type:"1¾ po");outlets[n]=o}
     const sp=x.special||{};
-    return{id:String(x.id||uid()),eventId:String(x.eventId||""),sourceCallId:String(x.sourceCallId||""),vehicleId:String(x.vehicleId||""),vehicleName:String(x.vehicleName||""),vehicleNumber:String(x.vehicleNumber||""),status:STATUS[x.status]?x.status:"station",firefighters:Number(x.firefighters||0),supplied:String(x.supplied||"no"),outlets,special:{fourInch:{active:!!sp.fourInch?.active,pressure:sp.fourInch?.pressure===""||sp.fourInch?.pressure==null?"":Number(sp.fourInch.pressure),sector:["1","2","3","4","5"].includes(String(sp.fourInch?.sector))?String(sp.fourInch.sector):"",location:String(sp.fourInch?.location||"")},deckGun:{active:!!sp.deckGun?.active,pressure:sp.deckGun?.pressure===""||sp.deckGun?.pressure==null?"":Number(sp.deckGun.pressure),sector:["1","2","3","4","5"].includes(String(sp.deckGun?.sector))?String(sp.deckGun.sector):"",location:String(sp.deckGun?.location||"")}},residualStart:x.residualStart===""||x.residualStart==null?"":Number(x.residualStart),residualEnd:x.residualEnd===""||x.residualEnd==null?"":Number(x.residualEnd),notes:String(x.notes||""),createdAt:String(x.createdAt||new Date().toISOString()),updatedAtText:String(x.updatedAtText||new Date().toLocaleString("fr-CA"))}
+    const nowIso=new Date().toISOString();
+    const createdAt=timestampIso(x.createdAt,nowIso);
+    const updatedAt=timestampIso(x.updatedAt,createdAt);
+    const updatedDate=new Date(updatedAt);
+    return{
+      id:String(x.id||uid()),
+      eventId:String(x.eventId||""),
+      sourceCallId:String(x.sourceCallId||""),
+      vehicleId:String(x.vehicleId||""),
+      vehicleName:String(x.vehicleName||""),
+      vehicleNumber:String(x.vehicleNumber||""),
+      status:STATUS[x.status]?x.status:"station",
+      firefighters:Number(x.firefighters||0),
+      supplied:String(x.supplied||"no"),
+      outlets,
+      special:{
+        fourInch:{active:!!sp.fourInch?.active,pressure:sp.fourInch?.pressure===""||sp.fourInch?.pressure==null?"":Number(sp.fourInch.pressure),sector:["1","2","3","4","5"].includes(String(sp.fourInch?.sector))?String(sp.fourInch.sector):"",location:String(sp.fourInch?.location||"")},
+        deckGun:{active:!!sp.deckGun?.active,pressure:sp.deckGun?.pressure===""||sp.deckGun?.pressure==null?"":Number(sp.deckGun.pressure),sector:["1","2","3","4","5"].includes(String(sp.deckGun?.sector))?String(sp.deckGun.sector):"",location:String(sp.deckGun?.location||"")}
+      },
+      residualStart:x.residualStart===""||x.residualStart==null?"":Number(x.residualStart),
+      residualEnd:x.residualEnd===""||x.residualEnd==null?"":Number(x.residualEnd),
+      notes:String(x.notes||""),
+      createdAt,
+      updatedAt,
+      updatedAtText:String(x.updatedAtText||(
+        Number.isFinite(updatedDate.getTime())
+          ? updatedDate.toLocaleString("fr-CA")
+          : new Date().toLocaleString("fr-CA")
+      )),
+      eventClosed:x.eventClosed===true,
+      eventClosedAt:timestampIso(x.eventClosedAt,""),
+      resetAfterEventId:String(x.resetAfterEventId||"")
+    }
   }
   const persist=()=>write(CACHE,usages),pending=()=>read(PENDING,{}),queue=u=>{const p=pending();p[u.id]=u;write(PENDING,p)},clearPending=id=>{const p=pending();delete p[id];write(PENDING,p)};
   const suppliedLabel=v=>({no:"Non alimenté",hydrant:"Borne",tanker:"Citerne",relay:"Relais",other:"Autre"})[v]||v;
@@ -194,7 +236,41 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
     window.dispatchEvent(new CustomEvent("firemap:vehicle-usage-updated",{detail:{eventId:"",deletedId:id}}));
     try{await window.fireMapCloud?.deleteVehicleUsage?.(id)}catch(_){}}
   async function flush(){for(const u of Object.values(pending()))try{await window.fireMapCloud?.saveVehicleUsage?.(u);clearPending(u.id)}catch(_){}}
-  function connect(){const c=window.fireMapCloud;if(!c?.subscribeVehicleUsages){render();return}cloudUnsub?.();cloudUnsub=c.subscribeVehicleUsages(items=>{const p=pending();usages=items.map(canonical);Object.values(p).forEach(x=>{const u=canonical(x),i=usages.findIndex(y=>y.id===u.id);if(i>=0)usages[i]=u;else usages.push(u)});persist();render();window.dispatchEvent(new CustomEvent("firemap:vehicle-usages-ready"));window.fireMapVehicles?.refreshProfiles?.();flush()},console.error);flush()}
+  function connect(){
+    const c=window.fireMapCloud;
+    if(!c?.subscribeVehicleUsages){render();return}
+    cloudUnsub?.();
+    cloudUnsub=c.subscribeVehicleUsages(items=>{
+      const p=pending();
+      usages=items.map(canonical);
+
+      // Une sauvegarde locale encore en attente garde temporairement priorité
+      // jusqu'à confirmation Firebase.
+      Object.values(p).forEach(x=>{
+        const u=canonical(x),i=usages.findIndex(y=>y.id===u.id);
+        if(i>=0)usages[i]=u;
+        else usages.push(u);
+      });
+
+      persist();
+      render();
+
+      // IMPORTANT V25.0.4:
+      // les autres appareils doivent rafraîchir immédiatement les profils,
+      // le tableau du chef, les secteurs et les compteurs.
+      window.dispatchEvent(new CustomEvent("firemap:vehicle-usages-ready",{
+        detail:{source:"firebase",count:usages.length}
+      }));
+      window.dispatchEvent(new CustomEvent("firemap:vehicle-usage-updated",{
+        detail:{source:"firebase",remote:true,count:usages.length}
+      }));
+      window.fireMapVehicles?.refreshProfiles?.();
+      flush();
+    },error=>{
+      console.error("Synchronisation temps réel des fiches véhicules interrompue.",error);
+    });
+    flush();
+  }
   document.addEventListener("click",e=>{const s=e.target.closest("[data-usage-status]");if(s)setStatus(s.dataset.usageStatus);const o=e.target.closest("[data-outlet-toggle]");if(o){const k=o.dataset.outletToggle;setActive(k,!active(k))}const ed=e.target.closest("[data-usage-edit]");if(ed)openForm(usages.find(x=>x.id===ed.dataset.usageEdit))});
   if($("newVehicleUsage")) $("newVehicleUsage").onclick=()=>openForm();
   if($("closeVehicleUsageDialog")) $("closeVehicleUsageDialog").onclick=()=>$("vehicleUsageDialog").close();

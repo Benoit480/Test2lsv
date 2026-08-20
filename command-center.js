@@ -580,6 +580,7 @@ document.addEventListener("click",event=>{
   window.addEventListener("firemap-cloud-ready",connectCommandCloud);
   timer=setInterval(tick,1000);
   window.addEventListener("storage",render);
+  window.addEventListener("firemap:vehicle-usages-ready",render);
   window.addEventListener("firemap:vehicle-usage-updated",render);
   window.addEventListener("firemap:command-event-linked",render);
 })();
