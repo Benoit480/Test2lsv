@@ -1398,3 +1398,33 @@ body[data-account-role="unit"] #endCommandEvent,
   opacity:1!important;
   filter:none!important;
 }
+
+
+/* FireMap V25.0.7 — fluidité carte iPhone */
+#map.firemap-map-moving .vehicle-marker-body,
+#map.firemap-map-moving .station-marker-body,
+#map.firemap-map-moving .hydrant-marker,
+#map.firemap-map-moving .building-marker,
+#map.firemap-map-moving .intervention-pin {
+  box-shadow:none !important;
+  filter:none !important;
+  animation:none !important;
+  transition:none !important;
+}
+
+#map.firemap-map-moving .vehicle-marker.live .vehicle-marker-body:after,
+#map.firemap-map-moving .pulse-ring:before,
+#map.firemap-map-moving .pulse-ring:after {
+  display:none !important;
+}
+
+#map.firemap-map-moving .leaflet-marker-icon,
+#map.firemap-map-moving .leaflet-marker-shadow {
+  transition:none !important;
+  will-change:transform;
+}
+
+#map .leaflet-tile {
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}

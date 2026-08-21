@@ -109,3 +109,15 @@ Google Maps est retiré temporairement de l'application.
 
 Note : le moteur de carte est sans Google. Le fond CARTO/OpenStreetMap utilisé par Leaflet
 nécessite encore Internet pour charger des tuiles qui ne sont pas déjà en cache.
+
+
+## V25.0.7 — Optimisation carte iPhone
+
+Optimisations de fluidité sans retirer les fonctions :
+- animations Leaflet coûteuses désactivées;
+- tuiles CARTO standard au lieu des tuiles Retina 2x;
+- chargement des tuiles surtout à la fin du déplacement;
+- bornes, bâtiments et véhicules ne sont plus reconstruits pendant le glissement;
+- un seul rafraîchissement est effectué à la fin du mouvement;
+- animations GPS/pulsations et ombres suspendues pendant le déplacement;
+- l'ancien nettoyage qui supprimait les caches FireMap à chaque démarrage a été retiré.
