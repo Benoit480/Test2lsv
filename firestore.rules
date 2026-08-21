@@ -7,6 +7,10 @@ service cloud.firestore {
     match /batiments/{batimentId} {
       allow read, create, update, delete: if request.auth != null;
     }
+    // Compatibilité temporaire avec l'ancien nom de collection vu dans Firebase.
+    match /batimen/{batimentId} {
+      allow read, create, update, delete: if request.auth != null;
+    }
     match /prevention/{preventionId} {
       allow read, create, update, delete: if request.auth != null;
     }

@@ -20,7 +20,16 @@
     return fallback;
   }
   function canonical(x={}){
-    const outlets={};for(let n=1;n<=6;n++){const o={...emptyOutlet(n),...(x.outlets?.[n]||x.outlets?.[String(n)]||{})};o.active=!!o.active;o.pressure=o.pressure===""||o.pressure==null?"":Number(o.pressure);o.sector=["1","2","3","4","5"].includes(String(o.sector))?String(o.sector):"";o.location=String(o.location||"");o.type=n<=2?"1¾ po":(["1¾ po","2½ po"].includes(o.type)?o.type:"1¾ po");outlets[n]=o}
+    const outlets={};
+    for(let n=1;n<=6;n++){
+      const o={...emptyOutlet(n),...(x.outlets?.[n]||x.outlets?.[String(n)]||{})};
+      o.active=!!o.active;
+      o.pressure=o.pressure===""||o.pressure==null?"":Number(o.pressure);
+      o.sector=["1","2","3","4","5"].includes(String(o.sector))?String(o.sector):"";
+      o.location=String(o.location||"");
+      o.type=n<=2?"1¾ po":(["1¾ po","2½ po"].includes(o.type)?o.type:"1¾ po");
+      outlets[n]=o;
+    }
     const sp=x.special||{};
     const nowIso=new Date().toISOString();
     const createdAt=timestampIso(x.createdAt,nowIso);
@@ -47,9 +56,7 @@
       createdAt,
       updatedAt,
       updatedAtText:String(x.updatedAtText||(
-        Number.isFinite(updatedDate.getTime())
-          ? updatedDate.toLocaleString("fr-CA")
-          : new Date().toLocaleString("fr-CA")
+        Number.isFinite(updatedDate.getTime())?updatedDate.toLocaleString("fr-CA"):new Date().toLocaleString("fr-CA")
       )),
       eventClosed:x.eventClosed===true,
       eventClosedAt:timestampIso(x.eventClosedAt,""),
@@ -238,37 +245,22 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
   async function flush(){for(const u of Object.values(pending()))try{await window.fireMapCloud?.saveVehicleUsage?.(u);clearPending(u.id)}catch(_){}}
   function connect(){
     const c=window.fireMapCloud;
-    if(!c?.subscribeVehicleUsages){render();return}
+    if(!c?.configured||!c?.subscribeVehicleUsages){render();return}
     cloudUnsub?.();
     cloudUnsub=c.subscribeVehicleUsages(items=>{
       const p=pending();
       usages=items.map(canonical);
-
-      // Une sauvegarde locale encore en attente garde temporairement priorité
-      // jusqu'à confirmation Firebase.
       Object.values(p).forEach(x=>{
         const u=canonical(x),i=usages.findIndex(y=>y.id===u.id);
-        if(i>=0)usages[i]=u;
-        else usages.push(u);
+        if(i>=0)usages[i]=u;else usages.push(u);
       });
-
       persist();
       render();
-
-      // IMPORTANT V25.0.4:
-      // les autres appareils doivent rafraîchir immédiatement les profils,
-      // le tableau du chef, les secteurs et les compteurs.
-      window.dispatchEvent(new CustomEvent("firemap:vehicle-usages-ready",{
-        detail:{source:"firebase",count:usages.length}
-      }));
-      window.dispatchEvent(new CustomEvent("firemap:vehicle-usage-updated",{
-        detail:{source:"firebase",remote:true,count:usages.length}
-      }));
+      window.dispatchEvent(new CustomEvent("firemap:vehicle-usages-ready",{detail:{source:"firebase",count:usages.length}}));
+      window.dispatchEvent(new CustomEvent("firemap:vehicle-usage-updated",{detail:{source:"firebase",remote:true,count:usages.length}}));
       window.fireMapVehicles?.refreshProfiles?.();
       flush();
-    },error=>{
-      console.error("Synchronisation temps réel des fiches véhicules interrompue.",error);
-    });
+    },error=>console.error("Synchronisation fiches véhicules:",error));
     flush();
   }
   document.addEventListener("click",e=>{const s=e.target.closest("[data-usage-status]");if(s)setStatus(s.dataset.usageStatus);const o=e.target.closest("[data-outlet-toggle]");if(o){const k=o.dataset.outletToggle;setActive(k,!active(k))}const ed=e.target.closest("[data-usage-edit]");if(ed)openForm(usages.find(x=>x.id===ed.dataset.usageEdit))});
@@ -500,5 +492,5 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
   window.addEventListener("firemap:command-event-linked",()=>{render();refreshVehicleProfiles()});
   render();
   refreshVehicleProfiles();
-  if(window.fireMapCloud)connect();else window.addEventListener("firemap-cloud-ready",connect,{once:true});
+  connect();window.addEventListener("firemap-cloud-ready",connect);window.addEventListener("online",connect);
 })();

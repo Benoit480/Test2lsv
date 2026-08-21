@@ -95,13 +95,3 @@ de fermeture dans `event-manager.js`.
 
 Le cache PWA historique est volontairement désactivé dans cette version afin que les
 mises à jour GitHub soient réellement chargées sur iPhone.
-
-
-## V25.0.4 — Synchronisation temps réel des fiches véhicules
-
-Correction de la section véhicules entre plusieurs appareils :
-- conservation correcte des horodatages Firebase;
-- conservation de `eventClosed` et `resetAfterEventId`;
-- sélection fiable de la fiche la plus récente;
-- chaque snapshot Firebase déclenche maintenant le rafraîchissement des profils véhicules;
-- le Poste de commandement se rafraîchit aussi à chaque changement provenant d'un autre appareil.

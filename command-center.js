@@ -1,4 +1,58 @@
-(()=>{"use strict";const $=id=>document.getElementById(id),I=window.fireMapInternal;if(!I)return;const EC="firemap-command-events-v1",AC="firemap-command-active-v1",UC="firemap-vehicle-usages-v2",ACTIVE_EVENT_DATA="firemap-command-active-event-data";let events=[],activeId=localStorage.getItem(AC)||"",timer,commandCloudUnsub=null;const read=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))||f}catch(_){return f}},write=(k,v)=>localStorage.setItem(k,JSON.stringify(v)),uid=()=>crypto.randomUUID?crypto.randomUUID():`e-${Date.now()}`,esc=v=>I.esc?I.esc(v):String(v??"");function normAddress(v=""){return String(v).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\b(rue|avenue|av|boulevard|boul|chemin|ch|route|rang)\b/g,"").replace(/[^a-z0-9]/g,"")}
+(()=>{"use strict";const $=id=>document.getElementById(id),I=window.fireMapInternal;if(!I)return;const EC="firemap-command-events-v1",AC="firemap-command-active-v1",UC="firemap-vehicle-usages-v2",ACTIVE_EVENT_DATA="firemap-command-active-event-data",PENDING_EVENTS="firemap-command-events-pending-v25";let events=[],activeId=localStorage.getItem(AC)||"",timer,commandCloudUnsub=null;const read=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))||f}catch(_){return f}},write=(k,v)=>localStorage.setItem(k,JSON.stringify(v)),uid=()=>crypto.randomUUID?crypto.randomUUID():`e-${Date.now()}`,esc=v=>I.esc?I.esc(v):String(v??"");function normAddress(v=""){return String(v).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\b(rue|avenue|av|boulevard|boul|chemin|ch|route|rang)\b/g,"").replace(/[^a-z0-9]/g,"")}
+
+function pendingEvents(){
+  const value=read(PENDING_EVENTS,{});
+  return value&&typeof value==="object"&&!Array.isArray(value)?value:{};
+}
+function queueCommandEvent(event){
+  if(!event?.id)return;
+  const pending=pendingEvents();
+  pending[String(event.id)]={...event,_queuedAt:new Date().toISOString()};
+  write(PENDING_EVENTS,pending);
+}
+function clearQueuedCommandEvent(id){
+  const pending=pendingEvents();
+  delete pending[String(id)];
+  write(PENDING_EVENTS,pending);
+}
+async function syncCommandEvent(event,{silent=false}={}){
+  if(!event?.id)return false;
+
+  // Queue FIRST. This makes an event impossible to lose if Firebase is still loading.
+  queueCommandEvent(event);
+
+  const cloud=window.fireMapCloud;
+  if(!cloud?.configured||typeof cloud.saveCommandEvent!=="function"){
+    if(!silent)console.info("Événement en attente de Firebase:",event.id);
+    return false;
+  }
+
+  try{
+    await cloud.saveCommandEvent(event);
+    clearQueuedCommandEvent(event.id);
+    return true;
+  }catch(error){
+    console.warn("Événement conservé en attente de synchronisation.",error);
+    return false;
+  }
+}
+async function flushCommandEventQueue(){
+  const cloud=window.fireMapCloud;
+  if(!cloud?.configured||typeof cloud.saveCommandEvent!=="function")return;
+
+  const pending=pendingEvents();
+  for(const [id,event] of Object.entries(pending)){
+    try{
+      const clean={...event};
+      delete clean._queuedAt;
+      await cloud.saveCommandEvent(clean);
+      clearQueuedCommandEvent(id);
+    }catch(error){
+      console.warn("Échec renvoi événement Firebase",id,error);
+    }
+  }
+}
+
 function buildings(){return window.fireMapPreplans?.getBuildings?.()||window.fireMapInternal?.state?.buildings||[]}
 function findBuilding(e){const target=normAddress(e?.address||"");if(!target)return null;const list=buildings();return list.find(b=>normAddress(b.address||b.adresse||"")===target)||list.find(b=>{const a=normAddress(b.address||b.adresse||"");return a&&(a.includes(target)||target.includes(a))})||null}
 function preventionRecord(id){return window.fireMapPrevention?.getRecordForBuilding?.(id)||null}
@@ -45,7 +99,10 @@ function addJournal(e,msg,options={}){
     fingerprint
   });
   return true;
-}async function submit(ev){ev.preventDefault();const id=$("commandEventId").value||uid(),old=events.find(x=>x.id===id),e={...old,id,number:$("commandEventNumberInput").value.trim(),address:$("commandEventAddressInput").value.trim(),type:$("commandEventTypeInput").value.trim(),alarm:$("commandEventAlarmInput").value,chief:$("commandEventChiefInput").value.trim(),notes:$("commandEventNotesInput").value.trim(),sourceCallId:old?.sourceCallId||"",status:"active",startedAt:old?.startedAt||new Date().toISOString(),journal:old?.journal||[]};if(!old)addJournal(e,"Événement créé",{category:"system"});const i=events.findIndex(x=>x.id===id);if(i>=0)events[i]=e;else events.push(e);activeId=id;localStorage.setItem(AC,id);saveLocal();$("commandEventDialog").close();render();try{await window.fireMapCloud?.saveCommandEvent?.(e)}catch(_){}}async function createEventFromActiveCall(call={}){
+}async function submit(ev){ev.preventDefault();const id=$("commandEventId").value||uid(),old=events.find(x=>x.id===id),e={...old,id,number:$("commandEventNumberInput").value.trim(),address:$("commandEventAddressInput").value.trim(),type:$("commandEventTypeInput").value.trim(),alarm:$("commandEventAlarmInput").value,chief:$("commandEventChiefInput").value.trim(),notes:$("commandEventNotesInput").value.trim(),sourceCallId:old?.sourceCallId||"",status:"active",startedAt:old?.startedAt||new Date().toISOString(),journal:old?.journal||[]};if(!old)addJournal(e,"Événement créé",{category:"system"});const i=events.findIndex(x=>x.id===id);if(i>=0)events[i]=e;else events.push(e);activeId=id;localStorage.setItem(AC,id);saveLocal();$("commandEventDialog").close();render();
+const synced=await syncCommandEvent(e);
+I.toast(synced?"Événement synchronisé.":"Événement enregistré — synchronisation Firebase en attente.");
+}async function createEventFromActiveCall(call={}){
     const address=String(call.adresse||call.address||"").trim();
     if(!address)return;
     const sourceCallId=String(call.callId||call.eventId||"").trim()||
@@ -93,13 +150,12 @@ function addJournal(e,msg,options={}){
       address:e.address
     }}));
     render();
-    try{
-      await window.fireMapCloud?.saveCommandEvent?.(e);
-      I.toast("Événement ajouté automatiquement au poste de commandement.");
-    }catch(err){
-      console.warn(err);
-      I.toast("Événement créé localement dans le poste de commandement.");
-    }
+    const synced=await syncCommandEvent(e);
+    I.toast(
+      synced
+        ?"Événement ajouté automatiquement et synchronisé."
+        :"Événement créé — synchronisation Firebase en attente."
+    );
   }
 
 
@@ -171,12 +227,16 @@ function applyCloudCommandEvents(items=[]){
 
 function connectCommandCloud(){
   const cloud=window.fireMapCloud;
-  if(!cloud?.subscribeCommandEvents)return;
+  if(!cloud?.configured||!cloud?.subscribeCommandEvents)return;
   commandCloudUnsub?.();
   commandCloudUnsub=cloud.subscribeCommandEvents(
-    items=>applyCloudCommandEvents(items),
+    items=>{
+      applyCloudCommandEvents(items);
+      flushCommandEventQueue();
+    },
     error=>console.warn("Synchronisation des événements indisponible.",error)
   );
+  flushCommandEventQueue();
 }
 
 function residualValues(rows){
@@ -424,7 +484,7 @@ function renderJournal(event){
 }
 function saveEventInBackground(event){
   saveLocal();
-  Promise.resolve(window.fireMapCloud?.saveCommandEvent?.(event)).catch(error=>console.warn("Journal en attente de synchronisation.",error));
+  syncCommandEvent(event,{silent:true}).catch(error=>console.warn("Journal en attente de synchronisation.",error));
 }
 
 function gpsPositionState(vehicle){
@@ -529,6 +589,8 @@ window.addEventListener("firemap:call-active",e=>createEventFromActiveCall(e.det
     getActiveEvent:active,
     refresh:render,
     getEvents:()=>events,
+    syncEvent:syncCommandEvent,
+    flushPendingEvents:flushCommandEventQueue,
     setActiveId:(id)=>{
       activeId=String(id||"");
       if(activeId)localStorage.setItem(AC,activeId);
@@ -578,6 +640,7 @@ document.addEventListener("click",event=>{
   render();
   connectCommandCloud();
   window.addEventListener("firemap-cloud-ready",connectCommandCloud);
+  window.addEventListener("online",()=>{connectCommandCloud();flushCommandEventQueue()});
   timer=setInterval(tick,1000);
   window.addEventListener("storage",render);
   window.addEventListener("firemap:vehicle-usages-ready",render);

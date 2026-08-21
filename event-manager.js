@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD="24.0.0";
+  const BUILD="25.0.5";
   const ACTIVE_ID_KEY="firemap-command-active-v1";
   const ACTIVE_DATA_KEY="firemap-command-active-event-data";
   const EVENTS_KEY="firemap-command-events-v1";
@@ -141,12 +141,12 @@
       }));
 
       // 4. Publish status=closed to Firebase for EVERY device.
-      if(window.fireMapCloud?.configured && window.fireMapCloud?.saveCommandEvent){
-        await window.fireMapCloud.saveCommandEvent(closed);
-        toast(`Événement terminé — ${result.reset||0} unités réinitialisées.`);
-      }else{
-        toast(`Événement terminé localement — ${result.reset||0} unités réinitialisées. Firebase non connecté.`);
-      }
+      const synced=await window.fireMapCommandCenter?.syncEvent?.(closed);
+      toast(
+        synced
+          ? `Événement terminé — ${result.reset||0} unités réinitialisées.`
+          : `Événement terminé — ${result.reset||0} unités réinitialisées; synchronisation Firebase en attente.`
+      );
     }catch(error){
       console.error("V24 fermeture événement",error);
       toast("Erreur pendant la fermeture de l’événement.");

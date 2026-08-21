@@ -410,7 +410,7 @@
   window.addEventListener("storage", e => {
     if (!e.key || e.key === "firemap-vehicle-usages-v2") renderList();
   });
-  if (window.fireMapCloud) connectCloud(); else window.addEventListener("firemap-cloud-ready", connectCloud, { once: true });
+  connectCloud(); window.addEventListener("firemap-cloud-ready", connectCloud);
   window.addEventListener("beforeunload", () => { if (state.watchId != null) navigator.geolocation.clearWatch(state.watchId); });
   window.fireMapVehicles = {
     getVehicles: () => state.vehicles,

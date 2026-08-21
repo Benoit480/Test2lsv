@@ -241,6 +241,6 @@
     flushPending(c);
   };
   setBuildings(loadCachedBuildings());
-  if(window.fireMapCloud)connect();else window.addEventListener("firemap-cloud-ready",connect,{once:true});
+  connect();window.addEventListener("firemap-cloud-ready",connect);
   window.addEventListener("online",()=>{if(window.fireMapCloud?.configured){connect()}});
 })();
