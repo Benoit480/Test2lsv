@@ -131,3 +131,15 @@ Optimisations de fluidité sans retirer les fonctions :
 - Rafraîchissement unique à la fin du geste.
 - Les véhicules ne sont pas reconstruits si leur état n'a pas réellement changé.
 - Optimisations de composition graphique pour Safari/iPhone.
+
+
+## V25.0.9 — Firebase non bloquant
+
+FireMap ne reste plus indéfiniment sur « Connexion… / Vérification Firebase ».
+
+- Firebase dispose d'un délai maximal de connexion.
+- Si Firebase tarde, FireMap passe en mode local.
+- L'application continue de fonctionner normalement.
+- Firebase retente automatiquement la connexion en arrière-plan.
+- Dès que Firebase revient, le statut devient « Synchronisation active ».
+- Les événements/fiches en attente continuent d'être renvoyés par les mécanismes V25.0.5.

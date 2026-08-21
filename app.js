@@ -164,16 +164,69 @@
   async function saveForm(){const p=canonical({id:$("hydrantId").value||uid(),name:$("hydrantName").value,address:$("hydrantAddress").value,lat:$("hydrantLat").value,lng:$("hydrantLng").value,status:$("hydrantStatus").value,outletType:$("outletType").value,flowGpm:flowValueForBand($("flowRate").value),flowRate:flowValueForBand($("flowRate").value),hydrantColor:$("flowRate").value,flowUnit:"gpm",inspection:$("inspectionDate").value,notes:$("hydrantNotes").value});if(!isFinite(p.lat)||!isFinite(p.lng))return toast("Coordonnées invalides.");const i=state.hydrants.findIndex(x=>x.id===p.id);if(i>=0)state.hydrants[i]=p;else state.hydrants.push(p);setHydrants(state.hydrants,"local");$("hydrantDialog").close();try{if(window.fireMapCloud?.configured)await window.fireMapCloud.savePoint(p);toast("Borne enregistrée et synchronisée.")}catch(e){console.error(e);toast("Borne enregistrée localement, erreur Firebase.")}}
   async function removeCurrent(){const id=$("hydrantId").value;if(!id||!confirm("Supprimer définitivement cette borne ?"))return;state.hydrants=state.hydrants.filter(p=>p.id!==id);setHydrants(state.hydrants,"local");$("hydrantDialog").close();try{if(window.fireMapCloud?.configured)await window.fireMapCloud.deletePoint(id);toast("Borne supprimée.")}catch(e){toast("Suppression locale seulement.")}}
   function locate(){if(!navigator.geolocation)return toast("GPS non disponible.");navigator.geolocation.getCurrentPosition(p=>{state.user={lat:p.coords.latitude,lng:p.coords.longitude};userLayer.clearLayers();L.circleMarker([state.user.lat,state.user.lng],{radius:9,color:"#fff",weight:3,fillColor:"#2563eb",fillOpacity:1}).bindPopup("Votre position").addTo(userLayer).openPopup();map.setView([state.user.lat,state.user.lng],16)},()=>toast("Autorisez la localisation dans Safari."),{enableHighAccuracy:true,timeout:12000,maximumAge:5000})}
-  function connectCloud(){const start=()=>{const c=window.fireMapCloud;if(!c?.configured){$("syncTitle").textContent="Mode local";$("syncText").textContent="Firebase non connecté";return}$("syncTitle").textContent="Synchronisation active";$("syncText").textContent="Tous les appareils sont reliés";$("syncDot").classList.add("ok");c.subscribe(async data=>{if(data.length){setHydrants(data,"cloud")}else if(!state.cloudHasData&&state.hydrants.length){try{await c.saveMany(state.hydrants);toast("Bornes initiales envoyées dans Firebase.")}catch(e){console.error(e)}}},e=>{console.error(e);$("syncTitle").textContent="Erreur Firebase"})};if(window.fireMapCloud)start();else window.addEventListener("firemap-cloud-ready",start,{once:true})}
+  function updateSyncStatus(){
+    const c=window.fireMapCloud;
+    const title=$("syncTitle"),text=$("syncText"),dot=$("syncDot");
+    if(!title||!text||!dot)return;
+    dot.classList.remove("ok");
+    if(c?.configured){
+      title.textContent="Synchronisation active";
+      text.textContent="Tous les appareils sont reliés";
+      dot.classList.add("ok");
+      return;
+    }
+    if(c?.connecting){
+      title.textContent="Connexion…";
+      text.textContent="Firebase en arrière-plan";
+      return;
+    }
+    title.textContent="Mode local";
+    text.textContent="Firebase se reconnectera automatiquement";
+  }
+  let hydrantCloudUnsub=null;
+  function connectCloud(){
+    updateSyncStatus();
+    const c=window.fireMapCloud;
+    if(!c?.configured||typeof c.subscribe!=="function")return;
 
-  // V25.0.7: ne plus supprimer le cache FireMap à chaque démarrage.
+    try{hydrantCloudUnsub?.()}catch(_){}
+    hydrantCloudUnsub=c.subscribe(async data=>{
+      if(data.length){
+        setHydrants(data,"cloud");
+      }else if(!state.cloudHasData&&state.hydrants.length){
+        try{
+          await c.saveMany(state.hydrants);
+          toast("Bornes initiales envoyées dans Firebase.");
+        }catch(e){console.error(e)}
+      }
+    },e=>{
+      console.error(e);
+      $("syncTitle").textContent="Mode local";
+      $("syncText").textContent="Connexion Firebase interrompue";
+      $("syncDot").classList.remove("ok");
+    });
+  }
+
+  // FireMap remains usable even if Firebase never answers.
+  setTimeout(()=>{
+    if(!window.fireMapCloud?.configured){
+      $("syncTitle").textContent="Mode local";
+      $("syncText").textContent="Firebase continue de se connecter";
+      $("syncDot").classList.remove("ok");
+    }
+  },6000);
+
+  window.addEventListener("firemap-cloud-ready",connectCloud);
+  window.addEventListener("firemap-cloud-status",updateSyncStatus);
+
+  // V25.0.9: ne plus supprimer le cache FireMap à chaque démarrage.
   // Le service worker conserve maintenant l'application et les tuiles déjà visitées.
-  localStorage.setItem("firemap-runtime-build","25.0.7");
+  localStorage.setItem("firemap-runtime-build","25.0.9");
 
   window.fireMapInternal={map,state,showView,openHydrantForm:openForm,navUrl,toast,esc,norm,addressNorm,getAddresses:()=>state.addresses,getHydrants:()=>state.hydrants,selectAddress,clearIntervention,nearestAddress,rankHydrantsByRoad,drawRoadRoutes};
   document.addEventListener("click",e=>{const v=e.target.closest("[data-view]");if(v)showView(v.dataset.view);const ai=e.target.closest("[data-address-index]");if(ai)selectAddress(state.addresses[Number(ai.dataset.addressIndex)]);const edit=e.target.closest("[data-edit]");if(edit)openForm(state.hydrants.find(p=>p.id===edit.dataset.edit));const show=e.target.closest("[data-show]");if(show){const p=state.hydrants.find(x=>x.id===show.dataset.show);showView("map");map.setView([p.lat,p.lng],18);state.markers.get(p.id)?.openPopup()}const nav=e.target.closest("[data-nav]");if(nav){const p=state.hydrants.find(x=>x.id===nav.dataset.nav);if(p)location.href=navUrl(p.lat,p.lng)}const ns=e.target.closest("[data-nearest-show]");if(ns){const p=state.hydrants.find(x=>x.id===ns.dataset.nearestShow);if(p){map.setView([p.lat,p.lng],18);state.markers.get(p.id)?.openPopup()}}const hi=e.target.closest("[data-history]");if(hi){const x=state.history[Number(hi.dataset.history)];if(x)selectAddress(x,false)}const fi=e.target.closest("[data-favorite]");if(fi){const x=state.favorites[Number(fi.dataset.favorite)];if(x)selectAddress(x,false)}const fr=e.target.closest("[data-favorite-remove]");if(fr){state.favorites.splice(Number(fr.dataset.favoriteRemove),1);localStorage.setItem("firemap-favorites",JSON.stringify(state.favorites));renderFavorites()}});
   [["addressSearch","results","searchStatus"],["addressSearchFull","resultsFull","searchStatusFull"]].forEach(([i,b,s])=>$(i).addEventListener("input",()=>renderResults(i,b,s)));$("clearSearch").onclick=()=>{$("addressSearch").value="";$("results").innerHTML="";updateAddressCounts()};$("clearSearchFull").onclick=()=>{$("addressSearchFull").value="";$("resultsFull").innerHTML="";updateAddressCounts()};
   $("menuBtn").onclick=$("bottomMore").onclick=openDrawer;$("closeDrawer").onclick=$("backdrop").onclick=closeDrawer;$("clearIntervention").onclick=clearIntervention;$("addFavorite").onclick=addFavorite;$("voiceSearch").onclick=()=>startVoice("addressSearch","results","searchStatus");$("voiceSearchFull").onclick=()=>startVoice("addressSearchFull","resultsFull","searchStatusFull");$("clearHistory").onclick=()=>{state.history=[];localStorage.removeItem("firemap-interventions");renderHistory()};[$("drawerAdd"),$("addHydrantTop"),$("bottomAdd")].filter(Boolean).forEach(b=>b.onclick=()=>openForm());$("locateBtn").onclick=locate;$("gpsBtn").onclick=()=>state.selected?window.fireMapNavigation?.start(state.selected):toast("Choisissez une adresse.");$("nearestBtn").onclick=nearest;$("hydrantToggle").onchange=e=>e.target.checked?hydrantLayer.addTo(map):map.removeLayer(hydrantLayer);$("hydrantSearch").oninput=renderHydrantList;$("statusFilter").onchange=renderHydrantList;$("closeModal").onclick=$("cancelModal").onclick=()=>$("hydrantDialog").close();$("hydrantForm").onsubmit=e=>{e.preventDefault();saveForm()};$("deleteHydrant").onclick=removeCurrent;map.on("click",e=>state.lastMapClick={lat:e.latlng.lat,lng:e.latlng.lng});window.editFireHydrant=id=>openForm(state.hydrants.find(p=>p.id===id));
   window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();state.deferredInstall=e;$("installBtn").classList.remove("hidden")});$("installBtn").onclick=async()=>{if(state.deferredInstall){state.deferredInstall.prompt();await state.deferredInstall.userChoice;state.deferredInstall=null}};
-  loadHistory();loadFavorites();loadBase().then(connectCloud);
+  loadHistory();loadFavorites();connectCloud();loadBase().then(()=>connectCloud()).catch(error=>{console.warn("Banque locale:",error);connectCloud()});
 })();
