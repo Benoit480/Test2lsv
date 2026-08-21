@@ -1,7 +1,7 @@
 (() => {
   "use strict";
   const CENTER=[46.2563,-72.9417], ADDRESS_FILE="louiseville_adresses.json", HYDRANT_FILE="firemap-2026-07-30 2.geojson";
-  const $=id=>document.getElementById(id), state={addresses:[],hydrants:[],markers:new Map(),selected:null,user:null,lastMapClick:null,cloudReady:false,cloudHasData:false,deferredInstall:null,nearest:[],history:[],favorites:[],mapMoving:false,pendingMarkerRender:false};
+  const $=id=>document.getElementById(id), state={addresses:[],hydrants:[],markers:new Map(),selected:null,user:null,lastMapClick:null,cloudReady:false,cloudHasData:false,deferredInstall:null,nearest:[],history:[],favorites:[],mapMoving:false,pendingMarkerRender:false,lastHydrantRenderKey:"",lastHydrantDetailMode:null};
   const map=L.map("map",{
     zoomControl:true,
     preferCanvas:true,
@@ -23,6 +23,7 @@
     detectRetina:false
   }).addTo(map);
   const hydrantLayer=L.layerGroup().addTo(map), interventionLayer=L.layerGroup().addTo(map), resourceLayer=L.layerGroup().addTo(map), userLayer=L.layerGroup().addTo(map);
+  const hydrantCanvasRenderer=L.canvas({padding:0.25,tolerance:8});
   const mapContainer=map.getContainer();
   map.on("movestart zoomstart",()=>{
     state.mapMoving=true;
@@ -33,9 +34,11 @@
     state.mapMoving=false;
     mapContainer.classList.remove("firemap-map-moving");
     window.fireMapMapMoving=false;
-    if(state.pendingMarkerRender){
+    const detailMode=map.getZoom()>=16;
+    const modeChanged=detailMode!==state.lastHydrantDetailMode;
+    if(state.pendingMarkerRender||modeChanged){
       state.pendingMarkerRender=false;
-      requestAnimationFrame(()=>renderMarkers());
+      requestAnimationFrame(()=>renderMarkers(modeChanged));
     }
     window.dispatchEvent(new CustomEvent("firemap:map-idle"));
   });
@@ -66,18 +69,52 @@
   function hydrantSvg(color){return `<svg viewBox="0 0 64 74" aria-hidden="true"><g fill="${color}" stroke="#090b10" stroke-width="2.2" stroke-linejoin="round"><path d="M24 8h16l4 8H20z"/><rect x="21" y="15" width="22" height="9" rx="4"/><path d="M18 25h28v32H18z"/><rect x="7" y="31" width="12" height="17" rx="4"/><rect x="45" y="31" width="12" height="17" rx="4"/><rect x="3" y="35" width="7" height="9" rx="2"/><rect x="54" y="35" width="7" height="9" rx="2"/><path d="M14 57h36l6 10H8z"/><rect x="26" y="29" width="12" height="20" rx="4" fill="#0c1017" opacity=".3"/></g><circle cx="32" cy="9" r="3" fill="#d8e1ec"/></svg>`}
   function markerHtml(p){const band=flowBand(p.flowGpm),border=statusColor(p.status);return `<div class="hydrant-marker" style="--flow:${band.color};--status:${border}" title="${band.label} — ${band.range}"><div class="hydrant-emoji">${hydrantSvg(band.color)}</div><div class="hydrant-gpm">${band.key==="blue"?"≥1500":band.key==="green"?"1000–1499":band.key==="orange"?"500–999":band.key==="red"?"<500":"?"}</div></div>`}
   function iconFor(p){return L.divIcon({className:"custom-hydrant",html:markerHtml(p),iconSize:[22,30],iconAnchor:[11,27],popupAnchor:[0,-27]})}
-  function renderMarkers(){
+  function hydrantRenderKey(detailMode){
+    return `${detailMode?"detail":"canvas"}|${state.hydrants.map(p=>[
+      p.id,Number(p.lat).toFixed(5),Number(p.lng).toFixed(5),Number(p.flowGpm||0),String(p.status||"")
+    ].join(":")).join("|")}`;
+  }
+  function hydrantPopupHtml(p){
+    const band=flowBand(p.flowGpm);
+    return `<strong>Borne ${esc(p.name)}</strong><br>${esc(p.address)||"Adresse non inscrite"}<br><b style="color:${band.color}">${fmtGpm(p.flowGpm)}</b><br><span class="status ${statusClass(p.status)}">${statusLabel(p.status)}</span><br><button onclick="window.editFireHydrant('${esc(p.id)}')">Modifier</button>`;
+  }
+  function renderMarkers(force=false){
     if(state.mapMoving||window.fireMapMapMoving){
       state.pendingMarkerRender=true;
       return;
     }
-    hydrantLayer.clearLayers();state.markers.clear();state.hydrants.forEach(p=>{const band=flowBand(p.flowGpm);const m=L.marker([p.lat,p.lng],{icon:iconFor(p)}).bindPopup(`<strong>Borne ${esc(p.name)}</strong><br>${esc(p.address)||"Adresse non inscrite"}<br><b style="color:${band.color}">${fmtGpm(p.flowGpm)}</b><br><span class="status ${statusClass(p.status)}">${statusLabel(p.status)}</span><br><button onclick="window.editFireHydrant('${esc(p.id)}')">Modifier</button>`).addTo(hydrantLayer);state.markers.set(p.id,m)})}
-  function miniHydrant(p){const b=flowBand(p.flowGpm);return `<div class="hydrant-mini" style="--flow:${b.color};--status:${statusColor(p.status)}">${hydrantSvg(b.color)}</div>`}
-  function renderHydrantList(){const q=norm($("hydrantSearch").value),sf=$("statusFilter").value;const items=state.hydrants.filter(p=>(!sf||normalizeStatus(p.status)===sf)&&(!q||norm([p.name,p.address,p.status,p.notes,p.flowGpm].join(" ")).includes(q))).sort((a,b)=>a.name.localeCompare(b.name,"fr",{numeric:true}));$("hydrantList").innerHTML=items.map(p=>`<article class="card-item">${miniHydrant(p)}<div class="card-content"><h3>Borne ${esc(p.name)}</h3><span class="status ${statusClass(p.status)}">${statusLabel(p.status)}</span><p>${esc(p.address)||"Adresse non inscrite"}</p><p>${p.inspection?"Inspection : "+esc(p.inspection):"Inspection non inscrite"} · <b>${fmtGpm(p.flowGpm)}</b></p><div class="card-actions"><button class="secondary" data-show="${esc(p.id)}">Voir</button><button class="secondary" data-edit="${esc(p.id)}">Modifier</button><button class="primary" data-nav="${esc(p.id)}">GPS</button></div></div></article>`).join("")||`<div class="card-item">Aucune borne trouvée.</div>`}
-  function renderInspections(){const old=new Date();old.setFullYear(old.getFullYear()-1);let current=0,due=0,missing=0;const sorted=[...state.hydrants].sort((a,b)=>(a.inspection||"").localeCompare(b.inspection||""));sorted.forEach(p=>{if(!p.inspection)missing++;else if(new Date(p.inspection)<old)due++;else current++});$("inspectionStats").innerHTML=`<div><strong>${current}</strong><span>À jour</span></div><div><strong>${due}</strong><span>À inspecter</span></div><div><strong>${missing}</strong><span>Sans date</span></div>`;$("inspectionList").innerHTML=sorted.map(p=>`<article class="card-item">${miniHydrant(p)}<div class="card-content"><h3>Borne ${esc(p.name)}</h3><p>${esc(p.address)}</p><p>${fmtGpm(p.flowGpm)} · ${p.inspection?`Dernière inspection : ${esc(p.inspection)}`:"Aucune inspection inscrite"}</p><div class="card-actions"><button class="secondary" data-edit="${esc(p.id)}">Mettre à jour</button></div></div></article>`).join("")}
-  function search(query){const terms=addressNorm(query).split(" ").filter(Boolean);if(!terms.length)return[];return state.addresses.filter(a=>terms.every(t=>a.rechercheNormalisee.includes(t))).sort((a,b)=>a.adresse.localeCompare(b.adresse,"fr",{numeric:true})).slice(0,35)}
-  function updateAddressCounts(){const n=state.addresses.length.toLocaleString("fr-CA");$("searchStatus").textContent=`${n} adresses chargées`;$("searchStatusFull").textContent=`${n} adresses chargées`}
-  function renderResults(inputId,boxId,statusId){const input=$(inputId),items=search(input.value),box=$(boxId);box.innerHTML="";if(!input.value.trim()){updateAddressCounts();return}$(statusId).textContent=items.length?`${items.length} résultat(s) affiché(s)`:"Aucune adresse trouvée";box.innerHTML=items.map((a,i)=>`<button class="result-item" data-address-index="${state.addresses.indexOf(a)}"><span class="pin">📍</span><span><strong>${esc(a.adresse)}</strong><small>${a.lat.toFixed(6)}, ${a.lng.toFixed(6)}</small></span></button>`).join("")}
+    const detailMode=map.getZoom()>=16;
+    const key=hydrantRenderKey(detailMode);
+    if(!force&&key===state.lastHydrantRenderKey)return;
+
+    state.lastHydrantRenderKey=key;
+    state.lastHydrantDetailMode=detailMode;
+    hydrantLayer.clearLayers();
+    state.markers.clear();
+
+    state.hydrants.forEach(p=>{
+      if(!Number.isFinite(Number(p.lat))||!Number.isFinite(Number(p.lng)))return;
+      const band=flowBand(p.flowGpm);
+      let m;
+      if(detailMode){
+        m=L.marker([p.lat,p.lng],{icon:iconFor(p),keyboard:false,riseOnHover:false});
+      }else{
+        m=L.circleMarker([p.lat,p.lng],{
+          renderer:hydrantCanvasRenderer,
+          radius:6,
+          color:statusColor(p.status),
+          weight:2,
+          fillColor:band.color,
+          fillOpacity:.96,
+          opacity:1,
+          bubblingMouseEvents:false
+        });
+      }
+      m.bindPopup(hydrantPopupHtml(p),{autoPan:true,keepInView:false});
+      m.addTo(hydrantLayer);
+      state.markers.set(p.id,m);
+    });
+  }
   function interventionIcon(){return L.divIcon({className:"custom-hydrant",html:`<div class="intervention-pin pulse-ring"><span>🔥</span></div>`,iconSize:[38,38],iconAnchor:[8,34],popupAnchor:[10,-31]})}
   function saveHistory(a){const item={adresse:a.adresse,lat:a.lat,lng:a.lng,at:new Date().toISOString()};state.history=[item,...state.history.filter(x=>x.adresse!==item.adresse)].slice(0,8);localStorage.setItem("firemap-interventions",JSON.stringify(state.history));renderHistory()}
   function loadHistory(){try{state.history=JSON.parse(localStorage.getItem("firemap-interventions")||"[]")}catch(_){state.history=[]}renderHistory()}

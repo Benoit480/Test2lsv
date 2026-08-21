@@ -4,13 +4,16 @@
   if(!I) return console.error("FireMap interne indisponible");
   const $=id=>document.getElementById(id), esc=I.esc, norm=I.norm;
   const layer=L.layerGroup().addTo(I.map);
-  let buildings=[], markers=new Map(), pendingMapPoint=null, pendingMarkerRender=false;
+  const buildingCanvasRenderer=L.canvas({padding:0.25,tolerance:8});
+  let buildings=[], markers=new Map(), pendingMapPoint=null, pendingMarkerRender=false, lastRenderKey="", lastDetailMode=null;
   const BUILDINGS_CACHE_KEY="firemap-batiments-v1";
   const BUILDINGS_PENDING_KEY="firemap-batiments-pending-v1";
   const BUILDINGS_MIGRATED_KEY="firemap-batiments-cloud-migrated-v1";
   let cloudUnsubscribe=null, cloudConnected=false;
   window.addEventListener("firemap:map-idle",()=>{
-    if(pendingMarkerRender)requestAnimationFrame(()=>renderMarkers());
+    const detailMode=I.map.getZoom()>=16;
+    const modeChanged=detailMode!==lastDetailMode;
+    if(pendingMarkerRender||modeChanged)requestAnimationFrame(()=>renderMarkers(modeChanged));
   });
   function readJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||"")||fallback}catch(_){return fallback}}
   function writeJson(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch(e){console.warn("Stockage local indisponible",e)}}
@@ -29,13 +32,46 @@
   const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random().toString(16).slice(2);
   function canonical(b={}){return {id:String(b.id||uid()),name:String(b.name||"Bâtiment sans nom"),address:String(b.address||""),lat:Number(b.lat),lng:Number(b.lng),category:b.category||"other",risk:b.risk||"high",floors:Number(b.floors||0),basement:b.basement||"unknown",risks:b.risks||"",fdc:b.fdc||"",electrical:b.electrical||"",gas:b.gas||"",hazmat:b.hazmat||"",access:b.access||"",assembly:b.assembly||"",attackSide:b.attackSide||"",contactName:b.contactName||"",contactPhone:b.contactPhone||"",planUrl:b.planUrl||"",photoUrls:Array.isArray(b.photoUrls)?b.photoUrls:String(b.photoUrls||"").split(/\n+/).map(x=>x.trim()).filter(Boolean),notes:b.notes||"",preventionOccupancy:Number(b.preventionOccupancy||0),preventionAccessCode:b.preventionAccessCode||"",lastPreventionVisit:b.lastPreventionVisit||"",preventionInspector:b.preventionInspector||"",preventionNextReview:b.preventionNextReview||"",preventionScore:Number(b.preventionScore||0)}}
   function icon(b){const c=riskColor[b.risk]||"#ff9500",emoji=categoryIcon[b.category]||"🏢";return L.divIcon({className:"building-div-icon",html:`<div class="building-marker" style="--risk:${c}"><span>${emoji}</span></div>`,iconSize:[32,38],iconAnchor:[16,34],popupAnchor:[0,-32]})}
-  function renderMarkers(){
+  function buildingRenderKey(detailMode){
+    return `${detailMode?"detail":"canvas"}|${buildings.map(b=>[
+      b.id,Number(b.lat).toFixed(5),Number(b.lng).toFixed(5),String(b.risk||""),String(b.name||"")
+    ].join(":")).join("|")}`;
+  }
+  function renderMarkers(force=false){
     if(window.fireMapMapMoving){
       pendingMarkerRender=true;
       return;
     }
     pendingMarkerRender=false;
-    layer.clearLayers();markers.clear();buildings.forEach(b=>{if(!isFinite(b.lat)||!isFinite(b.lng))return;const m=L.marker([b.lat,b.lng],{icon:icon(b)}).bindPopup(`<strong>${esc(b.name)}</strong><br>${esc(b.address)}<br><span class="risk-badge ${b.risk}">${riskLabel[b.risk]}</span><br><button data-open-preplan="${esc(b.id)}">Ouvrir la fiche</button>`).addTo(layer);markers.set(b.id,m)})}
+    const detailMode=I.map.getZoom()>=16;
+    const key=buildingRenderKey(detailMode);
+    if(!force&&key===lastRenderKey)return;
+    lastRenderKey=key;
+    lastDetailMode=detailMode;
+
+    layer.clearLayers();markers.clear();
+    buildings.forEach(b=>{
+      if(!isFinite(b.lat)||!isFinite(b.lng))return;
+      const color=riskColor[b.risk]||"#ff9500";
+      let m;
+      if(detailMode){
+        m=L.marker([b.lat,b.lng],{icon:icon(b),keyboard:false,riseOnHover:false});
+      }else{
+        m=L.circleMarker([b.lat,b.lng],{
+          renderer:buildingCanvasRenderer,
+          radius:5,
+          color:"#0b0f16",
+          weight:2,
+          fillColor:color,
+          fillOpacity:.96,
+          bubblingMouseEvents:false
+        });
+      }
+      m.bindPopup(`<strong>${esc(b.name)}</strong><br>${esc(b.address)}<br><span class="risk-badge ${b.risk}">${riskLabel[b.risk]}</span><br><button data-open-preplan="${esc(b.id)}">Ouvrir la fiche</button>`);
+      m.addTo(layer);
+      markers.set(b.id,m);
+    });
+  }
   function renderList(){const q=norm($("buildingSearch").value),rf=$("riskFilter").value;const list=buildings.filter(b=>(!rf||b.risk===rf)&&(!q||norm(Object.values(b).join(" ")).includes(q))).sort((a,b)=>a.name.localeCompare(b.name,"fr"));$("buildingList").innerHTML=list.map(b=>`<article class="card-item building-card"><div class="building-list-icon" style="--risk:${riskColor[b.risk]}">${categoryIcon[b.category]}</div><div class="card-content"><h3>${esc(b.name)}</h3><span class="risk-badge ${b.risk}">${riskLabel[b.risk]}</span><p>${esc(b.address)||"Adresse non inscrite"}</p><p>${categoryLabel[b.category]} · ${b.floors||"?"} étage(s)</p><div class="card-actions"><button class="secondary" data-show-building="${esc(b.id)}">Ouvrir</button><button class="secondary" data-edit-building="${esc(b.id)}">Modifier</button><button class="primary" data-nav-building="${esc(b.id)}">GPS</button></div></div></article>`).join("")||'<div class="card-item">Aucun bâtiment enregistré.</div>'}
   function setBuildings(items,{persist=true}={}){buildings=items.map(canonical);if(persist)saveCachedBuildings(buildings);renderMarkers();renderList();window.dispatchEvent(new CustomEvent("firemap:buildings-updated",{detail:{buildings:buildings.slice()}}))}
   function openChoice(point=null){if(point){pendingMapPoint={lat:Number(point.lat),lng:Number(point.lng)};I.state.lastMapClick={...pendingMapPoint}}else pendingMapPoint=null;$("addChoiceDialog").showModal() }

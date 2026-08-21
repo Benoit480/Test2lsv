@@ -121,3 +121,13 @@ Optimisations de fluidité sans retirer les fonctions :
 - un seul rafraîchissement est effectué à la fin du mouvement;
 - animations GPS/pulsations et ombres suspendues pendant le déplacement;
 - l'ancien nettoyage qui supprimait les caches FireMap à chaque démarrage a été retiré.
+
+
+## V25.0.8 — Carte ultra fluide
+
+- Zoom 15 et moins : bornes et bâtiments dessinés sur Canvas Leaflet.
+- Zoom 16 et plus : icônes détaillées restaurées.
+- Aucun recalcul pendant le glissement de la carte.
+- Rafraîchissement unique à la fin du geste.
+- Les véhicules ne sont pas reconstruits si leur état n'a pas réellement changé.
+- Optimisations de composition graphique pour Safari/iPhone.

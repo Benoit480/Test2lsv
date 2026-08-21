@@ -1428,3 +1428,25 @@ body[data-account-role="unit"] #endCommandEvent,
   backface-visibility:hidden;
   -webkit-backface-visibility:hidden;
 }
+
+
+/* FireMap V25.0.8 — mode ultra fluide */
+#map {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  contain: paint;
+}
+#map .leaflet-map-pane,
+#map .leaflet-tile-pane,
+#map .leaflet-overlay-pane {
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+}
+#map.firemap-map-moving .leaflet-tooltip,
+#map.firemap-map-moving .leaflet-popup-pane {
+  pointer-events:none !important;
+}
+#map.firemap-map-moving .custom-hydrant,
+#map.firemap-map-moving .building-div-icon {
+  will-change:transform;
+}
