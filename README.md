@@ -95,3 +95,17 @@ de fermeture dans `event-manager.js`.
 
 Le cache PWA historique est volontairement désactivé dans cette version afin que les
 mises à jour GitHub soient réellement chargées sur iPhone.
+
+
+## V25.0.6 — Retour à la carte Leaflet sans Google Maps
+
+Google Maps est retiré temporairement de l'application.
+
+- La carte opérationnelle redevient la carte Leaflet utilisée auparavant.
+- La recherche d'adresse revient à la banque locale de Louiseville.
+- La synchronisation Firebase V25.0.5 est conservée.
+- Les bornes, bâtiments, événements, véhicules et fiches véhicules restent présents.
+- Aucun fichier `google-maps-adapter.js` ou `google-maps-config.js` n'est chargé.
+
+Note : le moteur de carte est sans Google. Le fond CARTO/OpenStreetMap utilisé par Leaflet
+nécessite encore Internet pour charger des tuiles qui ne sont pas déjà en cache.

@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v25-0-5-firebase-stable";
+const CACHE_VERSION = "firemap-v25-0-6-leaflet-no-google";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
@@ -6,8 +6,8 @@ const APP_SHELL = [
   "./",
   "index.html",
   "firemap-boot.js",
-  "google-maps-adapter.js",
-  "google-maps-config.js",
+  
+  
   "styles.css",
   "app.js",
   "preplans.js",
@@ -118,6 +118,6 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  // Ressources externes Google Maps : utilisation réseau avec repli cache si disponible.
+  // Ressources externes Leaflet/CARTO : utilisation réseau avec repli cache si disponible.
   event.respondWith(cacheFirst(request).catch(() => Response.error()));
 });
