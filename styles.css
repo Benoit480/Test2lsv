@@ -1346,14 +1346,14 @@ body[data-account-role="unit"] #endCommandEvent,
 }
 
 
-/* FireMap V24.0.3 — fond OSM sans clé API, rendu sombre */
-#map .leaflet-tile-pane .leaflet-tile {
-  filter: invert(92%) hue-rotate(180deg) brightness(52%) contrast(115%) saturate(55%);
+
+
+/* FireMap V24.0.4 — tuiles OSM natives, sans filtre GPU */
+#map .leaflet-tile {
+  filter:none !important;
+  -webkit-filter:none !important;
+  image-rendering:auto;
 }
-#map .leaflet-control-attribution {
-  background: rgba(5,10,16,.72) !important;
-  color: #d6dde8 !important;
-}
-#map .leaflet-control-attribution a {
-  color: #d6dde8 !important;
+#map .leaflet-tile-pane {
+  will-change:auto !important;
 }

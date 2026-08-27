@@ -119,3 +119,13 @@ mises à jour GitHub soient réellement chargées sur iPhone.
 - rendu sombre conservé via filtre CSS;
 - mêmes bornes, bâtiments, véhicules et Poste de commandement;
 - optimisations légères de la V24.0.2 conservées.
+
+
+## V24.0.4 — OSM natif sans filtre GPU
+
+- suppression complète du filtre sombre appliqué aux tuiles;
+- OpenStreetMap affiché dans son rendu natif;
+- `detectRetina` désactivé pour éviter les tuiles haute densité;
+- tampon de tuiles réduit;
+- chargement des nouvelles tuiles surtout à la fin du mouvement;
+- mêmes fonctions FireMap, sans Google Maps.

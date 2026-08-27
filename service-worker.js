@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v24-0-3-osm-no-key-no-google";
+const CACHE_VERSION = "firemap-v24-0-4-osm-native-no-filter";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
