@@ -1,13 +1,11 @@
-const CACHE_VERSION = "firemap-v25-0-9-firebase-nonblocking";
+const CACHE_VERSION = "firemap-v24-0-1-stable-firebase-no-google";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
 const APP_SHELL = [
+  "import/index.html",
   "./",
   "index.html",
-  "firemap-boot.js",
-  
-  
   "styles.css",
   "app.js",
   "preplans.js",
@@ -118,6 +116,6 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  // Ressources externes Leaflet/CARTO : utilisation réseau avec repli cache si disponible.
+  // CDN resources such as Leaflet are cached after the first successful load.
   event.respondWith(cacheFirst(request).catch(() => Response.error()));
 });

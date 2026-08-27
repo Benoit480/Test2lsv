@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD="25.0.5";
+  const BUILD="24.0.1";
   const ACTIVE_ID_KEY="firemap-command-active-v1";
   const ACTIVE_DATA_KEY="firemap-command-active-event-data";
   const EVENTS_KEY="firemap-command-events-v1";
