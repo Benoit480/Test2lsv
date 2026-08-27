@@ -1330,3 +1330,17 @@ body[data-account-role="unit"] #endCommandEvent,
 }
 .build-status-v24 strong{display:block;color:#bbf7d0}
 .build-status-v24 small{display:block;margin-top:2px;color:#86efac;font-size:10px}
+
+
+/* FireMap V24.0.2 — optimisation légère, apparence conservée */
+#map.firemap-map-moving .leaflet-marker-icon,
+#map.firemap-map-moving .leaflet-marker-shadow {
+  transition:none !important;
+}
+#map.firemap-map-moving .vehicle-marker-body,
+#map.firemap-map-moving .station-marker-body,
+#map.firemap-map-moving .hydrant-marker,
+#map.firemap-map-moving .building-marker {
+  animation:none !important;
+  transition:none !important;
+}

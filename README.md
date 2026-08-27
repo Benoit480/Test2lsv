@@ -95,3 +95,17 @@ de fermeture dans `event-manager.js`.
 
 Le cache PWA historique est volontairement désactivé dans cette version afin que les
 mises à jour GitHub soient réellement chargées sur iPhone.
+
+
+## V24.0.2 — Fluidité légère sans changer l'apparence
+
+- même carte Leaflet/CARTO;
+- mêmes icônes de bornes;
+- mêmes icônes bâtiments;
+- même Poste de commandement;
+- aucune intégration Google Maps;
+- pas de reconstruction des bornes pendant le déplacement;
+- pas de reconstruction des bâtiments pendant le déplacement;
+- pas de reconstruction des véhicules pendant le déplacement;
+- rafraîchissement une fois le geste terminé;
+- animations Leaflet coûteuses réduites.

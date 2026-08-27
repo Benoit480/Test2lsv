@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v24-0-1-stable-firebase-no-google";
+const CACHE_VERSION = "firemap-v24-0-2-fluidite-legere-no-google";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 

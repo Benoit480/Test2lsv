@@ -1,11 +1,34 @@
 (() => {
   "use strict";
   const CENTER=[46.2563,-72.9417], ADDRESS_FILE="louiseville_adresses.json", HYDRANT_FILE="firemap-2026-07-30 2.geojson";
-  const $=id=>document.getElementById(id), state={addresses:[],hydrants:[],markers:new Map(),selected:null,user:null,lastMapClick:null,cloudReady:false,cloudHasData:false,deferredInstall:null,nearest:[],history:[],favorites:[]};
-  const map=L.map("map",{zoomControl:true}).setView(CENTER,14);
+  const $=id=>document.getElementById(id), state={addresses:[],hydrants:[],markers:new Map(),selected:null,user:null,lastMapClick:null,cloudReady:false,cloudHasData:false,deferredInstall:null,nearest:[],history:[],favorites:[],mapMoving:false,pendingMarkerRender:false};
+  const map=L.map("map",{
+    zoomControl:true,
+    zoomAnimation:false,
+    fadeAnimation:false,
+    markerZoomAnimation:false,
+    inertia:true
+  }).setView(CENTER,14);
   map.attributionControl.setPrefix(false);
   L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:20,subdomains:"abcd",attribution:"&copy; OpenStreetMap &copy; CARTO"}).addTo(map);
   const hydrantLayer=L.layerGroup().addTo(map), interventionLayer=L.layerGroup().addTo(map), resourceLayer=L.layerGroup().addTo(map), userLayer=L.layerGroup().addTo(map);
+  const mapContainer=map.getContainer();
+  map.on("movestart zoomstart",()=>{
+    state.mapMoving=true;
+    window.fireMapMapMoving=true;
+    mapContainer.classList.add("firemap-map-moving");
+  });
+  map.on("moveend zoomend",()=>{
+    state.mapMoving=false;
+    window.fireMapMapMoving=false;
+    mapContainer.classList.remove("firemap-map-moving");
+    if(state.pendingMarkerRender){
+      state.pendingMarkerRender=false;
+      requestAnimationFrame(()=>renderMarkers());
+    }
+    window.dispatchEvent(new CustomEvent("firemap:map-idle"));
+  });
+
   const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const norm=s=>String(s??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
   const addressNorm=s=>{
@@ -32,7 +55,12 @@
   function hydrantSvg(color){return `<svg viewBox="0 0 64 74" aria-hidden="true"><g fill="${color}" stroke="#090b10" stroke-width="2.2" stroke-linejoin="round"><path d="M24 8h16l4 8H20z"/><rect x="21" y="15" width="22" height="9" rx="4"/><path d="M18 25h28v32H18z"/><rect x="7" y="31" width="12" height="17" rx="4"/><rect x="45" y="31" width="12" height="17" rx="4"/><rect x="3" y="35" width="7" height="9" rx="2"/><rect x="54" y="35" width="7" height="9" rx="2"/><path d="M14 57h36l6 10H8z"/><rect x="26" y="29" width="12" height="20" rx="4" fill="#0c1017" opacity=".3"/></g><circle cx="32" cy="9" r="3" fill="#d8e1ec"/></svg>`}
   function markerHtml(p){const band=flowBand(p.flowGpm),border=statusColor(p.status);return `<div class="hydrant-marker" style="--flow:${band.color};--status:${border}" title="${band.label} — ${band.range}"><div class="hydrant-emoji">${hydrantSvg(band.color)}</div><div class="hydrant-gpm">${band.key==="blue"?"≥1500":band.key==="green"?"1000–1499":band.key==="orange"?"500–999":band.key==="red"?"<500":"?"}</div></div>`}
   function iconFor(p){return L.divIcon({className:"custom-hydrant",html:markerHtml(p),iconSize:[22,30],iconAnchor:[11,27],popupAnchor:[0,-27]})}
-  function renderMarkers(){hydrantLayer.clearLayers();state.markers.clear();state.hydrants.forEach(p=>{const band=flowBand(p.flowGpm);const m=L.marker([p.lat,p.lng],{icon:iconFor(p)}).bindPopup(`<strong>Borne ${esc(p.name)}</strong><br>${esc(p.address)||"Adresse non inscrite"}<br><b style="color:${band.color}">${fmtGpm(p.flowGpm)}</b><br><span class="status ${statusClass(p.status)}">${statusLabel(p.status)}</span><br><button onclick="window.editFireHydrant('${esc(p.id)}')">Modifier</button>`).addTo(hydrantLayer);state.markers.set(p.id,m)})}
+  function renderMarkers(){
+    if(state.mapMoving||window.fireMapMapMoving){
+      state.pendingMarkerRender=true;
+      return;
+    }
+    hydrantLayer.clearLayers();state.markers.clear();state.hydrants.forEach(p=>{const band=flowBand(p.flowGpm);const m=L.marker([p.lat,p.lng],{icon:iconFor(p)}).bindPopup(`<strong>Borne ${esc(p.name)}</strong><br>${esc(p.address)||"Adresse non inscrite"}<br><b style="color:${band.color}">${fmtGpm(p.flowGpm)}</b><br><span class="status ${statusClass(p.status)}">${statusLabel(p.status)}</span><br><button onclick="window.editFireHydrant('${esc(p.id)}')">Modifier</button>`).addTo(hydrantLayer);state.markers.set(p.id,m)})}
   function miniHydrant(p){const b=flowBand(p.flowGpm);return `<div class="hydrant-mini" style="--flow:${b.color};--status:${statusColor(p.status)}">${hydrantSvg(b.color)}</div>`}
   function renderHydrantList(){const q=norm($("hydrantSearch").value),sf=$("statusFilter").value;const items=state.hydrants.filter(p=>(!sf||normalizeStatus(p.status)===sf)&&(!q||norm([p.name,p.address,p.status,p.notes,p.flowGpm].join(" ")).includes(q))).sort((a,b)=>a.name.localeCompare(b.name,"fr",{numeric:true}));$("hydrantList").innerHTML=items.map(p=>`<article class="card-item">${miniHydrant(p)}<div class="card-content"><h3>Borne ${esc(p.name)}</h3><span class="status ${statusClass(p.status)}">${statusLabel(p.status)}</span><p>${esc(p.address)||"Adresse non inscrite"}</p><p>${p.inspection?"Inspection : "+esc(p.inspection):"Inspection non inscrite"} · <b>${fmtGpm(p.flowGpm)}</b></p><div class="card-actions"><button class="secondary" data-show="${esc(p.id)}">Voir</button><button class="secondary" data-edit="${esc(p.id)}">Modifier</button><button class="primary" data-nav="${esc(p.id)}">GPS</button></div></div></article>`).join("")||`<div class="card-item">Aucune borne trouvée.</div>`}
   function renderInspections(){const old=new Date();old.setFullYear(old.getFullYear()-1);let current=0,due=0,missing=0;const sorted=[...state.hydrants].sort((a,b)=>(a.inspection||"").localeCompare(b.inspection||""));sorted.forEach(p=>{if(!p.inspection)missing++;else if(new Date(p.inspection)<old)due++;else current++});$("inspectionStats").innerHTML=`<div><strong>${current}</strong><span>À jour</span></div><div><strong>${due}</strong><span>À inspecter</span></div><div><strong>${missing}</strong><span>Sans date</span></div>`;$("inspectionList").innerHTML=sorted.map(p=>`<article class="card-item">${miniHydrant(p)}<div class="card-content"><h3>Borne ${esc(p.name)}</h3><p>${esc(p.address)}</p><p>${fmtGpm(p.flowGpm)} · ${p.inspection?`Dernière inspection : ${esc(p.inspection)}`:"Aucune inspection inscrite"}</p><div class="card-actions"><button class="secondary" data-edit="${esc(p.id)}">Mettre à jour</button></div></div></article>`).join("")}

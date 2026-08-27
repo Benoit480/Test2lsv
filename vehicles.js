@@ -29,8 +29,11 @@
     out: { label: "Hors service", color: "#64748b" }
   };
   const TYPE_ICON = { engine: "🚒", ladder: "🪜", tanker: "🚛", support: "🧰", pickup: "🛻", chief: "👨‍🚒" };
-  const state = { station: loadLocal("firemap-station", DEFAULT_STATION), vehicles: loadLocal("firemap-vehicles", DEFAULT_VEHICLES), markers: new Map(), watchId: null, sharingId: null, cloudStarted: false };
+  const state = { station: loadLocal("firemap-station", DEFAULT_STATION), vehicles: loadLocal("firemap-vehicles", DEFAULT_VEHICLES), markers: new Map(), watchId: null, sharingId: null, cloudStarted: false, pendingMapRender: false };
   const layer = L.layerGroup().addTo(core.map);
+  window.addEventListener("firemap:map-idle",()=>{
+    if(state.pendingMapRender)requestAnimationFrame(()=>renderMap());
+  });
 
   function loadLocal(key, fallback) {
     try { const v = JSON.parse(localStorage.getItem(key)); return v || structuredClone(fallback); }
@@ -74,6 +77,11 @@
       : state.vehicles.filter(vehicle=>String(vehicle.id)===String(account?.id||""));
   }
   function renderMap() {
+    if(window.fireMapMapMoving){
+      state.pendingMapRender=true;
+      return;
+    }
+    state.pendingMapRender=false;
     layer.clearLayers(); state.markers.clear();
     const s = state.station;
     L.marker([s.lat, s.lng], { icon: stationIcon(), zIndexOffset: 700 })
