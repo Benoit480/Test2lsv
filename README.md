@@ -109,3 +109,13 @@ mises à jour GitHub soient réellement chargées sur iPhone.
 - pas de reconstruction des véhicules pendant le déplacement;
 - rafraîchissement une fois le geste terminé;
 - animations Leaflet coûteuses réduites.
+
+
+## V24.0.3 — OpenStreetMap sans clé API
+
+- remplacement du fond CARTO par OpenStreetMap standard;
+- aucune clé API nécessaire;
+- aucun Google Maps;
+- rendu sombre conservé via filtre CSS;
+- mêmes bornes, bâtiments, véhicules et Poste de commandement;
+- optimisations légères de la V24.0.2 conservées.

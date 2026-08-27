@@ -10,7 +10,7 @@
     inertia:true
   }).setView(CENTER,14);
   map.attributionControl.setPrefix(false);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:20,subdomains:"abcd",attribution:"&copy; OpenStreetMap &copy; CARTO"}).addTo(map);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:20,attribution:"&copy; OpenStreetMap contributors"}).addTo(map);
   const hydrantLayer=L.layerGroup().addTo(map), interventionLayer=L.layerGroup().addTo(map), resourceLayer=L.layerGroup().addTo(map), userLayer=L.layerGroup().addTo(map);
   const mapContainer=map.getContainer();
   map.on("movestart zoomstart",()=>{

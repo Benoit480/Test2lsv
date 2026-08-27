@@ -1344,3 +1344,16 @@ body[data-account-role="unit"] #endCommandEvent,
   animation:none !important;
   transition:none !important;
 }
+
+
+/* FireMap V24.0.3 — fond OSM sans clé API, rendu sombre */
+#map .leaflet-tile-pane .leaflet-tile {
+  filter: invert(92%) hue-rotate(180deg) brightness(52%) contrast(115%) saturate(55%);
+}
+#map .leaflet-control-attribution {
+  background: rgba(5,10,16,.72) !important;
+  color: #d6dde8 !important;
+}
+#map .leaflet-control-attribution a {
+  color: #d6dde8 !important;
+}
