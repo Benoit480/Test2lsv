@@ -1398,3 +1398,42 @@ body[data-account-role="unit"] #endCommandEvent,
   opacity:1!important;
   filter:none!important;
 }
+
+
+/* FireMap V25.0.6 — repositionnement bornes */
+.hydrant-reposition-btn{
+  margin-top:8px!important;
+  width:100%;
+}
+#hydrantRepositionBar{
+  position:fixed;
+  z-index:100000;
+  left:12px;
+  right:12px;
+  bottom:calc(82px + env(safe-area-inset-bottom));
+  background:#080b10;
+  border:2px solid #ff3b30;
+  border-radius:14px;
+  padding:12px;
+  box-shadow:0 8px 28px rgba(0,0,0,.55);
+  color:#fff;
+}
+.hydrant-reposition-title{
+  font-size:16px;
+  font-weight:900;
+  color:#ff4d45;
+  margin-bottom:4px;
+}
+.hydrant-reposition-text{
+  font-size:13px;
+  color:#d1d5db;
+  margin-bottom:10px;
+}
+.hydrant-reposition-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+#hydrantRepositionConfirm:disabled{
+  opacity:.45;
+}

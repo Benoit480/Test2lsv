@@ -95,3 +95,16 @@ de fermeture dans `event-manager.js`.
 
 Le cache PWA historique est volontairement désactivé dans cette version afin que les
 mises à jour GitHub soient réellement chargées sur iPhone.
+
+
+## V25.0.6 — Repositionnement manuel des bornes
+
+Ajout d'un bouton « Repositionner la borne » dans la fiche d'une borne.
+Après activation :
+1. toucher la nouvelle position sur la carte;
+2. vérifier le point;
+3. confirmer;
+4. latitude/longitude de la borne sont mises à jour;
+5. la nouvelle position est enregistrée dans Firebase et propagée aux autres appareils.
+
+La carte Google Maps, la recherche Google, Google Routes et les fonctions V25.0.5 restent inchangées.

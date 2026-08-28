@@ -117,4 +117,194 @@
   $("menuBtn").onclick=$("bottomMore").onclick=openDrawer;$("closeDrawer").onclick=$("backdrop").onclick=closeDrawer;$("clearIntervention").onclick=clearIntervention;$("addFavorite").onclick=addFavorite;$("voiceSearch").onclick=()=>startVoice("addressSearch","results","searchStatus");$("voiceSearchFull").onclick=()=>startVoice("addressSearchFull","resultsFull","searchStatusFull");$("clearHistory").onclick=()=>{state.history=[];localStorage.removeItem("firemap-interventions");renderHistory()};[$("drawerAdd"),$("addHydrantTop"),$("bottomAdd")].filter(Boolean).forEach(b=>b.onclick=()=>openForm());$("locateBtn").onclick=locate;$("gpsBtn").onclick=()=>state.selected?window.fireMapNavigation?.start(state.selected):toast("Choisissez une adresse.");$("nearestBtn").onclick=nearest;$("hydrantToggle").onchange=e=>e.target.checked?hydrantLayer.addTo(map):map.removeLayer(hydrantLayer);$("hydrantSearch").oninput=renderHydrantList;$("statusFilter").onchange=renderHydrantList;$("closeModal").onclick=$("cancelModal").onclick=()=>$("hydrantDialog").close();$("hydrantForm").onsubmit=e=>{e.preventDefault();saveForm()};$("deleteHydrant").onclick=removeCurrent;map.on("click",e=>state.lastMapClick={lat:e.latlng.lat,lng:e.latlng.lng});window.editFireHydrant=id=>openForm(state.hydrants.find(p=>p.id===id));
   window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();state.deferredInstall=e;$("installBtn").classList.remove("hidden")});$("installBtn").onclick=async()=>{if(state.deferredInstall){state.deferredInstall.prompt();await state.deferredInstall.userChoice;state.deferredInstall=null}};
   loadHistory();loadFavorites();loadBase().then(connectCloud);
+
+  // V25.0.6 — ajout du bouton de repositionnement dans les fiches de bornes.
+  function ensureHydrantRepositionButton(){
+    const candidates=[...document.querySelectorAll(".hydrant-popup,.gm-style-iw,.leaflet-popup-content")];
+    for(const box of candidates){
+      if(box.querySelector("[data-hydrant-reposition]"))continue;
+      const text=(box.textContent||"").toLowerCase();
+      if(!text.includes("borne")&&!text.includes("hydrant"))continue;
+      const edit=box.querySelector("[data-hydrant-edit],.hydrant-edit");
+      if(edit){
+        edit.insertAdjacentHTML("afterend",`<button type="button" class="btn secondary hydrant-reposition-btn" data-hydrant-reposition>📍 Repositionner la borne</button>`);
+      }
+    }
+  }
+  const hydrantPopupObserver=new MutationObserver(()=>ensureHydrantRepositionButton());
+  hydrantPopupObserver.observe(document.body,{childList:true,subtree:true});
+
+  // FireMap V25.0.6 — repositionnement manuel des bornes
+  let hydrantRepositionState=null;
+
+  function getOpenHydrantId(){
+    // Known popup/edit implementations generally expose the selected hydrant in state.
+    const ids=[
+      state?.activeHydrantId,
+      state?.selectedHydrantId,
+      state?.editingHydrantId,
+      window.fireMapSelectedHydrantId
+    ].filter(Boolean);
+    if(ids.length)return ids[0];
+
+    const popup=document.querySelector(".gm-style-iw,.leaflet-popup-content,.hydrant-popup");
+    const el=popup?.querySelector("[data-hydrant-id]");
+    return el?.getAttribute("data-hydrant-id")||null;
+  }
+
+  function findHydrantById(id){
+    if(!id)return null;
+    return (state?.hydrants||[]).find(h=>String(h.id)===String(id))||null;
+  }
+
+  function setHydrantCoordinatesLocal(h,lat,lng){
+    if(!h)return;
+    h.lat=Number(lat);
+    h.lng=Number(lng);
+    h.latitude=Number(lat);
+    h.longitude=Number(lng);
+  }
+
+  async function persistHydrantCoordinates(h){
+    const cloud=window.fireMapCloud;
+    if(!cloud||!h)return;
+    // Prefer the app's canonical hydrant writer when available.
+    if(typeof cloud.saveHydrant==="function"){
+      await cloud.saveHydrant(h);
+      return;
+    }
+    if(typeof cloud.setHydrant==="function"){
+      await cloud.setHydrant(h);
+      return;
+    }
+    if(typeof cloud.upsertHydrant==="function"){
+      await cloud.upsertHydrant(h);
+      return;
+    }
+    throw new Error("Méthode de sauvegarde de borne indisponible");
+  }
+
+  function beginHydrantReposition(){
+    const id=getOpenHydrantId();
+    const hydrant=findHydrantById(id);
+    if(!hydrant){
+      alert("Impossible d’identifier cette borne. Ouvre sa fiche puis réessaie.");
+      return;
+    }
+
+    // Close any popup so the whole map can be tapped.
+    try{ window.fireMapGoogleAdapter?.closeInfoWindow?.(); }catch(_){}
+    try{ state?.map?.closePopup?.(); }catch(_){}
+
+    hydrantRepositionState={id:String(hydrant.id),hydrant,lat:null,lng:null,marker:null};
+
+    const bar=document.createElement("div");
+    bar.id="hydrantRepositionBar";
+    bar.innerHTML=`
+      <div class="hydrant-reposition-title">📍 Repositionnement de la borne</div>
+      <div class="hydrant-reposition-text">Touche la nouvelle position exacte sur la carte.</div>
+      <div class="hydrant-reposition-actions">
+        <button type="button" id="hydrantRepositionCancel" class="btn secondary">Annuler</button>
+        <button type="button" id="hydrantRepositionConfirm" class="btn primary" disabled>Confirmer</button>
+      </div>`;
+    document.body.appendChild(bar);
+
+    bar.querySelector("#hydrantRepositionCancel").onclick=cancelHydrantReposition;
+    bar.querySelector("#hydrantRepositionConfirm").onclick=confirmHydrantReposition;
+
+    enableHydrantRepositionMapClick();
+  }
+
+  function enableHydrantRepositionMapClick(){
+    const map=window.fireMapGoogleAdapter?.map||window.fireMapMap||state?.map||window.map;
+    if(!map)return;
+
+    if(window.google?.maps && map.addListener){
+      hydrantRepositionState.listener=map.addListener("click",(ev)=>{
+        const lat=ev.latLng.lat(), lng=ev.latLng.lng();
+        setHydrantRepositionPoint(lat,lng,map);
+      });
+    }else if(map.on){
+      hydrantRepositionState.leafletHandler=(ev)=>setHydrantRepositionPoint(ev.latlng.lat,ev.latlng.lng,map);
+      map.on("click",hydrantRepositionState.leafletHandler);
+    }
+  }
+
+  function setHydrantRepositionPoint(lat,lng,map){
+    if(!hydrantRepositionState)return;
+    hydrantRepositionState.lat=Number(lat);
+    hydrantRepositionState.lng=Number(lng);
+
+    if(window.google?.maps && map?.getDiv){
+      if(hydrantRepositionState.marker)hydrantRepositionState.marker.setMap(null);
+      hydrantRepositionState.marker=new google.maps.Marker({
+        position:{lat:Number(lat),lng:Number(lng)},
+        map,
+        zIndex:99999
+      });
+    }else if(window.L && map?.addLayer){
+      if(hydrantRepositionState.marker)map.removeLayer(hydrantRepositionState.marker);
+      hydrantRepositionState.marker=L.circleMarker([lat,lng],{
+        radius:10,weight:4,color:"#fff",fillColor:"#ff2d2d",fillOpacity:1
+      }).addTo(map);
+    }
+
+    const btn=document.getElementById("hydrantRepositionConfirm");
+    if(btn)btn.disabled=false;
+    const txt=document.querySelector("#hydrantRepositionBar .hydrant-reposition-text");
+    if(txt)txt.textContent=`Nouvelle position : ${Number(lat).toFixed(6)}, ${Number(lng).toFixed(6)}`;
+  }
+
+  function cleanupHydrantReposition(){
+    const map=window.fireMapGoogleAdapter?.map||window.fireMapMap||state?.map||window.map;
+    if(hydrantRepositionState?.listener){
+      try{google.maps.event.removeListener(hydrantRepositionState.listener);}catch(_){}
+    }
+    if(hydrantRepositionState?.leafletHandler && map?.off){
+      try{map.off("click",hydrantRepositionState.leafletHandler);}catch(_){}
+    }
+    if(hydrantRepositionState?.marker){
+      try{
+        if(hydrantRepositionState.marker.setMap)hydrantRepositionState.marker.setMap(null);
+        else if(map?.removeLayer)map.removeLayer(hydrantRepositionState.marker);
+      }catch(_){}
+    }
+    document.getElementById("hydrantRepositionBar")?.remove();
+    hydrantRepositionState=null;
+  }
+
+  function cancelHydrantReposition(){
+    cleanupHydrantReposition();
+  }
+
+  async function confirmHydrantReposition(){
+    if(!hydrantRepositionState||hydrantRepositionState.lat==null)return;
+    const {hydrant,lat,lng}=hydrantRepositionState;
+    const oldLat=hydrant.lat, oldLng=hydrant.lng, oldLatitude=hydrant.latitude, oldLongitude=hydrant.longitude;
+    setHydrantCoordinatesLocal(hydrant,lat,lng);
+
+    const btn=document.getElementById("hydrantRepositionConfirm");
+    if(btn){btn.disabled=true;btn.textContent="Enregistrement…";}
+    try{
+      await persistHydrantCoordinates(hydrant);
+      cleanupHydrantReposition();
+      if(typeof renderMarkers==="function")renderMarkers();
+      window.dispatchEvent(new CustomEvent("firemap:hydrant-repositioned",{detail:{id:hydrant.id,lat,lng}}));
+      alert("Position de la borne enregistrée.");
+    }catch(err){
+      hydrant.lat=oldLat; hydrant.lng=oldLng;
+      hydrant.latitude=oldLatitude; hydrant.longitude=oldLongitude;
+      if(btn){btn.disabled=false;btn.textContent="Confirmer";}
+      alert("Impossible d’enregistrer la nouvelle position : "+(err?.message||err));
+    }
+  }
+
+  document.addEventListener("click",(e)=>{
+    const btn=e.target.closest?.("[data-hydrant-reposition]");
+    if(!btn)return;
+    e.preventDefault();
+    e.stopPropagation();
+    beginHydrantReposition();
+  });
+
 })();
