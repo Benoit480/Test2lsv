@@ -95,37 +95,3 @@ de fermeture dans `event-manager.js`.
 
 Le cache PWA historique est volontairement désactivé dans cette version afin que les
 mises à jour GitHub soient réellement chargées sur iPhone.
-
-
-## V24.0.2 — Fluidité légère sans changer l'apparence
-
-- même carte Leaflet/CARTO;
-- mêmes icônes de bornes;
-- mêmes icônes bâtiments;
-- même Poste de commandement;
-- aucune intégration Google Maps;
-- pas de reconstruction des bornes pendant le déplacement;
-- pas de reconstruction des bâtiments pendant le déplacement;
-- pas de reconstruction des véhicules pendant le déplacement;
-- rafraîchissement une fois le geste terminé;
-- animations Leaflet coûteuses réduites.
-
-
-## V24.0.3 — OpenStreetMap sans clé API
-
-- remplacement du fond CARTO par OpenStreetMap standard;
-- aucune clé API nécessaire;
-- aucun Google Maps;
-- rendu sombre conservé via filtre CSS;
-- mêmes bornes, bâtiments, véhicules et Poste de commandement;
-- optimisations légères de la V24.0.2 conservées.
-
-
-## V24.0.4 — OSM natif sans filtre GPU
-
-- suppression complète du filtre sombre appliqué aux tuiles;
-- OpenStreetMap affiché dans son rendu natif;
-- `detectRetina` désactivé pour éviter les tuiles haute densité;
-- tampon de tuiles réduit;
-- chargement des nouvelles tuiles surtout à la fin du mouvement;
-- mêmes fonctions FireMap, sans Google Maps.
