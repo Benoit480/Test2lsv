@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v25-0-6-google-reposition-bornes";
+const CACHE_VERSION = "firemap-v25-0-7-address-contrast";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 

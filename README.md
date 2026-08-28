@@ -108,3 +108,14 @@ Après activation :
 5. la nouvelle position est enregistrée dans Firebase et propagée aux autres appareils.
 
 La carte Google Maps, la recherche Google, Google Routes et les fonctions V25.0.5 restent inchangées.
+
+
+## V25.0.7 — Suggestions d'adresses plus visibles
+
+- fond très foncé pour les suggestions Google Places;
+- texte blanc;
+- partie correspondante en bleu;
+- taille du texte augmentée;
+- séparation claire entre les résultats;
+- survol/sélection plus visible;
+- même correction pour les listes de suggestions locales FireMap.
