@@ -119,3 +119,12 @@ La carte Google Maps, la recherche Google, Google Routes et les fonctions V25.0.
 - séparation claire entre les résultats;
 - survol/sélection plus visible;
 - même correction pour les listes de suggestions locales FireMap.
+
+
+## V25.0.8 — Suggestions Google dans l'Assistant
+
+- google-address-search.js est maintenant réellement chargé au démarrage;
+- le champ Adresse de l'Assistant d'intervention utilise Google Places en ligne;
+- les anciennes suggestions locales ne remplacent plus les résultats Google;
+- toucher une suggestion Google lance l'intervention avec l'adresse et les coordonnées Google;
+- la banque Louiseville demeure disponible comme repli hors ligne.

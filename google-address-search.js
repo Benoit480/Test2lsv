@@ -1,10 +1,11 @@
 (() => {
   "use strict";
 
-  const BUILD="24.1.0";
+  const BUILD="25.0.8";
   const INPUTS=[
-    {input:"addressSearch",box:"results",status:"searchStatus"},
-    {input:"addressSearchFull",box:"resultsFull",status:"searchStatusFull"}
+    {input:"addressSearch",box:"results",status:"searchStatus",mode:"select"},
+    {input:"addressSearchFull",box:"resultsFull",status:"searchStatusFull",mode:"select"},
+    {input:"assistantAddress",box:"assistantSuggestions",status:null,mode:"assistant"}
   ];
   const cfg=window.FIREMAP_GOOGLE_CONFIG||{};
   const I=window.fireMapInternal;
@@ -37,14 +38,14 @@
   }
 
   function renderLocal(spec,query,message=""){
-    const box=$(spec.box), status=$(spec.status);
-    if(!box||!status)return;
+    const box=$(spec.box), status=spec.status?$(spec.status):null;
+    if(!box)return;
     const items=localSearch(query);
     box.innerHTML=items.map(a=>{
       const idx=localAddresses().indexOf(a);
       return `<button class="result-item local-address-result" data-address-index="${idx}"><span class="pin">📍</span><span><strong>${esc(a.adresse)}</strong><small>Louiseville — banque hors ligne</small></span></button>`;
     }).join("");
-    status.textContent=message || (query.trim()
+    if(status)status.textContent=message || (query.trim()
       ? (items.length?`${items.length} résultat(s) Louiseville — mode hors ligne`:`Aucune adresse de Louiseville trouvée`)
       : localStatusText());
   }
@@ -93,11 +94,11 @@
     if(!box||!status)return;
     if(query.trim().length<3){
       box.innerHTML="";
-      status.textContent="Google — entrez au moins 3 caractères";
+      if(status)status.textContent="Google — entrez au moins 3 caractères";
       return;
     }
 
-    status.textContent="Recherche Google…";
+    if(status)status.textContent="Recherche Google…";
     const lib=await ensurePlaces();
     const center=cfg.louisevilleCenter||{lat:46.2563,lng:-72.9417};
     const radius=Number(cfg.locationBiasRadiusMeters)||50000;
@@ -115,7 +116,8 @@
       `<button class="result-item google-address-result" data-google-result="${index}"><span class="pin">📍</span><span><strong>${esc(prediction.text.toString())}</strong><small>Google</small></span></button>`
     ).join("") + (predictions.length?googleBranding():"");
     box._fireMapGooglePredictions=predictions;
-    status.textContent=predictions.length?`${predictions.length} résultat(s) Google`:`Aucun résultat Google`;
+    box._fireMapGoogleSpec=spec;
+    if(status)status.textContent=predictions.length?`${predictions.length} résultat(s) Google`:`Aucun résultat Google`;
   }
 
   async function selectGooglePrediction(box,index){
@@ -129,12 +131,20 @@
       const lng=typeof location?.lng==="function"?location.lng():Number(location?.lng);
       if(!Number.isFinite(lat)||!Number.isFinite(lng))throw new Error("Coordonnées absentes");
       const address=String(place.formattedAddress||place.displayName||prediction.text.toString());
-      I.selectAddress({
+      const selected={
         adresse:address,
         lat,lng,
         source:"google",
         placeId:String(place.id||"")
-      });
+      };
+      if(box?._fireMapGoogleSpec?.mode==="assistant" && typeof window.fireMapAssistantStartAddress==="function"){
+        const input=document.getElementById("assistantAddress");
+        if(input)input.value=address;
+        box.innerHTML="";
+        window.fireMapAssistantStartAddress(selected);
+      }else{
+        I.selectAddress(selected);
+      }
       token=new placesLib.AutocompleteSessionToken();
     }catch(error){
       console.warn("Sélection Google impossible",error);
@@ -146,7 +156,8 @@
     const query=String(value||"");
     if(!query.trim()){
       $(spec.box).innerHTML="";
-      $(spec.status).textContent=online()&&configured()
+      const status=spec.status?$(spec.status):null;
+      if(status)status.textContent=online()&&configured()
         ? "Google en ligne — Louiseville disponible hors ligne"
         : localStatusText(configured()?"":" — Google non configuré");
       return;
