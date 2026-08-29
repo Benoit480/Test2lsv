@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD="25.0.8";
+  const BUILD="25.0.9";
   const INPUTS=[
     {input:"addressSearch",box:"results",status:"searchStatus",mode:"select"},
     {input:"addressSearchFull",box:"resultsFull",status:"searchStatusFull",mode:"select"},
@@ -90,8 +90,8 @@
   }
 
   async function renderGoogle(spec,query,requestId){
-    const box=$(spec.box),status=$(spec.status);
-    if(!box||!status)return;
+    const box=$(spec.box),status=spec.status?$(spec.status):null;
+    if(!box)return;
     if(query.trim().length<3){
       box.innerHTML="";
       if(status)status.textContent="Google — entrez au moins 3 caractères";

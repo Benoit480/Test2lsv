@@ -50,7 +50,20 @@
   }
   window.fireMapAssistantStartAddress=(address)=>start(address);
 
-  function suggestions(){const q=$("assistantAddress").value.trim();if(q.length<2){$("assistantSuggestions").innerHTML="";return}const nq=I.addressNorm(q);const list=I.getAddresses().filter(a=>I.addressNorm(a.adresse).includes(nq)).slice(0,8);$("assistantSuggestions").innerHTML=list.map((a,i)=>`<button type="button" data-assistant-address="${i}"><strong>${esc(a.adresse)}</strong></button>`).join("");$("assistantSuggestions")._items=list}
+  function suggestions(){
+    const box=$("assistantSuggestions");
+    const q=$("assistantAddress").value.trim();
+    if(window.fireMapGoogleAddressSearch?.mode?.()==="google"){
+      // Google Places owns this results box while online/configured.
+      box._items=[];
+      return;
+    }
+    if(q.length<2){box.innerHTML="";box._items=[];return}
+    const nq=I.addressNorm(q);
+    const list=I.getAddresses().filter(a=>I.addressNorm(a.adresse).includes(nq)).slice(0,8);
+    box.innerHTML=list.map((a,i)=>`<button type="button" data-assistant-address="${i}"><strong>${esc(a.adresse)}</strong></button>`).join("");
+    box._items=list;
+  }
 
 
   function readSmsSettings(){
@@ -260,7 +273,7 @@
   }
 
   $("assistantAddress").addEventListener("input",suggestions);
-  document.addEventListener("click",e=>{const a=e.target.closest("[data-assistant-address]");if(a){const item=$("assistantSuggestions")._items?.[Number(a.dataset.assistantAddress)];if(item)start(item)}const h=e.target.closest("[data-assistant-hydrant]");if(h){const p=I.getHydrants().find(x=>x.id===h.dataset.assistantHydrant);if(p){I.showView("map");I.map.setView([p.lat,p.lng],18);I.state.markers.get(p.id)?.openPopup()}}});
+  document.addEventListener("click",e=>{const a=e.target.closest("[data-assistant-address]");if(a&&window.fireMapGoogleAddressSearch?.mode?.()!=="google"){const item=$("assistantSuggestions")._items?.[Number(a.dataset.assistantAddress)];if(item)start(item)}const h=e.target.closest("[data-assistant-hydrant]");if(h){const p=I.getHydrants().find(x=>x.id===h.dataset.assistantHydrant);if(p){I.showView("map");I.map.setView([p.lat,p.lng],18);I.state.markers.get(p.id)?.openPopup()}}});
   $("assistantLaunch").onclick=()=>{
     const q=$("assistantAddress").value.trim();
     if(window.fireMapGoogleAddressSearch?.mode?.()==="google"){

@@ -128,3 +128,14 @@ La carte Google Maps, la recherche Google, Google Routes et les fonctions V25.0.
 - les anciennes suggestions locales ne remplacent plus les résultats Google;
 - toucher une suggestion Google lance l'intervention avec l'adresse et les coordonnées Google;
 - la banque Louiseville demeure disponible comme repli hors ligne.
+
+
+## V25.0.9 — Correction réelle des suggestions Google dans l'Assistant
+
+Correction du bug qui empêchait Google Places d'afficher ses résultats lorsque le champ
+n'avait pas d'élément de statut associé.
+
+- Google Places fonctionne maintenant dans `assistantAddress`;
+- les suggestions locales sont neutralisées lorsque Google est disponible;
+- la banque locale reste le repli hors ligne;
+- toucher un résultat Google démarre l'intervention avec ses coordonnées Google.
