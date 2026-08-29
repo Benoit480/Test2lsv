@@ -54,7 +54,7 @@
     const box=$("assistantSuggestions");
     const q=$("assistantAddress").value.trim();
     if(window.fireMapGoogleAddressSearch?.mode?.()==="google"){
-      // Google Places owns this results box while online/configured.
+      // Google Places owns this results box. Never render local results here.
       box._items=[];
       return;
     }

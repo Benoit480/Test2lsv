@@ -17,7 +17,7 @@
     }
     window.__fireMapGoogleMapsLoaded = () => googleReadyResolve(window.google);
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&loading=async&callback=__fireMapGoogleMapsLoaded&language=fr&region=CA&v=weekly`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&loading=async&libraries=places&callback=__fireMapGoogleMapsLoaded&language=fr&region=CA&v=weekly`;
     script.async = true;
     script.defer = true;
     script.onerror = () => console.error("FireMap: échec du chargement de Google Maps JavaScript API.");

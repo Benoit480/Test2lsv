@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD="25.0.9";
+  const BUILD="25.0.10";
   const INPUTS=[
     {input:"addressSearch",box:"results",status:"searchStatus",mode:"select"},
     {input:"addressSearchFull",box:"resultsFull",status:"searchStatusFull",mode:"select"},
@@ -66,6 +66,7 @@
         key:String(cfg.apiKey).trim(),
         v:"weekly",
         loading:"async",
+        libraries:"places",
         callback,
         language:cfg.language||"fr",
         region:cfg.region||"CA"
@@ -174,8 +175,18 @@
       try{
         await renderGoogle(spec,query,requestId);
       }catch(error){
-        console.warn("Recherche Google indisponible, repli Louiseville",error);
-        renderLocal(spec,query,"Google indisponible — résultats Louiseville");
+        console.warn("Recherche Google Places indisponible",error);
+        const box=$(spec.box);
+        const status=spec.status?$(spec.status):null;
+        if(box){
+          box._fireMapGooglePredictions=[];
+          box._fireMapGoogleSpec=spec;
+          box.innerHTML=`<div class="google-places-error">
+            <strong>⚠️ Google Places indisponible</strong>
+            <span>Activez Places API (New) pour afficher les suggestions Google.</span>
+          </div>`;
+        }
+        if(status)status.textContent="Google Places doit être activé";
       }
     },230);
   }

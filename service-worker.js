@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v25-0-9-google-suggestions-fixed";
+const CACHE_VERSION = "firemap-v25-0-10-google-places-explicit";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 

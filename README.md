@@ -139,3 +139,12 @@ n'avait pas d'élément de statut associé.
 - les suggestions locales sont neutralisées lorsque Google est disponible;
 - la banque locale reste le repli hors ligne;
 - toucher un résultat Google démarre l'intervention avec ses coordonnées Google.
+
+
+## V25.0.10 — Google Places chargé explicitement
+
+- `libraries=places` ajouté au chargement Google Maps;
+- la recherche Assistant utilise Google Places;
+- en ligne, aucun repli silencieux vers les suggestions locales;
+- si Places API (New) n'est pas activé, FireMap affiche un message clair;
+- la banque Louiseville reste disponible uniquement hors ligne.
