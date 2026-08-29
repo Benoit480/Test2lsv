@@ -148,3 +148,13 @@ n'avait pas d'élément de statut associé.
 - en ligne, aucun repli silencieux vers les suggestions locales;
 - si Places API (New) n'est pas activé, FireMap affiche un message clair;
 - la banque Louiseville reste disponible uniquement hors ligne.
+
+
+## V25.0.11 — Google Places natif dans l'Assistant
+
+- suppression complète des suggestions locales sous `assistantAddress`;
+- arrêt du module personnalisé qui concurrençait ce champ;
+- branchement direct de `google.maps.places.Autocomplete`;
+- suggestions affichées directement par Google;
+- le bouton Démarrer utilise la suggestion Google sélectionnée;
+- aucun résultat local ne peut reprendre la place dans ce champ.

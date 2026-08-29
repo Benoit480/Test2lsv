@@ -52,17 +52,7 @@
 
   function suggestions(){
     const box=$("assistantSuggestions");
-    const q=$("assistantAddress").value.trim();
-    if(window.fireMapGoogleAddressSearch?.mode?.()==="google"){
-      // Google Places owns this results box. Never render local results here.
-      box._items=[];
-      return;
-    }
-    if(q.length<2){box.innerHTML="";box._items=[];return}
-    const nq=I.addressNorm(q);
-    const list=I.getAddresses().filter(a=>I.addressNorm(a.adresse).includes(nq)).slice(0,8);
-    box.innerHTML=list.map((a,i)=>`<button type="button" data-assistant-address="${i}"><strong>${esc(a.adresse)}</strong></button>`).join("");
-    box._items=list;
+    if(box){box.innerHTML="";box._items=[];}
   }
 
 
@@ -273,16 +263,15 @@
   }
 
   $("assistantAddress").addEventListener("input",suggestions);
-  document.addEventListener("click",e=>{const a=e.target.closest("[data-assistant-address]");if(a&&window.fireMapGoogleAddressSearch?.mode?.()!=="google"){const item=$("assistantSuggestions")._items?.[Number(a.dataset.assistantAddress)];if(item)start(item)}const h=e.target.closest("[data-assistant-hydrant]");if(h){const p=I.getHydrants().find(x=>x.id===h.dataset.assistantHydrant);if(p){I.showView("map");I.map.setView([p.lat,p.lng],18);I.state.markers.get(p.id)?.openPopup()}}});
+  document.addEventListener("click",e=>{const a=e.target.closest("[data-assistant-address]");if(a){e.preventDefault();return;}const h=e.target.closest("[data-assistant-hydrant]");if(h){const p=I.getHydrants().find(x=>x.id===h.dataset.assistantHydrant);if(p){I.showView("map");I.map.setView([p.lat,p.lng],18);I.state.markers.get(p.id)?.openPopup()}}});
   $("assistantLaunch").onclick=()=>{
     const q=$("assistantAddress").value.trim();
-    if(window.fireMapGoogleAddressSearch?.mode?.()==="google"){
-      I.toast("Choisissez une suggestion Google dans la liste.");
+    const selected=window.fireMapAssistantGoogleSelected;
+    if(selected && I.addressNorm(selected.adresse)===I.addressNorm(q)){
+      start(selected);
       return;
     }
-    const nq=I.addressNorm(q);
-    const a=I.getAddresses().find(x=>I.addressNorm(x.adresse)===nq)||I.getAddresses().find(x=>I.addressNorm(x.adresse).includes(nq));
-    a?start(a):I.toast("Adresse introuvable dans la banque de Louiseville.");
+    I.toast("Choisissez une suggestion Google dans la liste.");
   };
   $("assistantUseActive").onclick=()=>I.state.selected?start(I.state.selected):I.toast("Sélectionnez d’abord une adresse sur la carte.");
   $("saveSmsSettings")?.addEventListener("click",()=>{
