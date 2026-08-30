@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v25-0-11-native-google-places";
+const CACHE_VERSION = "firemap-v25-0-12-special-vehicle-profiles";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
