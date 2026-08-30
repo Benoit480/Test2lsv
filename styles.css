@@ -1576,3 +1576,7 @@ body[data-account-role="unit"] #endCommandEvent,
 .vehicle-chef-actions{
   margin-top:12px;
 }
+
+#vehicleUsageLadderSection.hidden,#vehicleUsageTankerSection.hidden{display:none!important}
+#vehicleUsageLadderSection{background:#08111a;border:1px solid #46556b}
+#vehicleUsageTankerSection{background:#07121b;border:1px solid #334c63}

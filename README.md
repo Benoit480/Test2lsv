@@ -175,3 +175,4 @@ Le formulaire officiel `vehicleUsageDialog` est maintenant conditionnel selon le
   pressions et résiduels.
 
 Les autres unités gardent encore la fiche générique pour l'instant.
+\n\n## V25.0.14\nJournal automatique des changements 102/202/502/802. Fiches spécialisées 502 Échelle et 802 Citerne.\n

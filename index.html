@@ -37,7 +37,7 @@
     <button data-view="search" class="drawer-link">🔎 Recherche d’adresse</button>
     <button id="switchVehicleAccount" class="drawer-link hidden">👤 Changer de compte</button>
     <div id="buildStatusV24" class="build-status-v24">
-      <strong>FireMap V25.0.13</strong>
+      <strong>FireMap V25.0.14</strong>
       <small>Firebase temps réel stable · Google indépendant</small>
     </div>
     <div class="drawer-separator"></div>
@@ -605,6 +605,41 @@
         </div>
       </div>
 
+
+      <div class="form-section hidden" id="vehicleUsageLadderSection">
+        <h3>🪜 Échelle — 502</h3>
+        <div class="form-grid">
+          <label>Opérateur échelle<input id="vehicleUsageLadderOperator" type="text"></label>
+          <label>Échelle déployée<select id="vehicleUsageLadderDeployed"><option value="no">Non</option><option value="yes">Oui</option></select></label>
+          <label>Hauteur (pi)<input id="vehicleUsageLadderHeight" type="number" min="0"></label>
+          <label>Angle (°)<input id="vehicleUsageLadderAngle" type="number" min="0" max="90"></label>
+          <label>Stabilisateurs<select id="vehicleUsageLadderStabilizers"><option value="">Non précisé</option><option value="stowed">Rangés</option><option value="deployed">Déployés</option></select></label>
+          <label>Alimentation<select id="vehicleUsageLadderSupply"><option value="none">Non alimenté</option><option value="hydrant">Borne</option><option value="engine">Autopompe</option><option value="tanker">Citerne</option><option value="other">Autre</option></select></label>
+          <label>Pression alimentation (PSI)<input id="vehicleUsageLadderSupplyPsi" type="number" min="0"></label>
+          <label>Canon aérien<select id="vehicleUsageLadderGun"><option value="off">Inactif</option><option value="on">Actif</option></select></label>
+          <label>Pression canon (PSI)<input id="vehicleUsageLadderGunPsi" type="number" min="0"></label>
+          <label>Secteur<select id="vehicleUsageLadderSector"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+          <label class="wide">Affectation / emplacement<input id="vehicleUsageLadderAssignment" type="text"></label>
+        </div>
+      </div>
+
+      <div class="form-section hidden" id="vehicleUsageTankerSection">
+        <h3>🚛 Citerne — 802</h3>
+        <div class="form-grid">
+          <label>Capacité totale (gal)<input id="vehicleUsageTankerCapacity" type="number" min="0"></label>
+          <label>Niveau d’eau<select id="vehicleUsageTankerLevel"><option value="100">100 %</option><option value="75">75 %</option><option value="50">50 %</option><option value="25">25 %</option><option value="0">Vide</option></select></label>
+          <label>Mode<select id="vehicleUsageTankerMode"><option value="">Non précisé</option><option value="scene">Sur intervention</option><option value="filling">Remplissage</option><option value="shuttle">Navette</option><option value="dumping">Vidange / alimentation</option></select></label>
+          <label>Source de remplissage<input id="vehicleUsageTankerFillSource" type="text"></label>
+          <label>Alimente<input id="vehicleUsageTankerSupplying" type="text" placeholder="202 / bassin"></label>
+          <label>Débit transfert (GPM)<input id="vehicleUsageTankerFlow" type="number" min="0"></label>
+          <label>Départ navette<input id="vehicleUsageTankerShuttleStart" type="time"></label>
+          <label>Retour navette<input id="vehicleUsageTankerShuttleReturn" type="time"></label>
+          <label>Temps rotation (min)<input id="vehicleUsageTankerTurnaround" type="number" min="0"></label>
+          <label>Rotations<input id="vehicleUsageTankerTrips" type="number" min="0"></label>
+          <label class="wide">Notes navette / eau<textarea id="vehicleUsageTankerNotes" rows="2"></textarea></label>
+        </div>
+      </div>
+
       <div class="form-section" id="vehicleUsagePumpSection">
         <h3>💧 Panneau de pompe</h3>
         <p class="pump-panel-help">Touchez une sortie pour la mettre en service. Elle passe alors au vert.</p>
@@ -704,6 +739,6 @@
   <div id="toast" class="toast hidden"></div>
   <script src="google-maps-config.js?v=25.0.0"></script>
   <script src="google-maps-adapter.js?v=25.0.2"></script>
-  <script src="firemap-boot.js?v=25.0.13"></script>
+  <script src="firemap-boot.js?v=25.0.14"></script>
 </body>
 </html>

@@ -64,6 +64,23 @@
         resources:String(x.chef?.resources||""),
         priorities:String(x.chef?.priorities||"")
       },
+      ladder:{
+        operator:String(x.ladder?.operator||""),deployed:String(x.ladder?.deployed||"no"),
+        height:x.ladder?.height===""||x.ladder?.height==null?"":Number(x.ladder.height),
+        angle:x.ladder?.angle===""||x.ladder?.angle==null?"":Number(x.ladder.angle),
+        stabilizers:String(x.ladder?.stabilizers||""),supply:String(x.ladder?.supply||"none"),
+        supplyPsi:x.ladder?.supplyPsi===""||x.ladder?.supplyPsi==null?"":Number(x.ladder.supplyPsi),
+        gun:String(x.ladder?.gun||"off"),gunPsi:x.ladder?.gunPsi===""||x.ladder?.gunPsi==null?"":Number(x.ladder.gunPsi),
+        sector:String(x.ladder?.sector||""),assignment:String(x.ladder?.assignment||"")
+      },
+      tanker:{
+        capacity:x.tanker?.capacity===""||x.tanker?.capacity==null?"":Number(x.tanker.capacity),
+        level:String(x.tanker?.level||"100"),mode:String(x.tanker?.mode||""),fillSource:String(x.tanker?.fillSource||""),
+        supplying:String(x.tanker?.supplying||""),flow:x.tanker?.flow===""||x.tanker?.flow==null?"":Number(x.tanker.flow),
+        shuttleStart:String(x.tanker?.shuttleStart||""),shuttleReturn:String(x.tanker?.shuttleReturn||""),
+        turnaround:x.tanker?.turnaround===""||x.tanker?.turnaround==null?"":Number(x.tanker.turnaround),
+        trips:x.tanker?.trips===""||x.tanker?.trips==null?"":Number(x.tanker.trips),notes:String(x.tanker?.notes||"")
+      },
       residualStart:x.residualStart===""||x.residualStart==null?"":Number(x.residualStart),
       residualEnd:x.residualEnd===""||x.residualEnd==null?"":Number(x.residualEnd),
       notes:String(x.notes||""),
@@ -108,20 +125,19 @@
   }
 
   function setVehicleFormMode(number){
-    const isChef=String(number)==="102";
-    const isPump=String(number)==="202";
-
+    const isChef=String(number)==="102",isPump=String(number)==="202",isLadder=String(number)==="502",isTanker=String(number)==="802";
+    const noPump=isChef||isLadder||isTanker;
     $("vehicleUsageChefSection")?.classList.toggle("hidden",!isChef);
-    $("vehicleUsageSuppliedLabel")?.classList.toggle("hidden",isChef);
-    $("vehicleUsagePumpSection")?.classList.toggle("hidden",isChef);
-    $("vehicleUsageSpecialSection")?.classList.toggle("hidden",isChef);
-    $("vehicleUsagePressureSection")?.classList.toggle("hidden",isChef);
-
-    if(isChef){
-      $("vehicleUsageTitle").textContent="Fiche 102 — Chef";
-    }else if(isPump){
-      $("vehicleUsageTitle").textContent="Fiche 202 — Autopompe";
-    }
+    $("vehicleUsageLadderSection")?.classList.toggle("hidden",!isLadder);
+    $("vehicleUsageTankerSection")?.classList.toggle("hidden",!isTanker);
+    $("vehicleUsageSuppliedLabel")?.classList.toggle("hidden",noPump);
+    $("vehicleUsagePumpSection")?.classList.toggle("hidden",noPump);
+    $("vehicleUsageSpecialSection")?.classList.toggle("hidden",noPump);
+    $("vehicleUsagePressureSection")?.classList.toggle("hidden",noPump);
+    if(isChef)$("vehicleUsageTitle").textContent="Fiche 102 — Chef";
+    else if(isPump)$("vehicleUsageTitle").textContent="Fiche 202 — Autopompe";
+    else if(isLadder)$("vehicleUsageTitle").textContent="Fiche 502 — Échelle";
+    else if(isTanker)$("vehicleUsageTitle").textContent="Fiche 802 — Citerne";
   }
 
   function fillChef(c={}){
@@ -156,6 +172,20 @@
     };
   }
 
+
+  function fillLadder(x={}){for(const [id,k] of [["vehicleUsageLadderOperator","operator"],["vehicleUsageLadderDeployed","deployed"],["vehicleUsageLadderHeight","height"],["vehicleUsageLadderAngle","angle"],["vehicleUsageLadderStabilizers","stabilizers"],["vehicleUsageLadderSupply","supply"],["vehicleUsageLadderSupplyPsi","supplyPsi"],["vehicleUsageLadderGun","gun"],["vehicleUsageLadderGunPsi","gunPsi"],["vehicleUsageLadderSector","sector"],["vehicleUsageLadderAssignment","assignment"]])$(id).value=x[k]??""}
+  function readLadder(){return{operator:$("vehicleUsageLadderOperator").value.trim(),deployed:$("vehicleUsageLadderDeployed").value,height:$("vehicleUsageLadderHeight").value,angle:$("vehicleUsageLadderAngle").value,stabilizers:$("vehicleUsageLadderStabilizers").value,supply:$("vehicleUsageLadderSupply").value,supplyPsi:$("vehicleUsageLadderSupplyPsi").value,gun:$("vehicleUsageLadderGun").value,gunPsi:$("vehicleUsageLadderGunPsi").value,sector:$("vehicleUsageLadderSector").value,assignment:$("vehicleUsageLadderAssignment").value.trim()}}
+  function fillTanker(x={}){for(const [id,k] of [["vehicleUsageTankerCapacity","capacity"],["vehicleUsageTankerLevel","level"],["vehicleUsageTankerMode","mode"],["vehicleUsageTankerFillSource","fillSource"],["vehicleUsageTankerSupplying","supplying"],["vehicleUsageTankerFlow","flow"],["vehicleUsageTankerShuttleStart","shuttleStart"],["vehicleUsageTankerShuttleReturn","shuttleReturn"],["vehicleUsageTankerTurnaround","turnaround"],["vehicleUsageTankerTrips","trips"],["vehicleUsageTankerNotes","notes"]])$(id).value=x[k]??""}
+  function readTanker(){return{capacity:$("vehicleUsageTankerCapacity").value,level:$("vehicleUsageTankerLevel").value,mode:$("vehicleUsageTankerMode").value,fillSource:$("vehicleUsageTankerFillSource").value.trim(),supplying:$("vehicleUsageTankerSupplying").value.trim(),flow:$("vehicleUsageTankerFlow").value,shuttleStart:$("vehicleUsageTankerShuttleStart").value,shuttleReturn:$("vehicleUsageTankerShuttleReturn").value,turnaround:$("vehicleUsageTankerTurnaround").value,trips:$("vehicleUsageTankerTrips").value,notes:$("vehicleUsageTankerNotes").value.trim()}}
+  function journalSummary(before,after,n){
+    const a=[];const p=(label,x,y)=>{if(String(x??"")!==String(y??""))a.push(`${label}: ${x||"—"} → ${y||"—"}`)};
+    p("État",before?.status,after?.status);p("Effectif",before?.firefighters,after?.firefighters);
+    if(n==="102"){p("Officier",before?.chef?.officer,after?.chef?.officer);p("Commandement",before?.chef?.commandMode,after?.chef?.commandMode);p("Stratégie",before?.chef?.strategy,after?.chef?.strategy);p("Renfort",before?.chef?.alarmLevel,after?.chef?.alarmLevel);for(let i=1;i<=5;i++)p(`Secteur ${i}`,before?.chef?.[`sector${i}`],after?.chef?.[`sector${i}`]);p("Sécurité",before?.chef?.safety,after?.chef?.safety)}
+    if(n==="202"){p("Alimentation",before?.supplied,after?.supplied);p("Résiduel initial",before?.residualStart,after?.residualStart);p("Résiduel final",before?.residualEnd,after?.residualEnd);for(let i=1;i<=6;i++){const b=before?.outlets?.[i]||{},c=after?.outlets?.[i]||{};p(`Sortie ${i}`,b.active?"Active":"Inactive",c.active?"Active":"Inactive");if(b.active||c.active){p(`Sortie ${i} PSI`,b.pressure,c.pressure);p(`Sortie ${i} secteur`,b.sector,c.sector)}}}
+    if(n==="502"){p("Échelle",before?.ladder?.deployed,after?.ladder?.deployed);p("Hauteur",before?.ladder?.height,after?.ladder?.height);p("Angle",before?.ladder?.angle,after?.ladder?.angle);p("Stabilisateurs",before?.ladder?.stabilizers,after?.ladder?.stabilizers);p("Alimentation",before?.ladder?.supply,after?.ladder?.supply);p("Canon aérien",before?.ladder?.gun,after?.ladder?.gun);p("Canon PSI",before?.ladder?.gunPsi,after?.ladder?.gunPsi);p("Secteur",before?.ladder?.sector,after?.ladder?.sector);p("Affectation",before?.ladder?.assignment,after?.ladder?.assignment)}
+    if(n==="802"){p("Niveau eau",before?.tanker?.level,after?.tanker?.level);p("Mode",before?.tanker?.mode,after?.tanker?.mode);p("Remplissage",before?.tanker?.fillSource,after?.tanker?.fillSource);p("Alimente",before?.tanker?.supplying,after?.tanker?.supplying);p("Débit GPM",before?.tanker?.flow,after?.tanker?.flow);p("Rotation min",before?.tanker?.turnaround,after?.tanker?.turnaround);p("Rotations",before?.tanker?.trips,after?.tanker?.trips)}
+    return a;
+  }
   function openForm(item=null){
     const saveStatus=$("vehicleUsageSaveStatus");
     if(saveStatus){
@@ -178,6 +208,8 @@ fillVehicleOptions();
     fillOutlet("fourInch",u.special.fourInch);
     fillOutlet("deckGun",u.special.deckGun);
     fillChef(u.chef);
+    fillLadder(u.ladder);
+    fillTanker(u.tanker);
     setVehicleFormMode(vehicleNumberFromSelect());
     $("vehicleUsageDialog").showModal()
   }
@@ -213,6 +245,8 @@ fillVehicleOptions();
         deckGun:readOutlet("deckGun")
       },
       chef:readChef(),
+      ladder:readLadder(),
+      tanker:readTanker(),
       residualStart:$("vehicleUsageResidualStart").value,
       residualEnd:$("vehicleUsageResidualEnd").value,
       notes:$("vehicleUsageNotes").value.trim(),
@@ -285,6 +319,8 @@ fillVehicleOptions();
       });
       usages=[...merged.values()];
 
+      const priorId=$("vehicleUsageId").value;
+      const prior=priorId?usages.find(x=>String(x.id)===String(priorId)):null;
       const u=fromForm();
       if(!u.vehicleId)throw new Error("Le véhicule sélectionné n’a pas d’identifiant.");
 
@@ -300,6 +336,10 @@ fillVehicleOptions();
       render();
       window.dispatchEvent(new CustomEvent("firemap:vehicle-usages-ready"));
       window.dispatchEvent(new CustomEvent("firemap:vehicle-usage-updated",{detail:{eventId:u.eventId,usage:u}}));
+      const journalNumber=String(u.vehicleNumber||vehicleNumberFromSelect()||"");
+      journalSummary(prior,u,journalNumber).forEach(message=>{
+        window.dispatchEvent(new CustomEvent("firemap:vehicle-journal-entry",{detail:{vehicleId:journalNumber,message:`${journalNumber} — ${message}`,at:new Date().toISOString()}}));
+      });
       window.fireMapVehicles?.refreshProfiles?.();
 
       setSaveStatus("✅ Fiche enregistrée sur le téléphone.","success");

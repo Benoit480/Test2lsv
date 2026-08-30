@@ -512,6 +512,17 @@ function render(){const e=active();$("commandEmpty").classList.toggle("hidden",!
 $("commandShowPreventionMap").onclick=()=>{const id=$("commandPreventionContent")?.dataset?.buildingId;if(!id)return I.toast("Aucun bâtiment lié.");window.fireMapPreplans?.showBuildingOnMap?.(id)};
 window.addEventListener("firemap:prevention-updated",()=>renderPrevention(active()));
 window.addEventListener("firemap:buildings-updated",()=>renderPrevention(active()));
+
+window.addEventListener("firemap:vehicle-journal-entry",event=>{
+  const e=active();
+  const message=String(event?.detail?.message||"").trim();
+  if(!e||!message)return;
+  if(addJournal(e,message,{category:"vehicle",level:"info",author:event?.detail?.vehicleId||"Véhicule"})){
+    saveLocal();
+    renderJournal(e);
+    saveEventInBackground(e);
+  }
+});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-command-tab]");if(b)tab(b.dataset.commandTab)});$("newCommandEvent").onclick=()=>openForm();$("editCommandEvent").onclick=()=>openForm(active());$("closeCommandEventDialog").onclick=$("cancelCommandEventDialog").onclick=()=>$("commandEventDialog").close();$("commandEventForm").onsubmit=submit;$("commandJournalAdd").onclick=()=>{
   const e=active(),text=$("commandJournalText").value.trim();
   if(!e||!text)return;
