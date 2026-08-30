@@ -37,7 +37,7 @@
     <button data-view="search" class="drawer-link">🔎 Recherche d’adresse</button>
     <button id="switchVehicleAccount" class="drawer-link hidden">👤 Changer de compte</button>
     <div id="buildStatusV24" class="build-status-v24">
-      <strong>FireMap V25.0.22</strong>
+      <strong>FireMap V25.0.23</strong>
       <small>Firebase temps réel stable · Google indépendant</small>
     </div>
     <div class="drawer-separator"></div>
@@ -191,23 +191,21 @@
       <div id="commandDashboard" class="hidden">
         <section class="command-event-head"><div><small id="commandEventNumber">ÉVÉNEMENT</small><h2 id="commandEventAddress">—</h2><p id="commandEventType">—</p></div><div><strong id="commandElapsed">00:00</strong><span>Temps écoulé</span></div></section>
         <div class="command-stats">
-          <article><strong id="commandVehicleCount">0</strong><span>🚒 Véhicules engagés</span></article>
-          <article class="green"><strong id="commandOnSceneCount">0</strong><span>🟢 Sur les lieux</span></article>
-          <article class="blue"><strong id="commandSuppliedCount">0</strong><span>🔵 Alimentés</span></article>
+          <article class="command-editable-stat" data-edit-command-stat="vehicles" role="button" tabindex="0"><strong id="commandVehicleCount">0</strong><span>🚒 Véhicules engagés</span></article>
+          <article class="green command-editable-stat" data-edit-command-stat="onscene" role="button" tabindex="0"><strong id="commandOnSceneCount">0</strong><span>🟢 Sur les lieux</span></article>
+          <article class="blue command-editable-stat" data-edit-command-stat="supplied" role="button" tabindex="0"><strong id="commandSuppliedCount">0</strong><span>🔵 Alimentés</span></article>
           <article class="firefighters-intervention command-editable-stat" data-edit-firefighters="intervention" role="button" tabindex="0" title="Toucher pour modifier">
             <strong id="commandFirefighterInterventionCount">0</strong>
             <span>👨‍🚒 Pompiers en intervention</span>
-            <small>✏️ Modifier</small>
           </article>
           <article class="firefighters-available command-editable-stat" data-edit-firefighters="available" role="button" tabindex="0" title="Toucher pour modifier">
             <strong id="commandFirefighterAvailableCount">0</strong>
             <span>🟢 Pompiers disponibles</span>
-            <small>✏️ Modifier</small>
           </article>
-          <article><strong id="commandOutletCount">0</strong><span>💧 Sorties actives</span></article>
-          <article class="residual"><strong id="commandAirAvailable">0</strong><span>🫁 Cylindres d’air disponibles</span></article>
-          <article class="rehab"><strong id="commandRehabStatus">Non installée</strong><span>🩺 État du rehab</span></article>
-          <article class="decon"><strong id="commandDeconStatus">Non active</strong><span>🚿 Station décontamination</span></article>
+          <article class="command-editable-stat" data-edit-command-stat="outlets" role="button" tabindex="0"><strong id="commandOutletCount">0</strong><span>💧 Sorties actives</span></article>
+          <article class="residual command-editable-stat" data-edit-command-stat="air" role="button" tabindex="0"><strong id="commandAirAvailable">0</strong><span>🫁 Cylindres d’air disponibles</span></article>
+          <article class="rehab command-editable-stat" data-edit-command-stat="rehab" role="button" tabindex="0"><strong id="commandRehabStatus">Non installée</strong><span>🩺 État du rehab</span></article>
+          <article class="decon command-editable-stat" data-edit-command-stat="decon" role="button" tabindex="0"><strong id="commandDeconStatus">Non active</strong><span>🚿 Station décontamination</span></article>
         </div>
         <div class="command-tabs"><button class="active" data-command-tab="vehicles">Véhicules</button><button data-command-tab="outlets">Sorties</button><button data-command-tab="sectors">Secteurs</button><button data-command-tab="gps">GPS</button><button data-command-tab="prevention">Prévention</button><button data-command-tab="journal">Journal</button><button data-command-tab="event">Événement</button></div>
         <div id="commandPanelVehicles" class="command-panel"><div id="commandVehicleList" class="command-vehicle-grid"></div></div>
@@ -865,6 +863,6 @@
   <div id="toast" class="toast hidden"></div>
   <script src="google-maps-config.js?v=25.0.0"></script>
   <script src="google-maps-adapter.js?v=25.0.2"></script>
-  <script src="firemap-boot.js?v=25.0.22"></script>
+  <script src="firemap-boot.js?v=25.0.23"></script>
 </body>
 </html>

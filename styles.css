@@ -1644,9 +1644,11 @@ body[data-account-role="unit"] #endCommandEvent,
 .command-stats article.command-editable-stat:active{
   transform:scale(.98);
 }
-.command-stats article.command-editable-stat small{
-  display:block;
-  margin-top:5px;
-  font-size:11px;
-  opacity:.78;
+
+/* V25.0.23 — tous les carrés du commandement sont modifiables au toucher */
+.command-stats article.command-editable-stat{
+  cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
 }
+.command-stats article.command-editable-stat:active{transform:scale(.98);}

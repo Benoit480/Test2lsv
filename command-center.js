@@ -514,10 +514,10 @@ function renderGpsVehicles(vehicles){
     </article>`;
   }).join("");
 }
-function render(){const e=active();$("commandEmpty").classList.toggle("hidden",!!e);$("commandDashboard").classList.toggle("hidden",!e);if(!e)return;const vehicles=window.fireMapVehicles?.getVehicles?.()||[],map=newestByVehicle(),rows=vehicles.map(v=>({v,u:map.get(String(v.id))})),eng=rows.filter(x=>x.u&&x.u.status!=="station"),out=rows.flatMap(x=>outletRows(x.u));$("commandEventNumber").textContent=`ÉVÉNEMENT ${e.number}`;$("commandEventAddress").textContent=e.address;$("commandEventType").textContent=e.type||"Type non inscrit";$("commandVehicleCount").textContent=eng.length;$("commandOnSceneCount").textContent=rows.filter(x=>["green","blue"].includes(state(x.u)[0])).length;$("commandSuppliedCount").textContent=rows.filter(x=>state(x.u)[0]==="blue").length;const firefightersIntervention=Math.max(0,Number(e.firefightersIntervention||0));
+function render(){const e=active();$("commandEmpty").classList.toggle("hidden",!!e);$("commandDashboard").classList.toggle("hidden",!e);if(!e)return;const vehicles=window.fireMapVehicles?.getVehicles?.()||[],map=newestByVehicle(),rows=vehicles.map(v=>({v,u:map.get(String(v.id))})),eng=rows.filter(x=>x.u&&x.u.status!=="station"),out=rows.flatMap(x=>outletRows(x.u));$("commandEventNumber").textContent=`ÉVÉNEMENT ${e.number}`;$("commandEventAddress").textContent=e.address;$("commandEventType").textContent=e.type||"Type non inscrit";$("commandVehicleCount").textContent=e.commandManual?.vehicles ?? eng.length;$("commandOnSceneCount").textContent=e.commandManual?.onscene ?? rows.filter(x=>["green","blue"].includes(state(x.u)[0])).length;$("commandSuppliedCount").textContent=e.commandManual?.supplied ?? rows.filter(x=>state(x.u)[0]==="blue").length;const firefightersIntervention=Math.max(0,Number(e.firefightersIntervention||0));
 $("commandFirefighterInterventionCount").textContent=firefightersIntervention;
 const firefightersAvailable=Math.max(0,Number(e.firefightersAvailable||0));
-$("commandFirefighterAvailableCount").textContent=firefightersAvailable;$("commandOutletCount").textContent=out.length;$("commandAirAvailable").textContent=String(supportAirAvailable(rows));$("commandRehabStatus").textContent=rehabStatus(rows);$("commandDeconStatus").textContent=deconStatus(rows);$("commandVehicleList").innerHTML=rows.map(({v,u})=>{const s=state(u);return`<article class="command-vehicle-card ${s[0]}"><span>${s[1]}</span><div><h3>${esc(v.name)}</h3><strong>${s[2]}</strong><p>👨‍🚒 ${Number(u?.firefighters||0)} · 💧 ${outletRows(u).length}</p></div></article>`}).join("");renderGpsVehicles(vehicles);$("commandOutletList").innerHTML=out.length?out.map(o=>`<article class="command-outlet-card"><strong>${esc(o.vehicle)} — ${esc(o.name)}</strong><span>${esc(o.type||"")} · ${o.psi!==""&&o.psi!=null?o.psi:"—"} PSI · ${o.sector?`Secteur ${esc(o.sector)}`:"Secteur non précisé"}</span><p>${esc(o.location||"Affectation non inscrite")}</p></article>`).join(""):'<div class="card-item"><strong>Aucune sortie active</strong></div>';renderSectors(out);renderPrevention(e);const automaticChanged=buildAutomaticJournal(e,rows.map(x=>x.u).filter(Boolean));if(automaticChanged)saveEventInBackground(e);renderJournal(e);$("commandEventMeta").textContent=`Alarme ${e.alarm} · Chef : ${e.chief||"—"} · Début : ${new Date(e.startedAt).toLocaleString("fr-CA")}`;tick()}function tick(){const e=active();if(!e)return;const s=Math.max(0,Math.floor((Date.now()-new Date(e.startedAt))/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;$("commandElapsed").textContent=h?`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`:`${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}`}function tab(name){document.querySelectorAll("[data-command-tab]").forEach(b=>b.classList.toggle("active",b.dataset.commandTab===name));["Vehicles","Outlets","Sectors","Gps","Prevention","Journal","Event"].forEach(n=>$("commandPanel"+n).classList.toggle("hidden",n.toLowerCase()!==name))}$("commandOpenPrevention").onclick=()=>{const id=$("commandPreventionContent")?.dataset?.buildingId;if(!id)return I.toast("Aucune fiche de prévention liée.");window.fireMapPrevention?.open?.(id)};
+$("commandFirefighterAvailableCount").textContent=firefightersAvailable;$("commandOutletCount").textContent=e.commandManual?.outlets ?? out.length;$("commandAirAvailable").textContent=String(e.commandManual?.air ?? supportAirAvailable(rows));$("commandRehabStatus").textContent=e.commandManual?.rehab ?? rehabStatus(rows);$("commandDeconStatus").textContent=e.commandManual?.decon ?? deconStatus(rows);$("commandVehicleList").innerHTML=rows.map(({v,u})=>{const s=state(u);return`<article class="command-vehicle-card ${s[0]}"><span>${s[1]}</span><div><h3>${esc(v.name)}</h3><strong>${s[2]}</strong><p>👨‍🚒 ${Number(u?.firefighters||0)} · 💧 ${outletRows(u).length}</p></div></article>`}).join("");renderGpsVehicles(vehicles);$("commandOutletList").innerHTML=out.length?out.map(o=>`<article class="command-outlet-card"><strong>${esc(o.vehicle)} — ${esc(o.name)}</strong><span>${esc(o.type||"")} · ${o.psi!==""&&o.psi!=null?o.psi:"—"} PSI · ${o.sector?`Secteur ${esc(o.sector)}`:"Secteur non précisé"}</span><p>${esc(o.location||"Affectation non inscrite")}</p></article>`).join(""):'<div class="card-item"><strong>Aucune sortie active</strong></div>';renderSectors(out);renderPrevention(e);const automaticChanged=buildAutomaticJournal(e,rows.map(x=>x.u).filter(Boolean));if(automaticChanged)saveEventInBackground(e);renderJournal(e);$("commandEventMeta").textContent=`Alarme ${e.alarm} · Chef : ${e.chief||"—"} · Début : ${new Date(e.startedAt).toLocaleString("fr-CA")}`;tick()}function tick(){const e=active();if(!e)return;const s=Math.max(0,Math.floor((Date.now()-new Date(e.startedAt))/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;$("commandElapsed").textContent=h?`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`:`${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}`}function tab(name){document.querySelectorAll("[data-command-tab]").forEach(b=>b.classList.toggle("active",b.dataset.commandTab===name));["Vehicles","Outlets","Sectors","Gps","Prevention","Journal","Event"].forEach(n=>$("commandPanel"+n).classList.toggle("hidden",n.toLowerCase()!==name))}$("commandOpenPrevention").onclick=()=>{const id=$("commandPreventionContent")?.dataset?.buildingId;if(!id)return I.toast("Aucune fiche de prévention liée.");window.fireMapPrevention?.open?.(id)};
 $("commandShowPreventionMap").onclick=()=>{const id=$("commandPreventionContent")?.dataset?.buildingId;if(!id)return I.toast("Aucun bâtiment lié.");window.fireMapPreplans?.showBuildingOnMap?.(id)};
 window.addEventListener("firemap:prevention-updated",()=>renderPrevention(active()));
 window.addEventListener("firemap:buildings-updated",()=>renderPrevention(active()));
@@ -552,6 +552,61 @@ function editFirefighterCount(kind){
   saveEventInBackground(e);
   toast(`${label} : ${value}`);
 }
+
+
+function editCommandStat(kind){
+  const e=active();
+  if(!e)return toast("Aucun événement actif.");
+  const cfg={
+    vehicles:["Véhicules engagés","commandVehicleCount"],
+    onscene:["Sur les lieux","commandOnSceneCount"],
+    supplied:["Véhicules alimentés","commandSuppliedCount"],
+    outlets:["Sorties actives","commandOutletCount"],
+    air:["Cylindres d’air disponibles","commandAirAvailable"]
+  }[kind];
+  if(!cfg)return;
+  e.commandManual=e.commandManual||{};
+  const current=Math.max(0,Number($(cfg[1])?.textContent||0));
+  const raw=prompt(`${cfg[0]}\n\nEntrer le nombre :`,String(current));
+  if(raw===null)return;
+  const value=Number.parseInt(String(raw).trim(),10);
+  if(!Number.isFinite(value)||value<0)return toast("Entrer un nombre valide de 0 ou plus.");
+  e.commandManual[kind]=value;
+  addJournal(e,`${cfg[0]} : ${current} → ${value}`,{category:"commandement",level:"info",author:"Commandement"});
+  saveLocal(); render(); saveEventInBackground(e); toast(`${cfg[0]} : ${value}`);
+}
+function editCommandStatus(kind){
+  const e=active();
+  if(!e)return toast("Aucun événement actif.");
+  e.commandManual=e.commandManual||{};
+  const isRehab=kind==="rehab";
+  const label=isRehab?"État du rehab":"Station décontamination";
+  const choices=isRehab?["Non installé","Prêt","Actif"]:["Non active","Active"];
+  const current=String(e.commandManual[kind] ?? (isRehab?$("commandRehabStatus")?.textContent:$("commandDeconStatus")?.textContent) ?? choices[0]);
+  const promptText=choices.map((x,i)=>`${i+1}. ${x}`).join("\\n");
+  const raw=prompt(`${label}\n\n${promptText}\n\nEntrer le numéro :`,String(Math.max(1,choices.indexOf(current)+1)));
+  if(raw===null)return;
+  const i=Number.parseInt(String(raw).trim(),10)-1;
+  if(i<0||i>=choices.length)return toast("Choix invalide.");
+  const value=choices[i];
+  e.commandManual[kind]=value;
+  addJournal(e,`${label} : ${current} → ${value}`,{category:"commandement",level:"info",author:"Commandement"});
+  saveLocal(); render(); saveEventInBackground(e); toast(`${label} : ${value}`);
+}
+document.addEventListener("click",event=>{
+  const target=event.target.closest("[data-edit-command-stat]");
+  if(!target)return;
+  const kind=target.dataset.editCommandStat;
+  if(kind==="rehab"||kind==="decon")editCommandStatus(kind); else editCommandStat(kind);
+});
+document.addEventListener("keydown",event=>{
+  const target=event.target.closest?.("[data-edit-command-stat]");
+  if(target&&(event.key==="Enter"||event.key===" ")){
+    event.preventDefault();
+    const kind=target.dataset.editCommandStat;
+    if(kind==="rehab"||kind==="decon")editCommandStatus(kind); else editCommandStat(kind);
+  }
+});
 
 document.addEventListener("click",event=>{
   const target=event.target.closest("[data-edit-firefighters]");
