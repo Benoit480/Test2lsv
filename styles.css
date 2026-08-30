@@ -1613,3 +1613,5 @@ body[data-account-role="unit"] #endCommandEvent,
   font-weight:700;
   overflow-wrap:anywhere;
 }
+
+.command-stats article small{display:block;margin-top:4px;color:#cbd5e1;font-size:12px;font-weight:700}

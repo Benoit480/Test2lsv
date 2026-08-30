@@ -193,3 +193,10 @@ La carte/résumé visible de chaque unité correspond maintenant à son rôle :
 - 902 : mission, matériel, remorque et affectation.
 
 Les mentions génériques alimentation/sorties/pression ne sont plus affichées sur les unités non-pompes.
+
+
+## V25.0.17 — Centre de commandement : air et rehab
+
+- Le tableau de commandement affiche maintenant le **nombre de cylindres d’air disponibles** (bouteilles pleines du véhicule de soutien) à la place du résiduel minimum.
+- Le statut **Réhab** est affiché directement sur la tuile du tableau de bord.
+- Les véhicules **alimentés** sont aussi comptés dans **Sur les lieux**.

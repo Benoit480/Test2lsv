@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v25-0-16-specific-vehicle-summaries";
+const CACHE_VERSION = "firemap-v25-0-17-command-air-rehab";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
