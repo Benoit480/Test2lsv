@@ -50,6 +50,20 @@
         fourInch:{active:!!sp.fourInch?.active,pressure:sp.fourInch?.pressure===""||sp.fourInch?.pressure==null?"":Number(sp.fourInch.pressure),sector:["1","2","3","4","5"].includes(String(sp.fourInch?.sector))?String(sp.fourInch.sector):"",location:String(sp.fourInch?.location||"")},
         deckGun:{active:!!sp.deckGun?.active,pressure:sp.deckGun?.pressure===""||sp.deckGun?.pressure==null?"":Number(sp.deckGun.pressure),sector:["1","2","3","4","5"].includes(String(sp.deckGun?.sector))?String(sp.deckGun.sector):"",location:String(sp.deckGun?.location||"")}
       },
+      chef:{
+        officer:String(x.chef?.officer||""),
+        commandMode:String(x.chef?.commandMode||""),
+        strategy:String(x.chef?.strategy||""),
+        alarmLevel:String(x.chef?.alarmLevel||""),
+        sector1:String(x.chef?.sector1||""),
+        sector2:String(x.chef?.sector2||""),
+        sector3:String(x.chef?.sector3||""),
+        sector4:String(x.chef?.sector4||""),
+        sector5:String(x.chef?.sector5||""),
+        safety:String(x.chef?.safety||""),
+        resources:String(x.chef?.resources||""),
+        priorities:String(x.chef?.priorities||"")
+      },
       residualStart:x.residualStart===""||x.residualStart==null?"":Number(x.residualStart),
       residualEnd:x.residualEnd===""||x.residualEnd==null?"":Number(x.residualEnd),
       notes:String(x.notes||""),
@@ -86,13 +100,87 @@
   function setActive(k,v){hid(k).value=v?"true":"false";const c=document.querySelector(`[data-outlet-card="${k}"]`);c?.classList.toggle("active",v);const b=c?.querySelector(".pump-outlet-toggle");b?.classList.toggle("active",v);const sm=b?.querySelector("small");if(sm)sm.textContent=v?"En service":(k==="deckGun"?"Non utilisé":"Non utilisée")}
   function fillOutlet(k,o={}){setActive(k,!!o.active);if(k==="fourInch"){$("fourInchPressure").value=o.pressure??"";$("fourInchSector").value=o.sector||"";$("fourInchLocation").value=o.location||"";return}if(k==="deckGun"){$("deckGunPressure").value=o.pressure??"";$("deckGunSector").value=o.sector||"";$("deckGunLocation").value=o.location||"";return}if(Number(k)>2)$(`outlet${k}Type`).value=o.type||"1¾ po";$(`outlet${k}Pressure`).value=o.pressure??"";$(`outlet${k}Sector`).value=o.sector||"";$(`outlet${k}Location`).value=o.location||""}
   function readOutlet(k){if(k==="fourInch")return{active:active(k),pressure:$("fourInchPressure").value,sector:$("fourInchSector").value,location:$("fourInchLocation").value.trim()};if(k==="deckGun")return{active:active(k),pressure:$("deckGunPressure").value,sector:$("deckGunSector").value,location:$("deckGunLocation").value.trim()};return{active:active(k),type:Number(k)<=2?"1¾ po":$(`outlet${k}Type`).value,pressure:$(`outlet${k}Pressure`).value,sector:$(`outlet${k}Sector`).value,location:$(`outlet${k}Location`).value.trim()}}
+  function vehicleNumberFromSelect(){
+    const s=$("vehicleUsageVehicle");
+    const text=String(s?.selectedOptions?.[0]?.textContent||"");
+    const value=String(s?.value||"");
+    return (text.match(/\b(102|202|502|602|802|902)\b/)||value.match(/\b(102|202|502|602|802|902)\b/)||[])[1]||"";
+  }
+
+  function setVehicleFormMode(number){
+    const isChef=String(number)==="102";
+    const isPump=String(number)==="202";
+
+    $("vehicleUsageChefSection")?.classList.toggle("hidden",!isChef);
+    $("vehicleUsageSuppliedLabel")?.classList.toggle("hidden",isChef);
+    $("vehicleUsagePumpSection")?.classList.toggle("hidden",isChef);
+    $("vehicleUsageSpecialSection")?.classList.toggle("hidden",isChef);
+    $("vehicleUsagePressureSection")?.classList.toggle("hidden",isChef);
+
+    if(isChef){
+      $("vehicleUsageTitle").textContent="Fiche 102 — Chef";
+    }else if(isPump){
+      $("vehicleUsageTitle").textContent="Fiche 202 — Autopompe";
+    }
+  }
+
+  function fillChef(c={}){
+    $("vehicleUsageChefOfficer").value=c.officer||"";
+    $("vehicleUsageChefCommandMode").value=c.commandMode||"";
+    $("vehicleUsageChefStrategy").value=c.strategy||"";
+    $("vehicleUsageChefAlarm").value=c.alarmLevel||"";
+    $("vehicleUsageChefSector1").value=c.sector1||"";
+    $("vehicleUsageChefSector2").value=c.sector2||"";
+    $("vehicleUsageChefSector3").value=c.sector3||"";
+    $("vehicleUsageChefSector4").value=c.sector4||"";
+    $("vehicleUsageChefSector5").value=c.sector5||"";
+    $("vehicleUsageChefSafety").value=c.safety||"";
+    $("vehicleUsageChefResources").value=c.resources||"";
+    $("vehicleUsageChefPriorities").value=c.priorities||"";
+  }
+
+  function readChef(){
+    return{
+      officer:$("vehicleUsageChefOfficer").value.trim(),
+      commandMode:$("vehicleUsageChefCommandMode").value,
+      strategy:$("vehicleUsageChefStrategy").value,
+      alarmLevel:$("vehicleUsageChefAlarm").value,
+      sector1:$("vehicleUsageChefSector1").value.trim(),
+      sector2:$("vehicleUsageChefSector2").value.trim(),
+      sector3:$("vehicleUsageChefSector3").value.trim(),
+      sector4:$("vehicleUsageChefSector4").value.trim(),
+      sector5:$("vehicleUsageChefSector5").value.trim(),
+      safety:$("vehicleUsageChefSafety").value.trim(),
+      resources:$("vehicleUsageChefResources").value.trim(),
+      priorities:$("vehicleUsageChefPriorities").value.trim()
+    };
+  }
+
   function openForm(item=null){
     const saveStatus=$("vehicleUsageSaveStatus");
     if(saveStatus){
       saveStatus.textContent="";
       saveStatus.className="vehicle-usage-save-status hidden";
     }
-fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}));$("vehicleUsageId").value=item?u.id:"";$("vehicleUsageVehicle").value=u.vehicleId||vehicles()[0]?.id||"";$("vehicleUsageFirefighters").value=u.firefighters;$("vehicleUsageSupplied").value=u.supplied;$("vehicleUsageResidualStart").value=u.residualStart;$("vehicleUsageResidualEnd").value=u.residualEnd;$("vehicleUsageNotes").value=u.notes;$("vehicleUsageTitle").textContent=item?`Modifier — ${u.vehicleName}`:"Nouvelle fiche véhicule";$("deleteVehicleUsage").classList.toggle("hidden",!item);setStatus(u.status);for(let n=1;n<=6;n++)fillOutlet(String(n),u.outlets[n]);fillOutlet("fourInch",u.special.fourInch);fillOutlet("deckGun",u.special.deckGun);$("vehicleUsageDialog").showModal()}
+fillVehicleOptions();
+    const u=item?canonical(item):ensureEventLink(canonical({}));
+    $("vehicleUsageId").value=item?u.id:"";
+    $("vehicleUsageVehicle").value=u.vehicleId||vehicles()[0]?.id||"";
+    $("vehicleUsageFirefighters").value=u.firefighters;
+    $("vehicleUsageSupplied").value=u.supplied;
+    $("vehicleUsageResidualStart").value=u.residualStart;
+    $("vehicleUsageResidualEnd").value=u.residualEnd;
+    $("vehicleUsageNotes").value=u.notes;
+    $("vehicleUsageTitle").textContent=item?`Modifier — ${u.vehicleName}`:"Nouvelle fiche véhicule";
+    $("deleteVehicleUsage").classList.toggle("hidden",!item);
+    setStatus(u.status);
+    for(let n=1;n<=6;n++)fillOutlet(String(n),u.outlets[n]);
+    fillOutlet("fourInch",u.special.fourInch);
+    fillOutlet("deckGun",u.special.deckGun);
+    fillChef(u.chef);
+    setVehicleFormMode(vehicleNumberFromSelect());
+    $("vehicleUsageDialog").showModal()
+  }
   function fromForm(){
     const id=$("vehicleUsageId").value||uid();
     const select=$("vehicleUsageVehicle");
@@ -124,6 +212,7 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
         fourInch:readOutlet("fourInch"),
         deckGun:readOutlet("deckGun")
       },
+      chef:readChef(),
       residualStart:$("vehicleUsageResidualStart").value,
       residualEnd:$("vehicleUsageResidualEnd").value,
       notes:$("vehicleUsageNotes").value.trim(),
@@ -263,6 +352,24 @@ fillVehicleOptions();const u=item?canonical(item):ensureEventLink(canonical({}))
     },error=>console.error("Synchronisation fiches véhicules:",error));
     flush();
   }
+  if($("vehicleUsageVehicle")) $("vehicleUsageVehicle").addEventListener("change",()=>{
+    setVehicleFormMode(vehicleNumberFromSelect());
+  });
+
+  if($("vehicleUsageChefCommand")) $("vehicleUsageChefCommand").onclick=()=>{
+    $("vehicleUsageDialog")?.close();
+    document.querySelector('[data-view="command"],#commandCenterBtn,.command-center-open')?.click?.();
+  };
+
+  if($("vehicleUsageChefJournal")) $("vehicleUsageChefJournal").onclick=()=>{
+    const text=prompt("Entrée au journal — Chef 102 :");
+    if(!text)return;
+    window.dispatchEvent(new CustomEvent("firemap:command-journal-add",{
+      detail:{vehicleId:"102",message:text,at:new Date().toISOString()}
+    }));
+    core.toast("Entrée envoyée au journal.");
+  };
+
   document.addEventListener("click",e=>{const s=e.target.closest("[data-usage-status]");if(s)setStatus(s.dataset.usageStatus);const o=e.target.closest("[data-outlet-toggle]");if(o){const k=o.dataset.outletToggle;setActive(k,!active(k))}const ed=e.target.closest("[data-usage-edit]");if(ed)openForm(usages.find(x=>x.id===ed.dataset.usageEdit))});
   if($("newVehicleUsage")) $("newVehicleUsage").onclick=()=>openForm();
   if($("closeVehicleUsageDialog")) $("closeVehicleUsageDialog").onclick=()=>$("vehicleUsageDialog").close();

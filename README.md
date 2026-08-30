@@ -158,3 +158,20 @@ n'avait pas d'élément de statut associé.
 - suggestions affichées directement par Google;
 - le bouton Démarrer utilise la suggestion Google sélectionnée;
 - aucun résultat local ne peut reprendre la place dans ce champ.
+
+
+## V25.0.13 — Correction réelle des fiches 102 / 202
+
+Le formulaire officiel `vehicleUsageDialog` est maintenant conditionnel selon le véhicule.
+
+### 102 — Chef
+- garde : véhicule, état, effectif, notes;
+- retire complètement : Alimenté, panneau de pompe, sorties, 4 po, canon et pressions;
+- ajoute : officier, mode de commandement, stratégie, renfort, secteurs 1 à 5,
+  sécurité, ressources demandées et risques/priorités.
+
+### 202 — Autopompe
+- conserve le formulaire de pompe complet : alimentation, 6 sorties, 4 po, canon,
+  pressions et résiduels.
+
+Les autres unités gardent encore la fiche générique pour l'instant.

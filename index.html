@@ -37,7 +37,7 @@
     <button data-view="search" class="drawer-link">🔎 Recherche d’adresse</button>
     <button id="switchVehicleAccount" class="drawer-link hidden">👤 Changer de compte</button>
     <div id="buildStatusV24" class="build-status-v24">
-      <strong>FireMap V25.0.12</strong>
+      <strong>FireMap V25.0.13</strong>
       <small>Firebase temps réel stable · Google indépendant</small>
     </div>
     <div class="drawer-separator"></div>
@@ -521,13 +521,13 @@
         <p id="vehicleUsageStatusText" class="usage-status-text">État : En caserne</p>
       </div>
 
-      <div class="form-section">
+      <div class="form-section" id="vehicleUsageCrewSection">
         <h3>👨‍🚒 Effectif</h3>
         <div class="form-grid">
           <label>Nombre de pompiers
             <input id="vehicleUsageFirefighters" type="number" min="0" max="20" step="1" value="0">
           </label>
-          <label>Alimenté
+          <label id="vehicleUsageSuppliedLabel">Alimenté
             <select id="vehicleUsageSupplied">
               <option value="no">Non</option>
               <option value="hydrant">Oui — borne</option>
@@ -541,7 +541,71 @@
 
       
 
-      <div class="form-section">
+
+      <div class="form-section hidden" id="vehicleUsageChefSection">
+        <h3>👨‍🚒 Commandement — Chef 102</h3>
+        <p class="pump-panel-help">Cette section remplace les fonctions de pompe pour le véhicule 102.</p>
+        <div class="form-grid">
+          <label>Officier responsable
+            <input id="vehicleUsageChefOfficer" type="text" placeholder="Nom de l’officier">
+          </label>
+          <label>Mode de commandement
+            <select id="vehicleUsageChefCommandMode">
+              <option value="">Non précisé</option>
+              <option value="mobile">Commandement mobile</option>
+              <option value="fixed">Poste de commandement établi</option>
+              <option value="transferred">Commandement transféré</option>
+            </select>
+          </label>
+          <label>Stratégie
+            <select id="vehicleUsageChefStrategy">
+              <option value="">Non définie</option>
+              <option value="offensive">Offensive</option>
+              <option value="defensive">Défensive</option>
+              <option value="transitional">Transitionnelle</option>
+            </select>
+          </label>
+          <label>Niveau de renfort
+            <select id="vehicleUsageChefAlarm">
+              <option value="">Normal</option>
+              <option value="1">Renfort 1</option>
+              <option value="2">Renfort 2</option>
+              <option value="3">Renfort 3</option>
+            </select>
+          </label>
+          <label>Secteur 1 — responsable
+            <input id="vehicleUsageChefSector1" type="text">
+          </label>
+          <label>Secteur 2 — responsable
+            <input id="vehicleUsageChefSector2" type="text">
+          </label>
+          <label>Secteur 3 — responsable
+            <input id="vehicleUsageChefSector3" type="text">
+          </label>
+          <label>Secteur 4 — responsable
+            <input id="vehicleUsageChefSector4" type="text">
+          </label>
+          <label>Secteur 5 — responsable
+            <input id="vehicleUsageChefSector5" type="text">
+          </label>
+          <label>Officier sécurité
+            <input id="vehicleUsageChefSafety" type="text">
+          </label>
+          <label class="wide">Ressources demandées
+            <textarea id="vehicleUsageChefResources" rows="2" placeholder="Entraide, ambulance, Hydro, autres unités…"></textarea>
+          </label>
+          <label class="wide">Risques / priorités
+            <textarea id="vehicleUsageChefPriorities" rows="2" placeholder="Sauvetage, exposition, matières dangereuses, stratégie…"></textarea>
+          </label>
+        </div>
+        <div class="modal-actions vehicle-chef-actions">
+          <span></span>
+          <button type="button" class="secondary" id="vehicleUsageChefJournal">📓 Journal</button>
+          <button type="button" class="primary" id="vehicleUsageChefCommand">🧭 Poste de commandement</button>
+        </div>
+      </div>
+
+      <div class="form-section" id="vehicleUsagePumpSection">
         <h3>💧 Panneau de pompe</h3>
         <p class="pump-panel-help">Touchez une sortie pour la mettre en service. Elle passe alors au vert.</p>
         <div class="pump-panel-grid">
@@ -584,7 +648,7 @@
         </div>
       </div>
 
-      <div class="form-section">
+      <div class="form-section" id="vehicleUsageSpecialSection">
         <h3>🚒 Équipements spéciaux</h3>
         <div class="pump-panel-grid special">
           <section class="pump-outlet-card special" data-outlet-card="fourInch">
@@ -602,7 +666,7 @@
         </div>
       </div>
 
-      <div class="form-section">
+      <div class="form-section" id="vehicleUsagePressureSection">
         <h3>📊 Pressions générales</h3>
         <div class="form-grid">
           <label>Résiduel initial (PSI)<input id="vehicleUsageResidualStart" type="number" min="0" step="1" inputmode="decimal"></label>
@@ -640,6 +704,6 @@
   <div id="toast" class="toast hidden"></div>
   <script src="google-maps-config.js?v=25.0.0"></script>
   <script src="google-maps-adapter.js?v=25.0.2"></script>
-  <script src="firemap-boot.js?v=25.0.12"></script>
+  <script src="firemap-boot.js?v=25.0.13"></script>
 </body>
 </html>
