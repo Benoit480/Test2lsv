@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD="25.0.5";
+  const BUILD="25.0.20";
   const ACTIVE_ID_KEY="firemap-command-active-v1";
   const ACTIVE_DATA_KEY="firemap-command-active-event-data";
   const EVENTS_KEY="firemap-command-events-v1";
@@ -111,45 +111,79 @@
     if(!confirm("Terminer cet événement? Les fiches des unités seront réinitialisées."))return;
 
     closing=true;
+    const closedAt=new Date().toISOString();
+    const closed={
+      ...event,
+      status:"closed",
+      closedAt,
+      closedBy:"102",
+      closedByLabel:"102 — Chef des opérations"
+    };
+
+    let result={archived:0,reset:0};
+
     try{
-      const closedAt=new Date().toISOString();
-      const closed={
-        ...event,
-        status:"closed",
-        closedAt,
-        closedBy:"102",
-        closedByLabel:"102 — Chef des opérations"
-      };
-
-      // 1. Reset first, while event id is still known.
-      const result=window.fireMapVehicleUsage?.resetAllUnitsAfterEvent?.(closed.id)
-        || {archived:0,reset:0};
-
-      // 2. Save closure locally.
-      const events=read(EVENTS_KEY,[]);
-      if(Array.isArray(events)){
-        const index=events.findIndex(item=>String(item.id)===String(closed.id));
-        if(index>=0)events[index]=closed;
-        else events.push(closed);
-        write(EVENTS_KEY,events);
+      // La fermeture locale est prioritaire : une erreur Firebase ne doit jamais
+      // empêcher le chef 102 de terminer l'événement.
+      try{
+        result=window.fireMapVehicleUsage?.resetAllUnitsAfterEvent?.(closed.id)
+          || {archived:0,reset:0};
+      }catch(error){
+        console.warn("Réinitialisation unités à reprendre",error);
       }
 
-      // 3. Clear current event on THIS device immediately.
-      clearLocalActiveEvent(closed);
-      localStorage.setItem(CLOSE_MARKER_KEY,JSON.stringify({
-        id:String(closed.id),closedAt,build:BUILD
-      }));
+      try{
+        const events=read(EVENTS_KEY,[]);
+        if(Array.isArray(events)){
+          const index=events.findIndex(item=>String(item.id)===String(closed.id));
+          if(index>=0)events[index]=closed;
+          else events.push(closed);
+          write(EVENTS_KEY,events);
+        }
+      }catch(error){
+        console.warn("Archivage local événement incomplet",error);
+      }
 
-      // 4. Publish status=closed to Firebase for EVERY device.
-      const synced=await window.fireMapCommandCenter?.syncEvent?.(closed);
-      toast(
-        synced
-          ? `Événement terminé — ${result.reset||0} unités réinitialisées.`
-          : `Événement terminé — ${result.reset||0} unités réinitialisées; synchronisation Firebase en attente.`
-      );
+      // Fermer l'événement sur cet appareil même si la synchro réseau échoue.
+      try{
+        clearLocalActiveEvent(closed);
+      }catch(error){
+        console.warn("Nettoyage événement actif",error);
+        localStorage.removeItem(ACTIVE_ID_KEY);
+        localStorage.removeItem(ACTIVE_DATA_KEY);
+        localStorage.removeItem(CALL_KEY);
+        window.fireMapCommandCenter?.setActiveId?.("");
+      }
+
+      try{
+        localStorage.setItem(CLOSE_MARKER_KEY,JSON.stringify({
+          id:String(closed.id),closedAt,build:"25.0.20"
+        }));
+      }catch(_){}
+
+      // Synchronisation non bloquante. syncEvent met déjà l'événement en file
+      // d'attente avant Firebase, donc aucune fermeture ne doit afficher une erreur.
+      try{
+        const synced=await window.fireMapCommandCenter?.syncEvent?.(closed);
+        toast(
+          synced
+            ? `Événement terminé — ${result.reset||0} unités réinitialisées.`
+            : `Événement terminé — ${result.reset||0} unités réinitialisées; synchronisation Firebase en attente.`
+        );
+      }catch(error){
+        console.warn("Fermeture locale réussie; Firebase en attente",error);
+        toast(`Événement terminé — ${result.reset||0} unités réinitialisées; synchronisation Firebase en attente.`);
+      }
     }catch(error){
-      console.error("V24 fermeture événement",error);
-      toast("Erreur pendant la fermeture de l’événement.");
+      console.error("Fermeture événement - erreur inattendue",error);
+      // Dernier filet de sécurité : l'événement ne doit pas rester actif pour 102.
+      try{
+        localStorage.removeItem(ACTIVE_ID_KEY);
+        localStorage.removeItem(ACTIVE_DATA_KEY);
+        localStorage.removeItem(CALL_KEY);
+        window.fireMapCommandCenter?.setActiveId?.("");
+      }catch(_){}
+      toast("Événement terminé localement; synchronisation à vérifier.");
     }finally{
       closing=false;
     }
