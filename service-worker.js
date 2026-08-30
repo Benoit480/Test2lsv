@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v25-0-20-close-event-fix";
+const CACHE_VERSION = "firemap-v25-0-22-manual-firefighters";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 

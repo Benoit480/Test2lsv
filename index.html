@@ -37,7 +37,7 @@
     <button data-view="search" class="drawer-link">🔎 Recherche d’adresse</button>
     <button id="switchVehicleAccount" class="drawer-link hidden">👤 Changer de compte</button>
     <div id="buildStatusV24" class="build-status-v24">
-      <strong>FireMap V25.0.20</strong>
+      <strong>FireMap V25.0.22</strong>
       <small>Firebase temps réel stable · Google indépendant</small>
     </div>
     <div class="drawer-separator"></div>
@@ -194,7 +194,16 @@
           <article><strong id="commandVehicleCount">0</strong><span>🚒 Véhicules engagés</span></article>
           <article class="green"><strong id="commandOnSceneCount">0</strong><span>🟢 Sur les lieux</span></article>
           <article class="blue"><strong id="commandSuppliedCount">0</strong><span>🔵 Alimentés</span></article>
-          <article><strong id="commandFirefighterCount">0</strong><span>👨‍🚒 Pompiers</span></article>
+          <article class="firefighters-intervention command-editable-stat" data-edit-firefighters="intervention" role="button" tabindex="0" title="Toucher pour modifier">
+            <strong id="commandFirefighterInterventionCount">0</strong>
+            <span>👨‍🚒 Pompiers en intervention</span>
+            <small>✏️ Modifier</small>
+          </article>
+          <article class="firefighters-available command-editable-stat" data-edit-firefighters="available" role="button" tabindex="0" title="Toucher pour modifier">
+            <strong id="commandFirefighterAvailableCount">0</strong>
+            <span>🟢 Pompiers disponibles</span>
+            <small>✏️ Modifier</small>
+          </article>
           <article><strong id="commandOutletCount">0</strong><span>💧 Sorties actives</span></article>
           <article class="residual"><strong id="commandAirAvailable">0</strong><span>🫁 Cylindres d’air disponibles</span></article>
           <article class="rehab"><strong id="commandRehabStatus">Non installée</strong><span>🩺 État du rehab</span></article>
@@ -856,6 +865,6 @@
   <div id="toast" class="toast hidden"></div>
   <script src="google-maps-config.js?v=25.0.0"></script>
   <script src="google-maps-adapter.js?v=25.0.2"></script>
-  <script src="firemap-boot.js?v=25.0.20"></script>
+  <script src="firemap-boot.js?v=25.0.22"></script>
 </body>
 </html>

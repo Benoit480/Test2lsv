@@ -1624,3 +1624,29 @@ body[data-account-role="unit"] #endCommandEvent,
   border-color:#06b6d4;
   background:#082129;
 }
+
+/* V25.0.21 — Effectifs au centre de commandement */
+.command-stats article.firefighters-intervention{
+  border-color:#ef4444;
+  background:#180b0d;
+}
+.command-stats article.firefighters-available{
+  border-color:#22c55e;
+  background:#07160d;
+}
+
+/* V25.0.22 — effectifs commandement ajustables manuellement */
+.command-stats article.command-editable-stat{
+  cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.command-stats article.command-editable-stat:active{
+  transform:scale(.98);
+}
+.command-stats article.command-editable-stat small{
+  display:block;
+  margin-top:5px;
+  font-size:11px;
+  opacity:.78;
+}
