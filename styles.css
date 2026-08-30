@@ -1584,3 +1584,32 @@ body[data-account-role="unit"] #endCommandEvent,
 #vehicleUsageSupportSection.hidden,#vehicleUsagePickupSection.hidden{display:none!important}
 #vehicleUsageSupportSection{background:#0b1018;border:1px solid #3a4658}
 #vehicleUsagePickupSection{background:#0b1016;border:1px solid #3d4652}
+
+
+/* FireMap V25.0.16 — résumés spécifiques par véhicule */
+.vehicle-specific-summary{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin-top:10px;
+}
+.vehicle-specific-summary>span{
+  display:grid;
+  grid-template-columns:auto minmax(105px,.75fr) 1.25fr;
+  align-items:start;
+  gap:8px;
+  padding:10px 12px;
+  background:#111827;
+  border:1px solid #263449;
+  border-radius:10px;
+  color:#cbd5e1;
+}
+.vehicle-specific-summary>span strong{
+  color:#fff;
+}
+.vehicle-specific-summary>span em{
+  color:#dbeafe;
+  font-style:normal;
+  font-weight:700;
+  overflow-wrap:anywhere;
+}

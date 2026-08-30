@@ -186,7 +186,7 @@
     })[key] || String(value || "Non alimenté");
   }
   function usageState(usage, vehicle) {
-    if (usage?.supplied && usage.supplied !== "no") {
+    if (String(vehicle?.number||vehicle?.id||"")==="202" && usage?.supplied && usage.supplied !== "no") {
       return { label: "Alimenté", color: "#3b82f6", className: "usage-supplied" };
     }
     if (usage?.status === "onscene") {
@@ -235,6 +235,103 @@
     }
     return rows.length ? `<ul class="vehicle-profile-outlets">${rows.join("")}</ul>` : '<p class="vehicle-profile-empty">Aucune sortie en service</p>';
   }
+
+  function profileValue(label,value,icon="•"){
+    const shown=value!==""&&value!=null?esc(value):"—";
+    return `<span>${icon} <strong>${esc(label)}</strong><em>${shown}</em></span>`;
+  }
+
+  function specializedUsageSummary(v,usage){
+    const number=String(v?.number||v?.id||"");
+    const crew=`<div class="vehicle-profile-stats"><span>👨‍🚒 <strong>${Number(usage?.firefighters||0)}</strong> pompier${Number(usage?.firefighters||0)>1?"s":""}</span></div>`;
+
+    if(number==="102"){
+      const c=usage?.chef||{};
+      return `${crew}<div class="vehicle-specific-summary">
+        ${profileValue("Officier",c.officer,"👨‍🚒")}
+        ${profileValue("Commandement",c.commandMode,"🧭")}
+        ${profileValue("Stratégie",c.strategy,"🎯")}
+        ${profileValue("Renfort",c.alarmLevel||"Normal","🚨")}
+        ${profileValue("Sécurité",c.safety,"🦺")}
+        ${c.resources?profileValue("Ressources",c.resources,"📞"):""}
+        ${c.priorities?profileValue("Priorités",c.priorities,"⚠️"):""}
+      </div>`;
+    }
+
+    if(number==="502"){
+      const x=usage?.ladder||{};
+      return `${crew}<div class="vehicle-specific-summary">
+        ${profileValue("Échelle",x.deployed==="yes"?"Déployée":"Non déployée","🪜")}
+        ${profileValue("Hauteur",x.height!==""?`${x.height} pi`:"","📏")}
+        ${profileValue("Angle",x.angle!==""?`${x.angle}°`:"","📐")}
+        ${profileValue("Stabilisateurs",x.stabilizers,"🦿")}
+        ${profileValue("Alimentation",x.supply,"💧")}
+        ${profileValue("Canon aérien",x.gun==="on"?"Actif":"Inactif","🚿")}
+        ${x.gunPsi!==""?profileValue("Canon",`${x.gunPsi} PSI`,"📊"):""}
+        ${profileValue("Secteur",x.sector,"📍")}
+        ${x.assignment?profileValue("Affectation",x.assignment,"🎯"):""}
+      </div>`;
+    }
+
+    if(number==="602"){
+      const x=usage?.support||{};
+      return `${crew}<div class="vehicle-specific-summary">
+        ${profileValue("Responsable",x.officer,"👨‍🚒")}
+        ${profileValue("Mission",x.mission,"🧰")}
+        ${profileValue("Éclairage",x.lighting==="on"?"Déployé":"Non déployé","💡")}
+        ${profileValue("Ventilation",x.ventilation,"🌬️")}
+        ${profileValue("Bouteilles pleines",x.fullBottles,"🟢")}
+        ${profileValue("Bouteilles vides",x.emptyBottles,"🔴")}
+        ${profileValue("Réhabilitation",x.rehab,"🩺")}
+        ${profileValue("Secteur",x.sector,"📍")}
+        ${x.equipment?profileValue("Matériel",x.equipment,"🧰"):""}
+      </div>`;
+    }
+
+    if(number==="802"){
+      const x=usage?.tanker||{};
+      return `${crew}<div class="vehicle-specific-summary">
+        ${profileValue("Capacité",x.capacity!==""?`${x.capacity} gal`:"","🚛")}
+        ${profileValue("Niveau d’eau",x.level!==""?`${x.level} %`:"","💧")}
+        ${profileValue("Mode",x.mode,"🔄")}
+        ${profileValue("Remplissage",x.fillSource,"🚰")}
+        ${profileValue("Alimente",x.supplying,"➡️")}
+        ${x.flow!==""?profileValue("Débit",`${x.flow} GPM`,"🌊"):""}
+        ${x.turnaround!==""?profileValue("Rotation",`${x.turnaround} min`,"⏱️"):""}
+        ${profileValue("Rotations",x.trips,"🔁")}
+      </div>`;
+    }
+
+    if(number==="902"){
+      const x=usage?.pickup||{};
+      return `${crew}<div class="vehicle-specific-summary">
+        ${profileValue("Conducteur",x.driver,"👨‍🚒")}
+        ${profileValue("Mission",x.mission,"🎯")}
+        ${profileValue("Secteur",x.sector,"📍")}
+        ${profileValue("Remorque",x.trailer,"🛻")}
+        ${x.equipment?profileValue("Matériel",x.equipment,"🧰"):""}
+        ${x.special?profileValue("Spécialisé",x.special,"⚙️"):""}
+        ${x.assignment?profileValue("Affectation",x.assignment,"📌"):""}
+      </div>`;
+    }
+
+    // 202 — Autopompe keeps the hydraulic summary.
+    const count=usageActiveCount(usage);
+    return `<div class="vehicle-profile-stats">
+      <span>👨‍🚒 <strong>${Number(usage?.firefighters || 0)}</strong> pompier${Number(usage?.firefighters || 0) > 1 ? "s" : ""}</span>
+      <span>💧 <strong>${esc(usageSupplyLabel(usage?.supplied || "no"))}</strong></span>
+      <span>🚿 <strong>${count}</strong> sortie${count !== 1 ? "s" : ""} active${count !== 1 ? "s" : ""}</span>
+    </div>
+    <div class="vehicle-profile-residual">
+      <span>📊 <strong>Pression résiduelle</strong></span>
+      <div>
+        <span>Initiale : <strong>${usage?.residualStart !== "" && usage?.residualStart != null ? `${esc(usage.residualStart)} PSI` : "Non inscrite"}</strong></span>
+        <span>Finale : <strong>${usage?.residualEnd !== "" && usage?.residualEnd != null ? `${esc(usage.residualEnd)} PSI` : "Non inscrite"}</strong></span>
+      </div>
+    </div>
+    ${activeOutletSummary(usage)}`;
+  }
+
   function renderList() {
     const activeAccount=window.fireMapAccount?.current?.();
     $("stationNameDisplay").textContent=window.fireMapAccount?.isChief?.()
@@ -262,19 +359,7 @@
         </div>
 
         <div class="vehicle-profile-usage">
-          <div class="vehicle-profile-stats">
-            <span>👨‍🚒 <strong>${Number(usage?.firefighters || 0)}</strong> pompier${Number(usage?.firefighters || 0) > 1 ? "s" : ""}</span>
-            <span>💧 <strong>${esc(usageSupplyLabel(usage?.supplied || "no"))}</strong></span>
-            <span>🚿 <strong>${count}</strong> sortie${count !== 1 ? "s" : ""} active${count !== 1 ? "s" : ""}</span>
-          </div>
-          <div class="vehicle-profile-residual">
-            <span>📊 <strong>Pression résiduelle</strong></span>
-            <div>
-              <span>Initiale : <strong>${usage?.residualStart !== "" && usage?.residualStart != null ? `${esc(usage.residualStart)} PSI` : "Non inscrite"}</strong></span>
-              <span>Finale : <strong>${usage?.residualEnd !== "" && usage?.residualEnd != null ? `${esc(usage.residualEnd)} PSI` : "Non inscrite"}</strong></span>
-            </div>
-          </div>
-          ${activeOutletSummary(usage)}
+          ${specializedUsageSummary(v,usage)}
           ${usage?.notes ? `<p class="vehicle-profile-notes">${esc(usage.notes)}</p>` : ""}
           <small>${usage?.updatedAtText ? `Dernière fiche : ${esc(usage.updatedAtText)}` : "Aucune fiche d’utilisation enregistrée"}</small>
         </div>

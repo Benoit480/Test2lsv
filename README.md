@@ -179,3 +179,17 @@ Les autres unités gardent encore la fiche générique pour l'instant.
 
 ## V25.0.15
 Fiches spécialisées 602 Soutien et 902 Pickup. Leurs changements sont ajoutés automatiquement au journal d’intervention.
+
+
+## V25.0.16 — Résumés véhicule spécifiques
+
+La carte/résumé visible de chaque unité correspond maintenant à son rôle :
+
+- 102 : commandement;
+- 202 : alimentation, sorties et pressions;
+- 502 : échelle aérienne;
+- 602 : soutien, éclairage, ventilation, bouteilles et réhabilitation;
+- 802 : eau et navette;
+- 902 : mission, matériel, remorque et affectation.
+
+Les mentions génériques alimentation/sorties/pression ne sont plus affichées sur les unités non-pompes.
