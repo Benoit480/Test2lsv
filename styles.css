@@ -1615,3 +1615,12 @@ body[data-account-role="unit"] #endCommandEvent,
 }
 
 .command-stats article small{display:block;margin-top:4px;color:#cbd5e1;font-size:12px;font-weight:700}
+
+.command-stats article.rehab{
+  border-color:#8b5cf6;
+  background:#170f2a;
+}
+.command-stats article.decon{
+  border-color:#06b6d4;
+  background:#082129;
+}

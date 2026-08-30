@@ -200,3 +200,13 @@ Les mentions génériques alimentation/sorties/pression ne sont plus affichées 
 - Le tableau de commandement affiche maintenant le **nombre de cylindres d’air disponibles** (bouteilles pleines du véhicule de soutien) à la place du résiduel minimum.
 - Le statut **Réhab** est affiché directement sur la tuile du tableau de bord.
 - Les véhicules **alimentés** sont aussi comptés dans **Sur les lieux**.
+
+
+## V25.0.18 — Rehab et décontamination séparés
+
+- Le tableau de commandement affiche maintenant des **carrés séparés** pour :
+  - les **cylindres d’air disponibles**
+  - l’**état du rehab**
+  - la **station décontamination**
+- La fiche **602** ajoute le champ **Station décontamination** avec état **Active / Non active**.
+- Le résumé du véhicule **602** affiche maintenant aussi l’état de la station décontamination.

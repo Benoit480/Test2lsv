@@ -240,6 +240,8 @@
     const shown=value!==""&&value!=null?esc(value):"—";
     return `<span>${icon} <strong>${esc(label)}</strong><em>${shown}</em></span>`;
   }
+  function rehabLabel(value){return value==="active"?"Active":value==="ready"?"Prête":"Non installée"}
+  function deconLabel(value){return value==="active"?"Active":"Non active"}
 
   function specializedUsageSummary(v,usage){
     const number=String(v?.number||v?.id||"");
@@ -282,7 +284,8 @@
         ${profileValue("Ventilation",x.ventilation,"🌬️")}
         ${profileValue("Bouteilles pleines",x.fullBottles,"🟢")}
         ${profileValue("Bouteilles vides",x.emptyBottles,"🔴")}
-        ${profileValue("Réhabilitation",x.rehab,"🩺")}
+        ${profileValue("Réhabilitation",rehabLabel(x.rehab),"🩺")}
+        ${profileValue("Station décon",deconLabel(x.decon),"🚿")}
         ${profileValue("Secteur",x.sector,"📍")}
         ${x.equipment?profileValue("Matériel",x.equipment,"🧰"):""}
       </div>`;
