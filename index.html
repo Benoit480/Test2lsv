@@ -37,7 +37,7 @@
     <button data-view="search" class="drawer-link">🔎 Recherche d’adresse</button>
     <button id="switchVehicleAccount" class="drawer-link hidden">👤 Changer de compte</button>
     <div id="buildStatusV24" class="build-status-v24">
-      <strong>FireMap V25.0.14</strong>
+      <strong>FireMap V25.0.15</strong>
       <small>Firebase temps réel stable · Google indépendant</small>
     </div>
     <div class="drawer-separator"></div>
@@ -640,6 +640,115 @@
         </div>
       </div>
 
+
+      <div class="form-section hidden" id="vehicleUsageSupportSection">
+        <h3>🧰 Soutien — 602</h3>
+        <p class="pump-panel-help">Logistique, matériel et soutien aux opérations.</p>
+        <div class="form-grid">
+          <label>Responsable soutien
+            <input id="vehicleUsageSupportOfficer" type="text" placeholder="Nom">
+          </label>
+          <label>Mission principale
+            <select id="vehicleUsageSupportMission">
+              <option value="">Non précisée</option>
+              <option value="lighting">Éclairage</option>
+              <option value="ventilation">Ventilation</option>
+              <option value="air">Air / bouteilles</option>
+              <option value="rehab">Réhabilitation</option>
+              <option value="logistics">Logistique</option>
+              <option value="traffic">Circulation / périmètre</option>
+              <option value="other">Autre</option>
+            </select>
+          </label>
+          <label>Éclairage
+            <select id="vehicleUsageSupportLighting">
+              <option value="off">Non déployé</option>
+              <option value="on">Déployé</option>
+            </select>
+          </label>
+          <label>Ventilation
+            <select id="vehicleUsageSupportVentilation">
+              <option value="off">Non déployée</option>
+              <option value="positive">Pression positive</option>
+              <option value="negative">Pression négative</option>
+              <option value="natural">Naturelle</option>
+            </select>
+          </label>
+          <label>Bouteilles pleines
+            <input id="vehicleUsageSupportFullBottles" type="number" min="0" inputmode="numeric" placeholder="0">
+          </label>
+          <label>Bouteilles vides
+            <input id="vehicleUsageSupportEmptyBottles" type="number" min="0" inputmode="numeric" placeholder="0">
+          </label>
+          <label>Réhabilitation
+            <select id="vehicleUsageSupportRehab">
+              <option value="off">Non installée</option>
+              <option value="ready">Prête</option>
+              <option value="active">Active</option>
+            </select>
+          </label>
+          <label>Secteur
+            <select id="vehicleUsageSupportSector">
+              <option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+              <option value="command">Commandement</option><option value="rehab">Réhabilitation</option>
+            </select>
+          </label>
+          <label class="wide">Matériel déployé
+            <textarea id="vehicleUsageSupportEquipment" rows="2" placeholder="Génératrice, ventilateur, éclairage, cylindres, outils…"></textarea>
+          </label>
+          <label class="wide">Autres besoins / notes
+            <textarea id="vehicleUsageSupportNotes" rows="2"></textarea>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section hidden" id="vehicleUsagePickupSection">
+        <h3>🛻 Pickup — 902</h3>
+        <p class="pump-panel-help">Mission, matériel transporté et affectation.</p>
+        <div class="form-grid">
+          <label>Responsable / conducteur
+            <input id="vehicleUsagePickupDriver" type="text" placeholder="Nom">
+          </label>
+          <label>Mission
+            <select id="vehicleUsagePickupMission">
+              <option value="">Non précisée</option>
+              <option value="transport">Transport</option>
+              <option value="traffic">Circulation / périmètre</option>
+              <option value="water">Approvisionnement eau</option>
+              <option value="equipment">Matériel</option>
+              <option value="personnel">Transport personnel</option>
+              <option value="command">Soutien commandement</option>
+              <option value="other">Autre</option>
+            </select>
+          </label>
+          <label>Secteur
+            <select id="vehicleUsagePickupSector">
+              <option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+              <option value="command">Commandement</option>
+            </select>
+          </label>
+          <label>Remorque
+            <select id="vehicleUsagePickupTrailer">
+              <option value="none">Aucune</option>
+              <option value="attached">Attachée</option>
+              <option value="deployed">Déployée sur place</option>
+            </select>
+          </label>
+          <label class="wide">Matériel transporté
+            <textarea id="vehicleUsagePickupEquipment" rows="2" placeholder="Pompe portative, cônes, outils, boyaux, matériel spécialisé…"></textarea>
+          </label>
+          <label class="wide">Équipement spécialisé
+            <textarea id="vehicleUsagePickupSpecial" rows="2"></textarea>
+          </label>
+          <label class="wide">Affectation / emplacement
+            <input id="vehicleUsagePickupAssignment" type="text" placeholder="Ex. route barrée côté nord">
+          </label>
+          <label class="wide">Notes
+            <textarea id="vehicleUsagePickupNotes" rows="2"></textarea>
+          </label>
+        </div>
+      </div>
+
       <div class="form-section" id="vehicleUsagePumpSection">
         <h3>💧 Panneau de pompe</h3>
         <p class="pump-panel-help">Touchez une sortie pour la mettre en service. Elle passe alors au vert.</p>
@@ -739,6 +848,6 @@
   <div id="toast" class="toast hidden"></div>
   <script src="google-maps-config.js?v=25.0.0"></script>
   <script src="google-maps-adapter.js?v=25.0.2"></script>
-  <script src="firemap-boot.js?v=25.0.14"></script>
+  <script src="firemap-boot.js?v=25.0.15"></script>
 </body>
 </html>

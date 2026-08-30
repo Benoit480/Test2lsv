@@ -1580,3 +1580,7 @@ body[data-account-role="unit"] #endCommandEvent,
 #vehicleUsageLadderSection.hidden,#vehicleUsageTankerSection.hidden{display:none!important}
 #vehicleUsageLadderSection{background:#08111a;border:1px solid #46556b}
 #vehicleUsageTankerSection{background:#07121b;border:1px solid #334c63}
+
+#vehicleUsageSupportSection.hidden,#vehicleUsagePickupSection.hidden{display:none!important}
+#vehicleUsageSupportSection{background:#0b1018;border:1px solid #3a4658}
+#vehicleUsagePickupSection{background:#0b1016;border:1px solid #3d4652}

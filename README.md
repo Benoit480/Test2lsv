@@ -176,3 +176,6 @@ Le formulaire officiel `vehicleUsageDialog` est maintenant conditionnel selon le
 
 Les autres unités gardent encore la fiche générique pour l'instant.
 \n\n## V25.0.14\nJournal automatique des changements 102/202/502/802. Fiches spécialisées 502 Échelle et 802 Citerne.\n
+
+## V25.0.15
+Fiches spécialisées 602 Soutien et 902 Pickup. Leurs changements sont ajoutés automatiquement au journal d’intervention.

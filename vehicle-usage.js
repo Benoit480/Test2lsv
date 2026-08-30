@@ -81,6 +81,20 @@
         turnaround:x.tanker?.turnaround===""||x.tanker?.turnaround==null?"":Number(x.tanker.turnaround),
         trips:x.tanker?.trips===""||x.tanker?.trips==null?"":Number(x.tanker.trips),notes:String(x.tanker?.notes||"")
       },
+      support:{
+        officer:String(x.support?.officer||""),mission:String(x.support?.mission||""),
+        lighting:String(x.support?.lighting||"off"),ventilation:String(x.support?.ventilation||"off"),
+        fullBottles:x.support?.fullBottles===""||x.support?.fullBottles==null?"":Number(x.support.fullBottles),
+        emptyBottles:x.support?.emptyBottles===""||x.support?.emptyBottles==null?"":Number(x.support.emptyBottles),
+        rehab:String(x.support?.rehab||"off"),sector:String(x.support?.sector||""),
+        equipment:String(x.support?.equipment||""),notes:String(x.support?.notes||"")
+      },
+      pickup:{
+        driver:String(x.pickup?.driver||""),mission:String(x.pickup?.mission||""),
+        sector:String(x.pickup?.sector||""),trailer:String(x.pickup?.trailer||"none"),
+        equipment:String(x.pickup?.equipment||""),special:String(x.pickup?.special||""),
+        assignment:String(x.pickup?.assignment||""),notes:String(x.pickup?.notes||"")
+      },
       residualStart:x.residualStart===""||x.residualStart==null?"":Number(x.residualStart),
       residualEnd:x.residualEnd===""||x.residualEnd==null?"":Number(x.residualEnd),
       notes:String(x.notes||""),
@@ -125,11 +139,13 @@
   }
 
   function setVehicleFormMode(number){
-    const isChef=String(number)==="102",isPump=String(number)==="202",isLadder=String(number)==="502",isTanker=String(number)==="802";
-    const noPump=isChef||isLadder||isTanker;
+    const isChef=String(number)==="102",isPump=String(number)==="202",isLadder=String(number)==="502",isTanker=String(number)==="802",isSupport=String(number)==="602",isPickup=String(number)==="902";
+    const noPump=isChef||isLadder||isTanker||isSupport||isPickup;
     $("vehicleUsageChefSection")?.classList.toggle("hidden",!isChef);
     $("vehicleUsageLadderSection")?.classList.toggle("hidden",!isLadder);
     $("vehicleUsageTankerSection")?.classList.toggle("hidden",!isTanker);
+    $("vehicleUsageSupportSection")?.classList.toggle("hidden",!isSupport);
+    $("vehicleUsagePickupSection")?.classList.toggle("hidden",!isPickup);
     $("vehicleUsageSuppliedLabel")?.classList.toggle("hidden",noPump);
     $("vehicleUsagePumpSection")?.classList.toggle("hidden",noPump);
     $("vehicleUsageSpecialSection")?.classList.toggle("hidden",noPump);
@@ -138,6 +154,8 @@
     else if(isPump)$("vehicleUsageTitle").textContent="Fiche 202 — Autopompe";
     else if(isLadder)$("vehicleUsageTitle").textContent="Fiche 502 — Échelle";
     else if(isTanker)$("vehicleUsageTitle").textContent="Fiche 802 — Citerne";
+    else if(isSupport)$("vehicleUsageTitle").textContent="Fiche 602 — Soutien";
+    else if(isPickup)$("vehicleUsageTitle").textContent="Fiche 902 — Pickup";
   }
 
   function fillChef(c={}){
@@ -184,8 +202,15 @@
     if(n==="202"){p("Alimentation",before?.supplied,after?.supplied);p("Résiduel initial",before?.residualStart,after?.residualStart);p("Résiduel final",before?.residualEnd,after?.residualEnd);for(let i=1;i<=6;i++){const b=before?.outlets?.[i]||{},c=after?.outlets?.[i]||{};p(`Sortie ${i}`,b.active?"Active":"Inactive",c.active?"Active":"Inactive");if(b.active||c.active){p(`Sortie ${i} PSI`,b.pressure,c.pressure);p(`Sortie ${i} secteur`,b.sector,c.sector)}}}
     if(n==="502"){p("Échelle",before?.ladder?.deployed,after?.ladder?.deployed);p("Hauteur",before?.ladder?.height,after?.ladder?.height);p("Angle",before?.ladder?.angle,after?.ladder?.angle);p("Stabilisateurs",before?.ladder?.stabilizers,after?.ladder?.stabilizers);p("Alimentation",before?.ladder?.supply,after?.ladder?.supply);p("Canon aérien",before?.ladder?.gun,after?.ladder?.gun);p("Canon PSI",before?.ladder?.gunPsi,after?.ladder?.gunPsi);p("Secteur",before?.ladder?.sector,after?.ladder?.sector);p("Affectation",before?.ladder?.assignment,after?.ladder?.assignment)}
     if(n==="802"){p("Niveau eau",before?.tanker?.level,after?.tanker?.level);p("Mode",before?.tanker?.mode,after?.tanker?.mode);p("Remplissage",before?.tanker?.fillSource,after?.tanker?.fillSource);p("Alimente",before?.tanker?.supplying,after?.tanker?.supplying);p("Débit GPM",before?.tanker?.flow,after?.tanker?.flow);p("Rotation min",before?.tanker?.turnaround,after?.tanker?.turnaround);p("Rotations",before?.tanker?.trips,after?.tanker?.trips)}
+    if(n==="602"){p("Responsable soutien",before?.support?.officer,after?.support?.officer);p("Mission",before?.support?.mission,after?.support?.mission);p("Éclairage",before?.support?.lighting,after?.support?.lighting);p("Ventilation",before?.support?.ventilation,after?.support?.ventilation);p("Bouteilles pleines",before?.support?.fullBottles,after?.support?.fullBottles);p("Bouteilles vides",before?.support?.emptyBottles,after?.support?.emptyBottles);p("Réhabilitation",before?.support?.rehab,after?.support?.rehab);p("Secteur",before?.support?.sector,after?.support?.sector);p("Matériel",before?.support?.equipment,after?.support?.equipment)}
+    if(n==="902"){p("Conducteur",before?.pickup?.driver,after?.pickup?.driver);p("Mission",before?.pickup?.mission,after?.pickup?.mission);p("Secteur",before?.pickup?.sector,after?.pickup?.sector);p("Remorque",before?.pickup?.trailer,after?.pickup?.trailer);p("Matériel",before?.pickup?.equipment,after?.pickup?.equipment);p("Équipement spécialisé",before?.pickup?.special,after?.pickup?.special);p("Affectation",before?.pickup?.assignment,after?.pickup?.assignment)}
     return a;
   }
+
+  function fillSupport(x={}){for(const [id,k] of [["vehicleUsageSupportOfficer","officer"],["vehicleUsageSupportMission","mission"],["vehicleUsageSupportLighting","lighting"],["vehicleUsageSupportVentilation","ventilation"],["vehicleUsageSupportFullBottles","fullBottles"],["vehicleUsageSupportEmptyBottles","emptyBottles"],["vehicleUsageSupportRehab","rehab"],["vehicleUsageSupportSector","sector"],["vehicleUsageSupportEquipment","equipment"],["vehicleUsageSupportNotes","notes"]])$(id).value=x[k]??""}
+  function readSupport(){return{officer:$("vehicleUsageSupportOfficer").value.trim(),mission:$("vehicleUsageSupportMission").value,lighting:$("vehicleUsageSupportLighting").value,ventilation:$("vehicleUsageSupportVentilation").value,fullBottles:$("vehicleUsageSupportFullBottles").value,emptyBottles:$("vehicleUsageSupportEmptyBottles").value,rehab:$("vehicleUsageSupportRehab").value,sector:$("vehicleUsageSupportSector").value,equipment:$("vehicleUsageSupportEquipment").value.trim(),notes:$("vehicleUsageSupportNotes").value.trim()}}
+  function fillPickup(x={}){for(const [id,k] of [["vehicleUsagePickupDriver","driver"],["vehicleUsagePickupMission","mission"],["vehicleUsagePickupSector","sector"],["vehicleUsagePickupTrailer","trailer"],["vehicleUsagePickupEquipment","equipment"],["vehicleUsagePickupSpecial","special"],["vehicleUsagePickupAssignment","assignment"],["vehicleUsagePickupNotes","notes"]])$(id).value=x[k]??""}
+  function readPickup(){return{driver:$("vehicleUsagePickupDriver").value.trim(),mission:$("vehicleUsagePickupMission").value,sector:$("vehicleUsagePickupSector").value,trailer:$("vehicleUsagePickupTrailer").value,equipment:$("vehicleUsagePickupEquipment").value.trim(),special:$("vehicleUsagePickupSpecial").value.trim(),assignment:$("vehicleUsagePickupAssignment").value.trim(),notes:$("vehicleUsagePickupNotes").value.trim()}}
   function openForm(item=null){
     const saveStatus=$("vehicleUsageSaveStatus");
     if(saveStatus){
@@ -210,6 +235,8 @@ fillVehicleOptions();
     fillChef(u.chef);
     fillLadder(u.ladder);
     fillTanker(u.tanker);
+    fillSupport(u.support);
+    fillPickup(u.pickup);
     setVehicleFormMode(vehicleNumberFromSelect());
     $("vehicleUsageDialog").showModal()
   }
@@ -247,6 +274,8 @@ fillVehicleOptions();
       chef:readChef(),
       ladder:readLadder(),
       tanker:readTanker(),
+      support:readSupport(),
+      pickup:readPickup(),
       residualStart:$("vehicleUsageResidualStart").value,
       residualEnd:$("vehicleUsageResidualEnd").value,
       notes:$("vehicleUsageNotes").value.trim(),
