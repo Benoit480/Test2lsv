@@ -31,6 +31,8 @@
   const TYPE_ICON = { engine: "🚒", ladder: "🪜", tanker: "🚛", support: "🧰", pickup: "🛻", chief: "👨‍🚒" };
   const state = { station: loadLocal("firemap-station", DEFAULT_STATION), vehicles: loadLocal("firemap-vehicles", DEFAULT_VEHICLES), markers: new Map(), watchId: null, sharingId: null, cloudStarted: false };
   const layer = L.layerGroup().addTo(core.map);
+  const stationLayer = L.layerGroup().addTo(core.map);
+  let stationMarker = null;
 
   function loadLocal(key, fallback) {
     try { const v = JSON.parse(localStorage.getItem(key)); return v || structuredClone(fallback); }
@@ -76,9 +78,18 @@
   function renderMap() {
     layer.clearLayers(); state.markers.clear();
     const s = state.station;
-    L.marker([s.lat, s.lng], { icon: stationIcon(), zIndexOffset: 700 })
-      .bindPopup(`<strong>🚒 ${esc(s.name)}</strong><br>${esc(s.address || "Adresse non inscrite")}<br>${s.phone ? `<a href="tel:${esc(s.phone)}">${esc(s.phone)}</a><br>` : ""}<button type="button" data-station-nav>Navigation</button>`)
-      .addTo(layer);
+    const stationPopup = `<strong>🚒 ${esc(s.name)}</strong><br>${esc(s.address || "Adresse non inscrite")}<br>${s.phone ? `<a href="tel:${esc(s.phone)}">${esc(s.phone)}</a><br>` : ""}<button type="button" data-station-nav>Navigation</button>`;
+    if (!stationMarker) {
+      stationMarker = L.marker([s.lat, s.lng], { icon: stationIcon(), zIndexOffset: 700 })
+        .bindPopup(stationPopup)
+        .addTo(stationLayer);
+    } else {
+      const pos = stationMarker.getLatLng();
+      if (Number(pos.lat) !== Number(s.lat) || Number(pos.lng) !== Number(s.lng)) {
+        stationMarker.setLatLng([s.lat, s.lng]);
+      }
+      stationMarker.setPopupContent(stationPopup);
+    }
     visibleMapVehicles().map(normalizeVehicle).forEach(v => {
       const m = statusMeta(v.status);
       const marker = L.marker([v.lat, v.lng], { icon: vehicleIcon(v), zIndexOffset: 600 })
