@@ -84,7 +84,7 @@
         .bindPopup(stationPopup)
         .addTo(stationLayer);
     } else {
-      const pos = stationMarker.getLatLng();
+      const pos = (stationMarker && typeof stationMarker.getLatLng === "function" ? stationMarker.getLatLng() : STATION);
       if (Number(pos.lat) !== Number(s.lat) || Number(pos.lng) !== Number(s.lng)) {
         stationMarker.setLatLng([s.lat, s.lng]);
       }
