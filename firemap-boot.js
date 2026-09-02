@@ -1,19 +1,19 @@
 (async () => {
   "use strict";
   const scripts=[
-    "firebase-config.js?v=25.0.26",
-    "firebase-sync.js?v=25.0.26",
-    "app.js?v=25.0.26",
-    "preplans.js?v=25.0.26",
-    "prevention.js?v=25.0.26",
-    "assistant.js?v=25.0.26",
-    "assistant-google-places-native.js?v=25.0.26",
-    "navigation.js?v=25.0.26",
-    "vehicle-accounts.js?v=25.0.26",
-    "vehicles.js?v=25.0.26",
-    "vehicle-usage.js?v=25.0.26",
-    "command-center.js?v=25.0.26",
-    "event-manager.js?v=25.0.26"
+    "firebase-config.js?v=25.0.27",
+    "firebase-sync.js?v=25.0.27",
+    "app.js?v=25.0.27",
+    "preplans.js?v=25.0.27",
+    "prevention.js?v=25.0.27",
+    "assistant.js?v=25.0.27",
+    "assistant-google-places-native.js?v=25.0.27",
+    "navigation.js?v=25.0.27",
+    "vehicle-accounts.js?v=25.0.27",
+    "vehicles.js?v=25.0.27",
+    "vehicle-usage.js?v=25.0.27",
+    "command-center.js?v=25.0.27",
+    "event-manager.js?v=25.0.27"
   ];
 
   // V25.0.5: FireMap starts immediately. Google Maps may finish later.
@@ -31,7 +31,7 @@
   // Re-register/update the PWA cache explicitly.
   if("serviceWorker" in navigator){
     try{
-      const registration=await navigator.serviceWorker.register("service-worker.js?v=25.0.26",{updateViaCache:"none"});
+      const registration=await navigator.serviceWorker.register("service-worker.js?v=25.0.27",{updateViaCache:"none"});
       registration.update().catch(()=>{});
     }catch(error){
       console.warn("Service worker FireMap indisponible.",error);

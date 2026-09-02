@@ -105,7 +105,9 @@
     bindPopup(html){this.popupHtml=html;return this}
     bindTooltip(text){this.tooltip=text;return this}
     openPopup(){if(!this.map?.gmap||!this.marker||!this.popupHtml&&!this.tooltip)return this; if(this.info)this.info.close();this.info=new google.maps.InfoWindow({content:this.popupHtml||this.tooltip});this.info.open({map:this.map.gmap,anchor:this.marker});return this}
+    getLatLng(){return wrapLatLng(this.pos)}
     setLatLng(v){this.pos=toLiteral(v);if(this.marker)this.marker.position=this.pos;return this}
+    setPopupContent(html){this.popupHtml=html; if(this.info){this.info.setContent(html)} return this}
   }
 
   class PolylineAdapter {
