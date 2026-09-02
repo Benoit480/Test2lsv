@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v25-0-27-google-marker-compat";
+const CACHE_VERSION = "firemap-v25-0-28-dashboard-effectifs-sorties";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
