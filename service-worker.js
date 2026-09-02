@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v25-0-25-station-fallback-fix";
+const CACHE_VERSION = "firemap-v25-0-26-position-fix";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 

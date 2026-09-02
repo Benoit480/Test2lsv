@@ -49,7 +49,7 @@
   function normalizeVehicle(v) {
     const type = v.type || DEFAULT_VEHICLES.find(x => x.id === String(v.id))?.type || "engine";
     const pos = stationPos(v);
-    return { ...v, id: String(v.id), number: String(v.number || v.id), name: v.name || `${type} ${v.id}`, type, icon: v.icon || TYPE_ICON[type] || "🚒", status: STATUS[v.status] ? v.status : "station", crew: v.crew || "", lat: Number(pos.lat), lng: Number(pos.lng), sharing: Boolean(v.sharing), updatedBy: v.updatedBy || "" };
+    return { ...v, id: String(v.id), number: String(v.number || v.id), name: v.name || `${type} ${v.id}`, type, icon: v.icon || TYPE_ICON[type] || "🚒", status: STATUS[v.status] ? v.status : "station", crew: v.crew || "", lat: Number(pos?.lat), lng: Number(pos?.lng), sharing: Boolean(v.sharing), updatedBy: v.updatedBy || "" };
   }
   function stationIcon() {
     return L.divIcon({ className: "", html: '<div class="station-marker"><div class="station-marker-body">🚒</div><div class="station-marker-label">CASERNE</div></div>', iconSize: [50, 62], iconAnchor: [25, 48], popupAnchor: [0, -46] });
@@ -85,7 +85,7 @@
         .addTo(stationLayer);
     } else {
       const pos = (stationMarker && typeof stationMarker.getLatLng === "function" ? stationMarker.getLatLng() : null);
-      if (Number(pos.lat) !== Number(s.lat) || Number(pos.lng) !== Number(s.lng)) {
+      if (Number(pos?.lat) !== Number(s.lat) || Number(pos?.lng) !== Number(s.lng)) {
         stationMarker.setLatLng([s.lat, s.lng]);
       }
       stationMarker.setPopupContent(stationPopup);
