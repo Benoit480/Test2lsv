@@ -516,7 +516,16 @@ function renderGpsVehicles(vehicles){
 }
 function render(){const e=active();$("commandEmpty").classList.toggle("hidden",!!e);$("commandDashboard").classList.toggle("hidden",!e);if(!e)return;const vehicles=window.fireMapVehicles?.getVehicles?.()||[],map=newestByVehicle(),rows=vehicles.map(v=>({v,u:map.get(String(v.id))})),eng=rows.filter(x=>x.u&&x.u.status!=="station"),out=rows.flatMap(x=>outletRows(x.u));$("commandEventNumber").textContent=`ÉVÉNEMENT ${e.number}`;$("commandEventAddress").textContent=e.address;$("commandEventType").textContent=e.type||"Type non inscrit";$("commandVehicleCount").textContent=e.commandManual?.vehicles ?? eng.length;$("commandOnSceneCount").textContent=e.commandManual?.onscene ?? rows.filter(x=>["green","blue"].includes(state(x.u)[0])).length;$("commandSuppliedCount").textContent=e.commandManual?.supplied ?? rows.filter(x=>state(x.u)[0]==="blue").length;const firefightersIntervention=Math.max(0,Number(e.firefightersIntervention||0));
 $("commandFirefighterInterventionCount").textContent=firefightersIntervention;
-const firefightersOnScene=Math.max(0,Number(e.firefightersOnScene??e.firefightersAvailable??0));
+// Additionne automatiquement les pompiers des unités arrivées ou alimentées.
+// Une correction manuelle sert seulement à ajouter/retirer un effectif d'entraide.
+const automaticFirefightersOnScene=rows
+  .filter(x=>["green","blue"].includes(state(x.u)[0]))
+  .reduce((total,x)=>total+Math.max(0,Number(x.u?.firefighters||0)),0);
+const firefightersOnSceneExtra=Number(e.commandManual?.firefightersOnSceneExtra);
+const legacyFirefightersOnScene=Number(e.firefightersOnScene??e.firefightersAvailable);
+const firefightersOnScene=Number.isFinite(firefightersOnSceneExtra)
+  ? Math.max(0,automaticFirefightersOnScene+firefightersOnSceneExtra)
+  : Math.max(automaticFirefightersOnScene,Number.isFinite(legacyFirefightersOnScene)?legacyFirefightersOnScene:0);
 $("commandFirefighterAvailableCount").textContent=firefightersOnScene;
 // Les sorties des fiches véhicules sont toujours la base du total. Une correction
 // manuelle représente seulement les sorties supplémentaires (ex. unité d'entraide).
@@ -545,16 +554,23 @@ function editFirefighterCount(kind){
   const e=active();
   if(!e)return toast("Aucun événement actif.");
   const isIntervention=kind==="intervention";
-  const key=isIntervention?"firefightersIntervention":"firefightersOnScene";
   const label=isIntervention?"Pompiers en intervention":"Pompiers sur les lieux";
-  const current=Math.max(0,Number(isIntervention?e[key]:(e.firefightersOnScene??e.firefightersAvailable??0)));
+  const current=Math.max(0,Number(isIntervention?e.firefightersIntervention:$("commandFirefighterAvailableCount")?.textContent||0));
   const raw=prompt(`${label}\n\nEntrer le nombre :`,String(current));
   if(raw===null)return;
   const value=Number.parseInt(String(raw).trim(),10);
   if(!Number.isFinite(value)||value<0)return toast("Entrer un nombre valide de 0 ou plus.");
   if(value===current)return;
-  e[key]=value;
-  if(!isIntervention)delete e.firefightersAvailable;
+  if(isIntervention)e.firefightersIntervention=value;
+  else{
+    const automatic=usageList()
+      .filter(u=>["green","blue"].includes(state(u)[0]))
+      .reduce((total,u)=>total+Math.max(0,Number(u?.firefighters||0)),0);
+    e.commandManual=e.commandManual||{};
+    e.commandManual.firefightersOnSceneExtra=value-automatic;
+    delete e.firefightersOnScene;
+    delete e.firefightersAvailable;
+  }
   addJournal(e,`${label} : ${current} → ${value}`,{category:"effectif",level:"info",author:"Commandement"});
   saveLocal();
   render();
