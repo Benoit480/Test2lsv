@@ -516,6 +516,7 @@ function renderGpsVehicles(vehicles){
 }
 function render(){const e=active();$("commandEmpty").classList.toggle("hidden",!!e);$("commandDashboard").classList.toggle("hidden",!e);if(!e)return;const vehicles=window.fireMapVehicles?.getVehicles?.()||[],map=newestByVehicle(),rows=vehicles.map(v=>({v,u:map.get(String(v.id))})),eng=rows.filter(x=>x.u&&x.u.status!=="station"),out=rows.flatMap(x=>outletRows(x.u));$("commandEventNumber").textContent=`ÉVÉNEMENT ${e.number}`;$("commandEventAddress").textContent=e.address;$("commandEventType").textContent=e.type||"Type non inscrit";$("commandVehicleCount").textContent=e.commandManual?.vehicles ?? eng.length;$("commandOnSceneCount").textContent=e.commandManual?.onscene ?? rows.filter(x=>["green","blue"].includes(state(x.u)[0])).length;$("commandSuppliedCount").textContent=e.commandManual?.supplied ?? rows.filter(x=>state(x.u)[0]==="blue").length;const firefightersIntervention=Math.max(0,Number(e.firefightersIntervention||0));
 $("commandFirefighterInterventionCount").textContent=firefightersIntervention;
+$("commandFirefighterStandbyCount").textContent=Math.max(0,Number(e.firefightersStandby||0));
 // Additionne automatiquement les pompiers des unités arrivées ou alimentées.
 // Une correction manuelle sert seulement à ajouter/retirer un effectif d'entraide.
 const automaticFirefightersOnScene=rows
@@ -554,14 +555,20 @@ function editFirefighterCount(kind){
   const e=active();
   if(!e)return toast("Aucun événement actif.");
   const isIntervention=kind==="intervention";
-  const label=isIntervention?"Pompiers en intervention":"Pompiers sur les lieux";
-  const current=Math.max(0,Number(isIntervention?e.firefightersIntervention:$("commandFirefighterAvailableCount")?.textContent||0));
+  const isStandby=kind==="standby";
+  const label=isIntervention?"Pompiers en intervention":isStandby?"Pompiers en attente (repos)":"Pompiers sur les lieux";
+  const current=Math.max(0,Number(
+    isIntervention?e.firefightersIntervention:
+    isStandby?e.firefightersStandby:
+    $("commandFirefighterAvailableCount")?.textContent||0
+  ));
   const raw=prompt(`${label}\n\nEntrer le nombre :`,String(current));
   if(raw===null)return;
   const value=Number.parseInt(String(raw).trim(),10);
   if(!Number.isFinite(value)||value<0)return toast("Entrer un nombre valide de 0 ou plus.");
   if(value===current)return;
   if(isIntervention)e.firefightersIntervention=value;
+  else if(isStandby)e.firefightersStandby=value;
   else{
     const automatic=usageList()
       .filter(u=>["green","blue"].includes(state(u)[0]))

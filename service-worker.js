@@ -1,4 +1,4 @@
-const CACHE_VERSION = "firemap-v25-0-29-pompiers-sur-les-lieux-auto";
+const CACHE_VERSION = "firemap-v25-0-30-pompiers-attente-repos";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 

@@ -1634,6 +1634,10 @@ body[data-account-role="unit"] #endCommandEvent,
   border-color:#22c55e;
   background:#07160d;
 }
+.command-stats article.firefighters-standby{
+  border-color:#eab308;
+  background:#1c1605;
+}
 
 /* V25.0.22 — effectifs commandement ajustables manuellement */
 .command-stats article.command-editable-stat{
