@@ -18,6 +18,9 @@
   async function render(){if(!active)return;matchedBuilding=findBuilding(active);$("assistantEmpty").classList.add("hidden");$("assistantDashboard").classList.remove("hidden");$("assistantActiveAddress").textContent=active.adresse;$("assistantPreplanStatus").textContent=matchedBuilding?`Préplan trouvé : ${matchedBuilding.name}`:"Aucun préplan associé à cette adresse";
     const b=matchedBuilding;
     $("assistantCritical").innerHTML=(active.callType?criticalCard("🚨","NATURE DE L’APPEL",active.callType,true):"")+(active.alarmLevel?criticalCard("🔔","NIVEAU / CAS",active.alarmLevel):"")+(b?[criticalCard("⚠️","RISQUES PARTICULIERS",b.risks,!!b.risks),criticalCard("💧","FDC / PRISE POMPIER",b.fdc),criticalCard("⚡","COUPURE ÉLECTRIQUE",b.electrical),criticalCard("🔥","GAZ / PROPANE",b.gas),criticalCard("☣️","MATIÈRES DANGEREUSES",b.hazmat,!!b.hazmat),criticalCard("🚪","ACCÈS POMPIER",b.access)].join(""):criticalCard("ℹ️","PRÉPLAN","Aucun bâtiment à risque enregistré à proximité"));
+    const hydrantsRelevant=I.isFireRelatedCall?I.isFireRelatedCall(active.callType||""):true;
+    $("assistantHydrants")?.closest(".assistant-panel")?.classList.toggle("hidden",!hydrantsRelevant);
+    if(!hydrantsRelevant){nearest=[];return}
     $("assistantHydrants").innerHTML='<p class="muted">Calcul des distances réelles par la route…</p>';
     nearest=await computeHydrants(active);
     const routeLabel=p=>p.roadDistance?`${fmt(p.distance)} par la route`:`${fmt(p.distance)} à vol d’oiseau`;

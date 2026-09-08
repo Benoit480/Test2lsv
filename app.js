@@ -1,7 +1,7 @@
 (() => {
   "use strict";
   const CENTER=[46.2563,-72.9417], ADDRESS_FILE="louiseville_adresses.json", HYDRANT_FILE="firemap-2026-07-30 2.geojson";
-  const $=id=>document.getElementById(id), state={addresses:[],hydrants:[],markers:new Map(),selected:null,user:null,lastMapClick:null,cloudReady:false,cloudHasData:false,deferredInstall:null,nearest:[],history:[],favorites:[]};
+  const $=id=>document.getElementById(id), state={addresses:[],hydrants:[],markers:new Map(),selected:null,user:null,lastMapClick:null,cloudReady:false,cloudHasData:false,deferredInstall:null,nearest:[],history:[],favorites:[],hydrantsRelevant:true};
   const map=L.map("map",{zoomControl:true}).setView(CENTER,14);
   map.attributionControl.setPrefix(false);
   L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:20,subdomains:"abcd",attribution:"&copy; OpenStreetMap &copy; CARTO"}).addTo(map);
@@ -24,6 +24,33 @@
   const flowBand=g=>{if(typeof g==="string"&&FLOW_BANDS[g])return FLOW_BANDS[g];g=Number(g)||0;if(g>=1500)return FLOW_BANDS.blue;if(g>=1000)return FLOW_BANDS.green;if(g>=500)return FLOW_BANDS.orange;if(g>0)return FLOW_BANDS.red;return FLOW_BANDS.gray};
   const fmtGpm=v=>flowBand(v).range;
   const flowValueForBand=k=>(FLOW_BANDS[k]||FLOW_BANDS.gray).value;
+  function isFireRelatedCall(value=""){
+    const type=norm(value);
+    // Si la nature n'est pas encore connue, conserver les bornes visibles par sécurité.
+    if(!type||type==="intervention"||type==="appel de repartition")return true;
+    return /\b(incendie|feu|fumee|flamme|alarme incendie|structure en feu|batiment en feu|vehicule en feu|auto en feu|camion en feu|garage en feu|remise en feu|cheminee|explosion|odeur de brule|electrique en feu|propane en feu|gaz en feu)\b/.test(type);
+  }
+  function applyHydrantCallVisibility(visible){
+    state.hydrantsRelevant=visible!==false;
+    const toggle=$("hydrantToggle");
+    if(toggle){
+      toggle.disabled=!state.hydrantsRelevant;
+      toggle.checked=state.hydrantsRelevant;
+    }
+    if(state.hydrantsRelevant){
+      if(toggle?.checked&&!map.hasLayer(hydrantLayer))hydrantLayer.addTo(map);
+      if(state.selected)renderNearest();
+    }else{
+      if(map.hasLayer(hydrantLayer))map.removeLayer(hydrantLayer);
+      resourceLayer.clearLayers();
+      state.nearest=[];
+      const list=$("nearestList");
+      if(list)list.innerHTML='<span class="muted">Bornes masquées pour cet appel non lié à un incendie.</span>';
+      if($("nearestText"))$("nearestText").textContent="Bornes non requises pour cette intervention";
+    }
+    $("nearestBtn")?.classList.toggle("hidden",!state.hydrantsRelevant);
+    $("nearestList")?.closest(".nearest-panel")?.classList.toggle("hidden",!state.hydrantsRelevant);
+  }
   function canonical(p){const legacyStatus=normalizeStatus(p.status);let flowGpm=Number(p.flowGpm??p.flowRate??p.debitGpm??0)||0;return {id:String(p.id||uid()),name:String(p.name||p.numero||"Sans numéro"),address:String(p.address||p.adresse||""),lat:Number(p.lat),lng:Number(p.lng),status:legacyStatus,hydrantColor:flowBand(flowGpm).key,outletType:p.outletType||p.outlet||"",flowRate:flowGpm,flowGpm,flowUnit:"gpm",inspection:p.inspection||"",notes:p.notes||"",type:"station"}}
   async function loadBase(){
     try{const [a,g]=await Promise.all([fetch(ADDRESS_FILE,{cache:"no-cache"}).then(r=>r.json()),fetch(HYDRANT_FILE,{cache:"no-cache"}).then(r=>r.json())]);state.addresses=a.map(x=>({...x,rechercheNormalisee:addressNorm([x.adresse,x.codePostal,x.recherche].filter(Boolean).join(" "))}));updateAddressCounts();const base=(g.features||[]).map(f=>canonical({...f.properties,lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0]})).filter(p=>isFinite(p.lat)&&isFinite(p.lng));setHydrants(base,"local");}catch(e){console.error(e);toast("Erreur de chargement des données.")}
@@ -66,7 +93,7 @@
     await Promise.all(items.slice(0,3).map(async(p,i)=>{try{const route=await window.fireMapGoogleRoutes.computeRoute(origin,p,{steps:false});if(!route?.path?.length)return;L.polyline(route.path,{color:colors[i],weight:i===0?5:3,opacity:.88,dashArray:i===0?null:"8 7"}).addTo(resourceLayer)}catch(_){L.polyline([[origin.lat,origin.lng],[p.lat,p.lng]],{color:colors[i],weight:i===0?4:2,opacity:.55,dashArray:"6 7"}).addTo(resourceLayer)}}))
   }
   async function renderNearest(){
-    const token=++nearestRenderToken,box=$("nearestList");resourceLayer.clearLayers();if(!state.selected){state.nearest=[];return[]}
+    const token=++nearestRenderToken,box=$("nearestList");resourceLayer.clearLayers();if(!state.selected||!state.hydrantsRelevant){state.nearest=[];return[]}
     box.innerHTML=`<span class="muted">Calcul des distances réelles par la route…</span>`;$("nearestText").textContent="Calcul des trajets routiers…";
     const items=await rankHydrantsByRoad(state.selected,3);if(token!==nearestRenderToken)return items;state.nearest=items;
     if(!items.length){box.innerHTML=`<span class="muted">Aucune borne active disponible.</span>`;$("nearestText").textContent="Aucune borne active";return[]}
@@ -76,7 +103,7 @@
     await drawRoadRoutes(state.selected,items);return items
   }
   function selectAddress(a,remember=true){state.selected=a;$("addressSearch").value=a.adresse;$("addressSearchFull").value=a.adresse;$("results").innerHTML=$("resultsFull").innerHTML="";$("interventionCard").classList.remove("hidden");$("selectedAddress").textContent=a.adresse;interventionLayer.clearLayers();resourceLayer.clearLayers();L.marker([a.lat,a.lng],{icon:interventionIcon()}).bindPopup(`<strong>🔥 Intervention</strong><br>${esc(a.adresse)}`).addTo(interventionLayer).openPopup();renderNearest();if(remember)saveHistory(a);map.setView([a.lat,a.lng],17);showView("map");window.dispatchEvent(new CustomEvent("firemap:intervention-start",{detail:{...a,lat:Number(a.lat),lng:Number(a.lng)}}))}
-  function clearIntervention(){const previous=state.selected;state.selected=null;state.nearest=[];interventionLayer.clearLayers();resourceLayer.clearLayers();$("interventionCard").classList.add("hidden");$("addressSearch").value=$("addressSearchFull").value="";updateAddressCounts();map.setView(CENTER,14);window.dispatchEvent(new CustomEvent("firemap:intervention-end",{detail:previous||null}))}
+  function clearIntervention(){const previous=state.selected;state.selected=null;state.nearest=[];interventionLayer.clearLayers();resourceLayer.clearLayers();applyHydrantCallVisibility(true);$("interventionCard").classList.add("hidden");$("addressSearch").value=$("addressSearchFull").value="";updateAddressCounts();map.setView(CENTER,14);window.dispatchEvent(new CustomEvent("firemap:intervention-end",{detail:previous||null}))}
   const navUrl=(lat,lng)=>/iPhone|iPad|iPod/i.test(navigator.userAgent)?`https://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`:`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
   function distance(a,b){const R=6371000,p1=a.lat*Math.PI/180,p2=b.lat*Math.PI/180,dp=(b.lat-a.lat)*Math.PI/180,dl=(b.lng-a.lng)*Math.PI/180,x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
   async function nearest(){if(!state.selected)return toast("Choisissez d’abord une adresse.");const items=await renderNearest();if(!items.length)return;map.fitBounds([[state.selected.lat,state.selected.lng],...items.map(p=>[p.lat,p.lng])],{padding:[45,45]});state.markers.get(items[0].id)?.openPopup()}
@@ -111,11 +138,14 @@
   }
   window.addEventListener("load",disableLegacyFireMapCache,{once:true});
 
-  window.fireMapInternal={map,state,showView,openHydrantForm:openForm,navUrl,toast,esc,norm,addressNorm,getAddresses:()=>state.addresses,getHydrants:()=>state.hydrants,selectAddress,clearIntervention,nearestAddress,rankHydrantsByRoad,drawRoadRoutes};
+  window.fireMapInternal={map,state,showView,openHydrantForm:openForm,navUrl,toast,esc,norm,addressNorm,getAddresses:()=>state.addresses,getHydrants:()=>state.hydrants,selectAddress,clearIntervention,nearestAddress,rankHydrantsByRoad,drawRoadRoutes,isFireRelatedCall,applyHydrantCallVisibility};
   document.addEventListener("click",e=>{const v=e.target.closest("[data-view]");if(v)showView(v.dataset.view);const ai=e.target.closest("[data-address-index]");if(ai)selectAddress(state.addresses[Number(ai.dataset.addressIndex)]);const edit=e.target.closest("[data-edit]");if(edit)openForm(state.hydrants.find(p=>p.id===edit.dataset.edit));const show=e.target.closest("[data-show]");if(show){const p=state.hydrants.find(x=>x.id===show.dataset.show);showView("map");map.setView([p.lat,p.lng],18);state.markers.get(p.id)?.openPopup()}const nav=e.target.closest("[data-nav]");if(nav){const p=state.hydrants.find(x=>x.id===nav.dataset.nav);if(p)location.href=navUrl(p.lat,p.lng)}const ns=e.target.closest("[data-nearest-show]");if(ns){const p=state.hydrants.find(x=>x.id===ns.dataset.nearestShow);if(p){map.setView([p.lat,p.lng],18);state.markers.get(p.id)?.openPopup()}}const hi=e.target.closest("[data-history]");if(hi){const x=state.history[Number(hi.dataset.history)];if(x)selectAddress(x,false)}const fi=e.target.closest("[data-favorite]");if(fi){const x=state.favorites[Number(fi.dataset.favorite)];if(x)selectAddress(x,false)}const fr=e.target.closest("[data-favorite-remove]");if(fr){state.favorites.splice(Number(fr.dataset.favoriteRemove),1);localStorage.setItem("firemap-favorites",JSON.stringify(state.favorites));renderFavorites()}});
   [["addressSearch","results","searchStatus"],["addressSearchFull","resultsFull","searchStatusFull"]].forEach(([i,b,s])=>$(i).addEventListener("input",()=>renderResults(i,b,s)));$("clearSearch").onclick=()=>{$("addressSearch").value="";$("results").innerHTML="";updateAddressCounts()};$("clearSearchFull").onclick=()=>{$("addressSearchFull").value="";$("resultsFull").innerHTML="";updateAddressCounts()};
   $("menuBtn").onclick=$("bottomMore").onclick=openDrawer;$("closeDrawer").onclick=$("backdrop").onclick=closeDrawer;$("clearIntervention").onclick=clearIntervention;$("addFavorite").onclick=addFavorite;$("voiceSearch").onclick=()=>startVoice("addressSearch","results","searchStatus");$("voiceSearchFull").onclick=()=>startVoice("addressSearchFull","resultsFull","searchStatusFull");$("clearHistory").onclick=()=>{state.history=[];localStorage.removeItem("firemap-interventions");renderHistory()};[$("drawerAdd"),$("addHydrantTop"),$("bottomAdd")].filter(Boolean).forEach(b=>b.onclick=()=>openForm());$("locateBtn").onclick=locate;$("gpsBtn").onclick=()=>state.selected?window.fireMapNavigation?.start(state.selected):toast("Choisissez une adresse.");$("nearestBtn").onclick=nearest;$("hydrantToggle").onchange=e=>e.target.checked?hydrantLayer.addTo(map):map.removeLayer(hydrantLayer);$("hydrantSearch").oninput=renderHydrantList;$("statusFilter").onchange=renderHydrantList;$("closeModal").onclick=$("cancelModal").onclick=()=>$("hydrantDialog").close();$("hydrantForm").onsubmit=e=>{e.preventDefault();saveForm()};$("deleteHydrant").onclick=removeCurrent;map.on("click",e=>state.lastMapClick={lat:e.latlng.lat,lng:e.latlng.lng});window.editFireHydrant=id=>openForm(state.hydrants.find(p=>p.id===id));
   window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();state.deferredInstall=e;$("installBtn").classList.remove("hidden")});$("installBtn").onclick=async()=>{if(state.deferredInstall){state.deferredInstall.prompt();await state.deferredInstall.userChoice;state.deferredInstall=null}};
+  window.addEventListener("firemap:call-active",event=>{
+    applyHydrantCallVisibility(isFireRelatedCall(event?.detail?.callType||""));
+  });
   loadHistory();loadFavorites();loadBase().then(connectCloud);
 
   // V25.0.6 — ajout du bouton de repositionnement dans les fiches de bornes.
