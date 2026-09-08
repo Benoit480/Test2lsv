@@ -123,7 +123,16 @@
   const navUrl=(lat,lng)=>/iPhone|iPad|iPod/i.test(navigator.userAgent)?`https://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`:`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
   function distance(a,b){const R=6371000,p1=a.lat*Math.PI/180,p2=b.lat*Math.PI/180,dp=(b.lat-a.lat)*Math.PI/180,dl=(b.lng-a.lng)*Math.PI/180,x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
   async function nearest(){if(!state.selected)return toast("Choisissez d’abord une adresse.");const items=await renderNearest();if(!items.length)return;map.fitBounds([[state.selected.lat,state.selected.lng],...items.map(p=>[p.lat,p.lng])],{padding:[45,45]});state.markers.get(items[0].id)?.openPopup()}
-  function showView(name){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===`view-${name}`));document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===name));closeDrawer();if(name==="map")setTimeout(()=>map.invalidateSize(),100)}
+  function showView(name){
+    document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===`view-${name}`));
+    document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===name));
+    closeDrawer();
+    if(name==="map")setTimeout(()=>{
+      map.invalidateSize();
+      // Le centrage doit être appliqué lorsque Google Maps est réellement visible.
+      if(state.selected)focusInterventionOnMap(state.selected,17);
+    },100);
+  }
   function openDrawer(){$("drawer").classList.add("open");$("backdrop").classList.remove("hidden")}
   function closeDrawer(){$("drawer").classList.remove("open");$("backdrop").classList.add("hidden")}
   function nearestAddress(pos,maxMeters=100){if(!pos||!state.addresses.length)return "";const rad=Math.PI/180,lat1=Number(pos.lat)*rad;let best=null,bestD=Infinity;for(const a of state.addresses){const lat2=Number(a.lat)*rad,dLat=lat2-lat1,dLng=(Number(a.lng)-Number(pos.lng))*rad;const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;const d=12742000*Math.asin(Math.min(1,Math.sqrt(h)));if(d<bestD){bestD=d;best=a}}return bestD<=maxMeters?best?.adresse||"":""}
